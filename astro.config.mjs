@@ -1,6 +1,7 @@
 // @ts-check
 import fs from 'node:fs';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { defineConfig } from 'astro/config';
 import react from '@astrojs/react';
 import sitemap from '@astrojs/sitemap';
@@ -81,13 +82,83 @@ function avisoDeIndexacion() {
   };
 }
 
+/**
+ * Sitio en mantención: toda URL lleva a la portada.
+ *
+ * Mientras esté en `true`, al terminar el build cada página HTML salvo la
+ * portada se reemplaza por una redirección a `/`. Incluye `404.html`, que es
+ * lo que el hosting sirve para las URL que no existen, así que también ésas
+ * terminan en la portada. Los documentos de `public/documentos` se quitan del
+ * build: un PDF no puede redirigir, y dejarlo sería dejar el contenido
+ * accesible por enlace directo.
+ *
+ * Se hace aquí y no con reglas del servidor porque el sitio puede alojarse en
+ * cualquier hosting de archivos: así funciona en todos sin configurar nada.
+ * `astro dev` no se ve afectado, para que el sitio se pueda seguir trabajando.
+ *
+ * Para salir de mantención: `false` aquí y devolverle a
+ * `src/pages/_index.astro` su nombre en lugar de la portada provisional.
+ */
+const EN_MANTENCION = true;
+
+/*
+  `location.replace` además del `refresh`: no deja la URL vieja en el
+  historial, así que «Atrás» no devuelve a una página que vuelve a redirigir.
+  El `refresh` cubre a quien navegue sin JavaScript.
+*/
+const REDIRECCION_A_PORTADA = `<!doctype html>
+<html lang="es-CL">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="robots" content="noindex" />
+    <meta http-equiv="refresh" content="0; url=/" />
+    <title>Sitio en Mantención — Ministerio de Bienes Nacionales</title>
+    <script>location.replace('/');</script>
+  </head>
+  <body>
+    <a href="/">Ir al inicio</a>
+  </body>
+</html>
+`;
+
+/**
+ * Aplica `EN_MANTENCION` sobre el build terminado.
+ *
+ * @returns {import('astro').AstroIntegration}
+ */
+function modoMantencion() {
+  return {
+    name: 'modo-mantencion',
+    hooks: {
+      'astro:build:done': ({ dir, logger }) => {
+        if (!EN_MANTENCION) return;
+        const raiz = fileURLToPath(dir);
+
+        fs.rmSync(path.join(raiz, 'documentos'), { recursive: true, force: true });
+
+        const paginas = fs
+          .readdirSync(raiz, { recursive: true, encoding: 'utf8' })
+          .filter((relativa) => relativa.endsWith('.html') && relativa !== 'index.html');
+        for (const relativa of paginas) {
+          fs.writeFileSync(path.join(raiz, relativa), REDIRECCION_A_PORTADA);
+        }
+
+        logger.warn(
+          `Sitio EN MANTENCIÓN: ${paginas.length} páginas redirigen a la portada. ` +
+            'Para salir, EN_MANTENCION = false en astro.config.mjs.',
+        );
+      },
+    },
+  };
+}
+
 export default defineConfig({
-  site: process.env.PUBLIC_SITE_URL ?? 'https://www.comunidadesagricolas.cl',
+  site: process.env.PUBLIC_SITE_URL ?? 'https://www.bienesnacionales.cl',
 
   // SSG puro: sin servidor en producción.
   output: 'static',
 
-  integrations: [react(), sitemap(), avisoDeIndexacion()],
+  integrations: [react(), sitemap(), avisoDeIndexacion(), modoMantencion()],
 
   build: {
     format: 'directory',

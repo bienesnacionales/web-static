@@ -38,7 +38,7 @@ export const PUBLICAR_BORRADORES =
 /**
  * ¿Esta construcción es la del sitio público?
  *
- * Mientras el sitio no esté en `www.comunidadesagricolas.cl` hay que poder
+ * Mientras el sitio no esté en `www.bienesnacionales.cl` hay que poder
  * instalarlo en un servidor de revisión sin que los buscadores lo encuentren.
  * Con esto en `false`, cada página sale con `noindex, nofollow` y `robots.txt`
  * prohíbe el sitio entero.

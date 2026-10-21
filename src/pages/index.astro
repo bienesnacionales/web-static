@@ -14,6 +14,7 @@ import '@fontsource-variable/plus-jakarta-sans';
 import '@/styles/global.css';
 import logoMinisterio from '@/assets/marca/bienes-nacionales.svg?url';
 import { politicaCsp } from '@/lib/seguridad';
+import { SITIO_PUBLICO } from '@/lib/publicacion';
 ---
 
 <!doctype html>
@@ -25,8 +26,12 @@ import { politicaCsp } from '@/lib/seguridad';
 
     <title>Sitio en Mantención — Ministerio de Bienes Nacionales</title>
     <meta name="description" content="Sitio en mantención. Pronta nueva web." />
-    {/* Una página de mantención nunca debe quedar en el índice de un buscador. */}
-    <meta name="robots" content="noindex, nofollow" />
+    {/*
+      Indexable en el sitio público, igual que BaseLayout: esta portada
+      reemplaza a la de www.bienesnacionales.cl, y con `noindex` el Ministerio
+      saldría de los buscadores mientras dure la mantención.
+    */}
+    {!SITIO_PUBLICO && <meta name="robots" content="noindex, nofollow" />}
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   </head>
 
