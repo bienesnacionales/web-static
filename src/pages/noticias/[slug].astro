@@ -1,0 +1,168 @@
+---
+import { render } from 'astro:content';
+import { Image } from 'astro:assets';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { listarNoticias, formatearFecha, type Noticia } from '@/lib/news';
+
+export async function getStaticPaths() {
+  const noticias = await listarNoticias();
+  return noticias.map((noticia, i) => ({
+    params: { slug: noticia.slug },
+    props: {
+      noticia,
+      // El listado va de más reciente a más antigua.
+      masReciente: noticias[i - 1] ?? null,
+      masAntigua: noticias[i + 1] ?? null,
+    },
+  }));
+}
+
+interface Props {
+  noticia: Noticia;
+  masReciente: Noticia | null;
+  masAntigua: Noticia | null;
+}
+
+const { noticia, masReciente, masAntigua } = Astro.props;
+
+// El cuerpo vive en la entrada de la colección; `news.ts` la adjunta.
+const Contenido = noticia.entrada ? (await render(noticia.entrada)).Content : null;
+---
+
+<BaseLayout
+  titulo={noticia.titulo}
+  descripcion={noticia.resumen}
+  sinIndexar={noticia.borrador}
+>
+  <div class="mx-auto max-w-3xl px-4 py-12 sm:px-6">
+    {/* Sólo visible en desarrollo: en producción esta noticia no se construye. */}
+    {
+      noticia.borrador && (
+        <p
+          data-pagefind-ignore
+          class="mb-8 rounded-xl border border-amber-300 bg-amber-50 px-4 py-3 text-sm
+                 font-medium text-amber-900 dark:border-amber-500/40 dark:bg-amber-500/10
+                 dark:text-amber-200"
+        >
+          <strong>Borrador.</strong> Esta noticia no se publica: está fuera del listado, de la
+          portada y del buscador. Quite <code>borrador: true</code> de su cabecera para encenderla.
+        </p>
+      )
+    }
+
+    <nav aria-label="Ruta de navegación" class="mb-10">
+      <ol class="flex flex-wrap items-center gap-x-2 text-sm text-slate-500 dark:text-slate-400">
+        <li>
+          <a href="/" class="hover:text-comunidad-700 hover:underline dark:hover:text-cosecha-400">
+            Inicio
+          </a>
+        </li>
+        <li aria-hidden="true">/</li>
+        <li>
+          <a
+            href="/noticias"
+            class="hover:text-comunidad-700 hover:underline dark:hover:text-cosecha-400"
+          >
+            Noticias
+          </a>
+        </li>
+      </ol>
+    </nav>
+
+    <article>
+      <header>
+        <p class="eyebrow">{noticia.categoria}</p>
+        <h1
+          class="mt-3 font-display text-4xl font-bold tracking-tight text-slate-900
+                 sm:text-5xl dark:text-white"
+        >
+          {noticia.titulo}
+        </h1>
+        <time
+          datetime={noticia.fecha}
+          class="mt-5 block text-sm text-slate-500 dark:text-slate-400"
+        >
+          {formatearFecha(noticia.fecha)}
+        </time>
+      </header>
+
+      {/*
+        El resumen no se muestra aquí: se genera a partir del inicio del
+        cuerpo, así que repetirlo sobre el texto completo resulta redundante.
+        Sigue usándose en las tarjetas del listado y en la meta description.
+      */}
+      {
+        noticia.imagen && (
+          /*
+            `<Image>` y no `<img>`: las dimensiones salen del archivo real, así
+            que el navegador reserva el hueco exacto y no hay salto de
+            maquetado. Antes estaban escritas a mano como 730x410 mientras el
+            reset de Tailwind (`img { height: auto }`) imponía la proporción
+            real: una portada cuadrada se dibujaba a 720x720 tras reservar
+            720x404, o sea 316 px de desplazamiento en cada carga.
+
+            `alt`: si la noticia no declara `imagenAlt`, la imagen se marca como
+            decorativa. Describir sin haber visto la foto sería afirmar cosas
+            no verificadas, y eso es peor para un lector de pantalla que un
+            `alt` vacío. El titular ya transmite de qué trata el artículo.
+          */
+          <Image
+            src={noticia.imagen}
+            alt={noticia.imagenAlt ?? ''}
+            widths={[480, 720, 1440]}
+            sizes="(min-width: 768px) 720px, 100vw"
+            loading="eager"
+            class="mt-10 w-full rounded-2xl border border-slate-200/60
+                   dark:border-slate-800"
+          />
+        )
+      }
+
+      {
+        Contenido && (
+          <div class="prosa mt-10">
+            <Contenido />
+          </div>
+        )
+      }
+    </article>
+
+    {/* Navegación entre artículos: evita que la página sea un callejón sin salida. */}
+    {
+      (masReciente || masAntigua) && (
+        <nav
+          aria-label="Otras noticias"
+          class="mt-16 grid gap-4 border-t border-slate-200/60 pt-8 sm:grid-cols-2
+                 dark:border-slate-800"
+        >
+          {masReciente ? (
+            <a
+              href={`/noticias/${masReciente.slug}`}
+              rel="prev"
+              class="tarjeta p-5 transition-shadow hover:shadow-lg"
+            >
+              <span class="eyebrow">Noticia más reciente</span>
+              <span class="mt-2 block font-semibold text-slate-900 dark:text-white">
+                {masReciente.titulo}
+              </span>
+            </a>
+          ) : (
+            <span />
+          )}
+          {masAntigua && (
+            <a
+              href={`/noticias/${masAntigua.slug}`}
+              rel="next"
+              class="tarjeta p-5 text-right transition-shadow hover:shadow-lg sm:col-start-2"
+            >
+              <span class="eyebrow">Noticia anterior</span>
+              <span class="mt-2 block font-semibold text-slate-900 dark:text-white">
+                {masAntigua.titulo}
+              </span>
+            </a>
+          )}
+        </nav>
+      )
+    }
+  </div>
+</BaseLayout>

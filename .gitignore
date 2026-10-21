@@ -1,0 +1,29 @@
+# Dependencias
+node_modules/
+ 
+# Salida de build (incluye el índice de Pagefind, que se genera en dist/)
+dist/
+ 
+# Artefactos de Astro y Vite (tipos generados, caché de dependencias)
+.astro/
+.vite/
+ 
+# Entorno: las variables (PUBLIC_GA_ID, PUBLIC_SITE_URL, SITIO_PUBLICO) se
+# definen en CI/CD o en un .env local que no se versiona.
+.env
+.env.*
+!.env.example
+ 
+# Logs
+*.log
+npm-debug.log*
+ 
+# Sistema operativo / editor
+.DS_Store
+Thumbs.db
+.vscode/*
+!.vscode/extensions.json
+.idea/
+ 
+# Configuración local de agentes: rutas de la máquina, no compartible.
+.claude/

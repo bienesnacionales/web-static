@@ -1,0 +1,483 @@
+/*
+  `source(none)` desactiva la detección automática y las fuentes se declaran a
+  mano: sólo se rastrea lo que de verdad genera clases.
+*/
+@import "tailwindcss" source(none);
+
+@source "../components";
+@source "../layouts";
+@source "../pages";
+@source "../content";
+@source "../data/navigation.ts";
+/*
+  Sin esta línea el degradado de respaldo no se pinta: `degradado.ts` guarda
+  las clases como cadenas y Tailwind sólo genera lo que encuentra escrito en
+  los archivos que rastrea. Las tarjetas sin imagen saldrían con el `div`
+  puesto y sin fondo ninguno.
+*/
+@source "../lib/degradado.ts";
+
+/* El modo oscuro se controla por clase en <html>, no por `prefers-color-scheme`:
+   el widget A11y debe poder forzar claro / oscuro / alto contraste. */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ---------------------------------------------------------------------------
+   Tokens de diseño
+   Azul institucional (el mismo del portal IDE Chile) + tierra cálida + ámbar
+   de acento (cosecha).
+--------------------------------------------------------------------------- */
+@theme {
+  /* Azul institucional — color primario de la marca */
+  --color-comunidad-50: #eef4fb;
+  --color-comunidad-100: #d8e6f5;
+  --color-comunidad-200: #b3cdea;
+  --color-comunidad-300: #7fabd9;
+  --color-comunidad-400: #4885c4;
+  --color-comunidad-500: #2566a8;
+  --color-comunidad-600: #1a4f8a;
+  --color-comunidad-700: #163f6e;
+  --color-comunidad-800: #143458;
+  --color-comunidad-900: #132c49;
+  --color-comunidad-950: #0d1c2f;
+
+  /* Tierra — apoyos cálidos y superficies secundarias */
+  --color-tierra-50: #faf6ef;
+  --color-tierra-100: #f1e8d8;
+  --color-tierra-200: #e2cfae;
+  --color-tierra-300: #cfb07e;
+  --color-tierra-400: #bd9457;
+  --color-tierra-500: #a97e42;
+  --color-tierra-600: #8c6536;
+  --color-tierra-700: #714f2e;
+  --color-tierra-800: #5e422b;
+  --color-tierra-900: #503927;
+  --color-tierra-950: #2c1e13;
+
+  /* Ámbar de acento — CTAs, microinteracciones y texto de marca en oscuro */
+  --color-cosecha-300: #fcd34d;
+  --color-cosecha-400: #fbbf24;
+  --color-cosecha-500: #f59e0b;
+  --color-cosecha-600: #d97706;
+  --color-cosecha-700: #b45309;
+
+  /* Superficies */
+  --color-lienzo: #f8f9fa;
+  --color-lienzo-oscuro: #0f172a;
+
+  /* Tipografía editorial. Los nombres "… Variable" son los que registran los
+     paquetes @fontsource-variable importados en BaseLayout.astro. */
+  --font-sans: "Inter Variable", "Inter", ui-sans-serif, system-ui, -apple-system,
+    "Segoe UI", sans-serif;
+  /* Titulares. El respaldo es Inter y no la del sistema: si la fuente no
+     llega, los titulares caen en la del cuerpo y la página sigue siendo la
+     misma. */
+  --font-display: "Plus Jakarta Sans Variable", "Inter Variable", ui-sans-serif,
+    system-ui, sans-serif;
+
+  /* Radios amplios */
+  --radius-2xl: 1rem;
+  --radius-3xl: 1.5rem;
+}
+
+/* ---------------------------------------------------------------------------
+   Base
+--------------------------------------------------------------------------- */
+@layer base {
+  :root {
+    /* Escala tipográfica ajustable por el widget A11y (A+ / A- / Reset). */
+    --a11y-escala-fuente: 1;
+    --a11y-espaciado-letra: 0em;
+    --a11y-altura-linea: 1.6;
+    color-scheme: light;
+
+    /*
+      Alto de la cabecera, sin contar su borde inferior.
+
+      Lo consume el contenido que quiera reservar el hueco del menú cuando la
+      cabecera flota. Medido: 5rem, la fila principal (`h-20` en Header.astro)
+      en todos los anchos — el menú móvil vive como botón dentro de esa misma
+      fila y su panel se superpone, así que no suma altura. En `rem` para que
+      siga a la escala tipográfica del widget A11y. **Si cambia el `h-20` de
+      la cabecera, cambia este valor.**
+    */
+    --altura-cabecera: 5rem;
+  }
+
+  html.dark {
+    color-scheme: dark;
+  }
+
+  html {
+    /* 100% del tamaño base del navegador, escalado por el widget.
+       Se usa un porcentaje para respetar el zoom del sistema operativo. */
+    font-size: calc(100% * var(--a11y-escala-fuente));
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-lienzo text-comunidad-950 antialiased;
+    font-family: var(--font-sans);
+    letter-spacing: var(--a11y-espaciado-letra);
+    line-height: var(--a11y-altura-linea);
+  }
+
+  html.dark body {
+    @apply bg-lienzo-oscuro text-slate-100;
+  }
+
+  h1, h2, h3, h4 {
+    font-family: var(--font-display);
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  /* Foco visible y consistente en todo el sitio (WCAG 2.1 AA — 2.4.7). */
+  :focus-visible {
+    @apply outline-2 outline-offset-2 outline-cosecha-600;
+    border-radius: 0.25rem;
+  }
+
+  html.dark :focus-visible {
+    @apply outline-cosecha-400;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Utilidades del sistema
+--------------------------------------------------------------------------- */
+@layer components {
+  /* Tarjeta base: blanco puro, borde ultrafino, esquinas amplias. */
+  .tarjeta {
+    @apply rounded-3xl border border-slate-200/60 bg-white
+           dark:border-slate-800 dark:bg-slate-900/60;
+  }
+
+  /* Etiqueta superior en mayúsculas con tracking amplio. */
+  .eyebrow {
+    @apply text-xs font-semibold uppercase tracking-[0.14em] text-comunidad-600
+           dark:text-cosecha-400;
+  }
+
+  /* Enlace "Saltar al contenido": oculto hasta recibir foco (WCAG 2.4.1). */
+  .skip-link {
+    @apply absolute left-4 top-4 z-[100] -translate-y-24 rounded-xl bg-comunidad-700
+           px-5 py-3 text-sm font-semibold text-white shadow-lg
+           transition-transform focus-visible:translate-y-0;
+  }
+
+  /* Entrada del panel del Mega Menú. Las reglas de reducción de movimiento
+     de más abajo la neutralizan automáticamente. */
+  .panel-mega {
+    animation: mega-entrada 140ms ease-out;
+  }
+
+  /* El aspa nativa de `input[type=search]` queda pegada al botón de cerrar
+     del modal del buscador y las dos juntas resultan ambiguas. Se oculta y se
+     deja una sola acción visible. */
+  .buscador-entrada::-webkit-search-cancel-button,
+  .buscador-entrada::-webkit-search-decoration {
+    -webkit-appearance: none;
+    appearance: none;
+  }
+
+  /* Resaltado de coincidencias en los extractos de Pagefind. El <mark> lo
+     pinta el Buscador a partir de los trozos que devuelve
+     `src/lib/extracto.ts`, sin clase propia, así que se estiliza por
+     elemento. */
+  .buscador-extracto mark {
+    @apply rounded bg-cosecha-300/50 px-0.5 font-semibold text-slate-900
+           dark:bg-cosecha-700/50 dark:text-white;
+  }
+
+  /* Tipografía de las páginas de contenido (`src/content/`).
+     Se escribe a mano en vez de usar @tailwindcss/typography para que el
+     modo de alto contraste y el espaciado ampliado del widget A11y sigan
+     mandando sobre estos estilos. Medida de línea ~68ch: por encima de eso
+     el ojo pierde el renglón al volver. */
+  .prosa {
+    @apply text-[1.0625rem] break-words text-slate-700 dark:text-slate-300;
+  }
+
+  /* La medida de 68 caracteres va en los hijos, no en el contenedor: acota lo
+     que se lee, no las rejillas de componentes (`.sin-prosa`). */
+  .prosa > *:not(.sin-prosa) {
+    @apply max-w-[68ch];
+  }
+
+  .prosa > * + * {
+    @apply mt-6;
+  }
+
+  .prosa h2 {
+    @apply mt-14 mb-0 font-display text-2xl font-bold tracking-tight
+           text-slate-900 dark:text-white;
+  }
+
+  .prosa h3 {
+    @apply mt-10 mb-0 font-display text-lg font-semibold
+           text-slate-900 dark:text-white;
+  }
+
+  .prosa a {
+    @apply font-medium text-comunidad-700 underline decoration-comunidad-700/30
+           underline-offset-2 hover:decoration-comunidad-700
+           dark:text-cosecha-400 dark:decoration-cosecha-400/30;
+  }
+
+  .prosa ul {
+    @apply list-disc space-y-2 pl-6 marker:text-comunidad-400;
+  }
+
+  .prosa ol {
+    @apply list-decimal space-y-2 pl-6 marker:text-comunidad-400;
+  }
+
+  .prosa li > ul,
+  .prosa li > ol {
+    @apply mt-2;
+  }
+
+  /* Componentes incrustados dentro de `.prosa`: devuelven el control al
+     marcado (sin viñetas ni subrayado heredados). */
+  .prosa .sin-prosa ul,
+  .prosa .sin-prosa ol {
+    @apply list-none space-y-0 pl-0;
+  }
+
+  .prosa .sin-prosa a {
+    @apply no-underline;
+  }
+
+  .prosa .sin-prosa a:hover {
+    @apply underline;
+  }
+
+  /* Imágenes intercaladas en el cuerpo (`![alt](./foto.jpg)`). */
+  .prosa img {
+    @apply rounded-2xl border border-slate-200/60 dark:border-slate-800;
+  }
+
+  /* Pie de foto: una imagen sola en su párrafo seguida de texto en cursiva. */
+  .prosa img + em,
+  .prosa p > img + em,
+  .prosa a:has(img) + em {
+    @apply mt-2 block text-sm not-italic text-slate-500 dark:text-slate-400;
+  }
+
+  /* El enlace que envuelve una imagen no es texto: ni subrayado ni color. */
+  .prosa a:has(img) {
+    @apply block no-underline;
+  }
+
+  /* El párrafo que sólo lleva una imagen usa el ancho completo de la columna:
+     una fotografía no tiene caracteres por línea. */
+  .prosa > p:has(img):not(.sin-prosa) {
+    @apply max-w-none;
+  }
+
+  .prosa blockquote {
+    @apply border-l-4 border-comunidad-200 pl-5 italic text-slate-600
+           dark:border-slate-700 dark:text-slate-400;
+  }
+
+  .prosa strong {
+    @apply font-semibold text-slate-900 dark:text-white;
+  }
+
+  /* `block` + `overflow-x-auto`: una tabla no se puede reflujar; desplazarla
+     dentro de su caja es la salida que no miente sobre los datos. */
+  .prosa table {
+    @apply block w-full overflow-x-auto border-collapse text-left text-sm;
+  }
+
+  .prosa th {
+    @apply border-b-2 border-slate-300 pb-2 pr-4 font-semibold
+           text-slate-900 dark:border-slate-700 dark:text-white;
+  }
+
+  .prosa td {
+    @apply border-b border-slate-200 py-2.5 pr-4 dark:border-slate-800;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Cabecera flotante sobre un Hero fotográfico
+--------------------------------------------------------------------------- */
+
+/*
+  Sobre una fotografía la cabecera no lleva fondo propio: el contraste del menú
+  lo garantiza el velo del Hero. Se exceptúan los menús desplegados, que
+  recuperan el fondo. La regla cuelga de `html[data-js]` porque sin JavaScript
+  el atributo no se quitaría nunca y el menú quedaría en blanco sobre el
+  contenido claro.
+*/
+html[data-js]
+  header[data-sobre-hero]:not(:has(details[open])):not(:has([aria-expanded="true"])) {
+  background-color: transparent;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  border-bottom-color: transparent;
+}
+
+@keyframes mega-entrada {
+  from {
+    opacity: 0;
+    transform: translateY(-0.35rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Barra de progreso del autoavance del Hero.
+
+   Se anima `transform` y no `width` porque el ancho recalcula el diseño en
+   cada fotograma; la escala la resuelve el compositor.
+
+   No hace falta guardia de movimiento reducido: el bloque del final de este
+   archivo pone `animation-duration: 0.01ms` a todo, así que la barra aparece
+   llena de golpe en vez de recorrerse, y el componente ya desactiva el
+   autoavance. */
+@keyframes barra-hero {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Ganchos del widget de accesibilidad
+   El widget sólo alterna atributos en <html>; el estilo vive aquí.
+--------------------------------------------------------------------------- */
+
+/* Alto contraste.
+   1. NO se usa `filter`: un filtro sobre <html> crea un bloque contenedor y
+      rompe el posicionamiento `fixed` de sus descendientes.
+   2. Se normaliza TODO a blanco/negro con `!important`: recolorear sólo el
+      texto dejaría fondos de marca intactos y produciría negro sobre verde
+      oscuro, justo lo contrario de lo que este modo debe garantizar.
+
+   AVISO: no uses el modificador `!` de Tailwind en color ni en fondo: para las
+   declaraciones `!important` el orden de capas se invierte y una utilidad
+   `!important` le gana a este bloque sin capa. */
+html[data-contraste="alto"] *:not(svg):not(svg *) {
+  background-color: #fff !important;
+  background-image: none !important;
+  color: #000 !important;
+  border-color: #000 !important;
+  box-shadow: none !important;
+}
+
+html[data-contraste="alto"] a,
+html[data-contraste="alto"] button {
+  @apply underline decoration-2 underline-offset-2;
+}
+
+/* Inversión al enfocar o apuntar: señal de estado inequívoca. */
+html[data-contraste="alto"] a:hover,
+html[data-contraste="alto"] a:focus-visible,
+html[data-contraste="alto"] button:hover,
+html[data-contraste="alto"] button:focus-visible {
+  background-color: #000 !important;
+  color: #fff !important;
+}
+
+html[data-contraste="alto"] .tarjeta,
+html[data-contraste="alto"] header,
+html[data-contraste="alto"] footer,
+html[data-contraste="alto"] [data-superficie] {
+  border: 2px solid #000 !important;
+}
+
+/* El velo de la cabecera del Hero se retira, no se recolorea: en este modo la
+   capa no defiende nada. */
+html[data-contraste="alto"] [data-velo-cabecera] {
+  display: none !important;
+}
+
+html[data-contraste="alto"] :focus-visible {
+  @apply outline-4 outline-black outline-offset-2;
+}
+
+/* La opción marcada necesita una señal que no dependa del color. */
+html[data-contraste="alto"] label:has(input:checked) {
+  outline: 3px solid #000;
+  outline-offset: 2px;
+}
+
+/* Los interruptores perderían su relleno de color: se recupera el contraste
+   con fondo negro y perilla blanca. */
+html[data-contraste="alto"] [data-interruptor] {
+  border: 2px solid #000 !important;
+}
+
+/* Botones que no son `<button>` ni `<a>` (llamadas a la acción dentro de un
+   enlace envolvente). */
+html[data-contraste="alto"] [data-boton] {
+  border: 2px solid #000 !important;
+}
+
+html[data-contraste="alto"] input:checked ~ [data-interruptor] {
+  background-color: #000 !important;
+}
+
+html[data-contraste="alto"] [data-interruptor]::after {
+  background-color: #fff !important;
+  border: 1px solid #000 !important;
+}
+
+/* Fuente adaptada a dislexia */
+html[data-dislexia="true"] body,
+html[data-dislexia="true"] h1,
+html[data-dislexia="true"] h2,
+html[data-dislexia="true"] h3,
+html[data-dislexia="true"] h4 {
+  font-family: "OpenDyslexic", "Atkinson Hyperlegible", var(--font-sans);
+}
+
+/* Espaciado ampliado de texto (WCAG 1.4.12) */
+html[data-espaciado="amplio"] {
+  --a11y-espaciado-letra: 0.12em;
+  --a11y-altura-linea: 2;
+}
+
+html[data-espaciado="amplio"] p {
+  word-spacing: 0.16em;
+  margin-block-end: 2em;
+}
+
+/* Destacado de enlaces */
+html[data-enlaces="destacados"] a:not(.skip-link) {
+  @apply bg-cosecha-300/40 underline decoration-2 underline-offset-2
+         dark:bg-cosecha-700/40;
+}
+
+/* Reducción de animaciones — por preferencia del sistema o por el widget.
+   El `:not([data-movimiento="normal"])` permite que quien desactive la opción
+   de forma explícita en el widget recupere las animaciones aunque su sistema
+   operativo pida reducirlas. */
+@media (prefers-reduced-motion: reduce) {
+  html:not([data-movimiento="normal"]) *,
+  html:not([data-movimiento="normal"]) *::before,
+  html:not([data-movimiento="normal"]) *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+html[data-movimiento="reducido"] *,
+html[data-movimiento="reducido"] *::before,
+html[data-movimiento="reducido"] *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+  scroll-behavior: auto !important;
+}

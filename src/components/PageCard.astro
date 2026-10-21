@@ -1,0 +1,31 @@
+---
+/**
+ * Tarjeta de enlace a una página de contenido. La usan los índices de
+ * sección (`/acerca-de`, `/politica`, …) para no repetir el maquetado.
+ */
+interface Props {
+  titulo: string;
+  descripcion: string;
+  href: string;
+  /** Nivel de encabezado, para no romper la jerarquía del documento. */
+  nivel?: 2 | 3;
+}
+
+const { titulo, descripcion, href, nivel = 3 } = Astro.props;
+const Titulo = `h${nivel}` as 'h2' | 'h3';
+---
+
+<article class="tarjeta group relative p-7">
+  <Titulo class="font-display text-lg font-semibold text-slate-900 dark:text-white">
+    {/* Enlace envolvente: toda la tarjeta es clicable, pero el nombre
+        accesible del enlace sigue siendo sólo el título. */}
+    <a
+      href={href}
+      class="after:absolute after:inset-0 group-hover:text-comunidad-700
+             dark:group-hover:text-cosecha-400"
+    >
+      {titulo}
+    </a>
+  </Titulo>
+  <p class="mt-3 text-sm text-slate-600 dark:text-slate-400">{descripcion}</p>
+</article>

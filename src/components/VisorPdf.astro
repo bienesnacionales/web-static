@@ -1,0 +1,186 @@
+---
+/**
+ * Visor de PDF en ventana modal.
+ *
+ * Un `<dialog>` único por página que intercepta los clics sobre enlaces a PDF
+ * del propio sitio y muestra el documento en un `<iframe>` (el visor nativo
+ * del navegador), con botones de descarga, abrir en pestaña nueva y cerrar.
+ *
+ * Decisiones:
+ *  - `<dialog>` nativo con `showModal()` y no una isla React: da gratis el
+ *    cierre con Escape, el fondo inerte y la devolución del foco al enlace
+ *    que lo abrió. Menos código que puede fallar.
+ *  - **Mejora progresiva**: sin JavaScript el enlace navega al PDF, que es lo
+ *    que hacía antes. El script sólo mejora el camino, no lo sustituye.
+ *  - Sólo PDFs del propio sitio (href que empieza por `/`): un PDF externo en
+ *    iframe lo bloquearía la CSP (`frame-src` hereda `default-src 'self'`) y
+ *    además no podríamos ofrecer descarga forzada entre orígenes.
+ *  - En pantallas chicas no se abre el modal: los navegadores móviles
+ *    renderizan mal los PDF embebidos (iOS muestra sólo la primera página),
+ *    así que ahí es mejor la navegación normal a pantalla completa.
+ */
+---
+
+<dialog
+  id="visor-pdf"
+  aria-labelledby="visor-pdf-titulo"
+  data-superficie
+  class="m-auto h-[min(92dvh,64rem)] w-[min(96vw,64rem)] rounded-3xl border
+         border-slate-200/60 bg-white p-0 shadow-2xl
+         backdrop:bg-slate-950/60 backdrop:backdrop-blur-sm
+         dark:border-slate-800 dark:bg-slate-950"
+>
+  <div class="flex h-full flex-col">
+    <header
+      class="flex items-center gap-2 border-b border-slate-200/60 py-3 pl-5 pr-3
+             dark:border-slate-800"
+    >
+      <h2
+        id="visor-pdf-titulo"
+        class="min-w-0 flex-1 truncate font-display text-base font-semibold
+               text-slate-900 dark:text-white"
+      >
+        Documento PDF
+      </h2>
+
+      <a
+        id="visor-pdf-descargar"
+        href="/"
+        download
+        class="inline-flex items-center gap-2 rounded-xl bg-comunidad-700 px-3.5 py-2
+               text-sm font-semibold text-white transition-colors hover:bg-comunidad-800"
+      >
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          class="size-4"
+          aria-hidden="true"
+        >
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+          <polyline points="7 10 12 15 17 10"></polyline>
+          <line x1="12" x2="12" y1="15" y2="3"></line>
+        </svg>
+        Descargar
+      </a>
+
+      <a
+        id="visor-pdf-abrir"
+        href="/"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="grid size-9 place-items-center rounded-xl text-slate-500 transition-colors
+               hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400
+               dark:hover:bg-slate-800 dark:hover:text-white"
+      >
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          class="size-4"
+          aria-hidden="true"
+        >
+          <path d="M21 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h6"></path>
+          <path d="m21 3-9 9"></path>
+          <path d="M15 3h6v6"></path>
+        </svg>
+        <span class="sr-only">Abrir el PDF en una pestaña nueva</span>
+      </a>
+
+      <button
+        id="visor-pdf-cerrar"
+        type="button"
+        class="grid size-9 place-items-center rounded-xl text-slate-500 transition-colors
+               hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400
+               dark:hover:bg-slate-800 dark:hover:text-white"
+      >
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          class="size-5"
+          aria-hidden="true"
+        >
+          <path d="M18 6 6 18"></path>
+          <path d="m6 6 12 12"></path>
+        </svg>
+        <span class="sr-only">Cerrar el visor</span>
+      </button>
+    </header>
+
+    {/*
+      Sin `src` de fábrica: se asigna al abrir y se retira al cerrar, para que
+      el PDF deje de descargarse en cuanto el visor se cierra.
+    */}
+    <iframe
+      id="visor-pdf-marco"
+      title="Vista previa del documento PDF"
+      class="w-full flex-1 border-0 bg-slate-100 dark:bg-slate-900"
+    ></iframe>
+  </div>
+</dialog>
+
+<script>
+  const dialogo = document.getElementById('visor-pdf') as HTMLDialogElement | null;
+  const marco = document.getElementById('visor-pdf-marco') as HTMLIFrameElement | null;
+  const titulo = document.getElementById('visor-pdf-titulo');
+  const descargar = document.getElementById('visor-pdf-descargar') as HTMLAnchorElement | null;
+  const abrir = document.getElementById('visor-pdf-abrir') as HTMLAnchorElement | null;
+  const cerrar = document.getElementById('visor-pdf-cerrar');
+
+  /** Sólo PDFs del propio sitio: los externos los bloquearía la CSP en iframe. */
+  const esPdfLocal = (href: string) => href.startsWith('/') && /\.pdf([?#]|$)/i.test(href);
+
+  if (dialogo && marco && titulo && descargar && abrir && cerrar) {
+    document.addEventListener('click', (e) => {
+      // Se respetan los gestos que piden otro destino (pestaña nueva, descarga
+      // con Alt, etc.) y los clics que otro script ya atendió.
+      if (e.defaultPrevented || e.button !== 0) return;
+      if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+
+      const enlace = (e.target as Element).closest?.('a[href]');
+      if (!(enlace instanceof HTMLAnchorElement) || enlace.closest('#visor-pdf')) return;
+
+      const href = enlace.getAttribute('href') ?? '';
+      if (!esPdfLocal(href)) return;
+
+      // En pantallas chicas el PDF embebido se ve mal: navegación normal.
+      if (window.matchMedia('(max-width: 640px)').matches) return;
+
+      e.preventDefault();
+      titulo.textContent = enlace.textContent?.trim() || 'Documento PDF';
+      descargar.href = href;
+      abrir.href = href;
+      // `view=FitH` pide al visor ajustar el ancho de página al marco.
+      marco.src = `${href}#view=FitH`;
+      dialogo.showModal();
+    });
+
+    cerrar.addEventListener('click', () => dialogo.close());
+
+    // Clic sobre el fondo (el propio <dialog>, fuera de su contenido) cierra.
+    dialogo.addEventListener('click', (e) => {
+      if (e.target === dialogo) dialogo.close();
+    });
+
+    /*
+      Al cerrar —botón, Escape o fondo— se retira el PDF del iframe para que
+      deje de descargarse. Se observa el atributo `open` en vez de escuchar el
+      evento `close`: el atributo cambia en todos los caminos de cierre sin
+      excepción, incluidos los que no disparan el evento (por ejemplo, si otro
+      script retira el atributo directamente).
+    */
+    new MutationObserver(() => {
+      if (!dialogo.open) marco.removeAttribute('src');
+    }).observe(dialogo, { attributes: true, attributeFilter: ['open'] });
+  }
+</script>

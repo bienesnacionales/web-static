@@ -1,0 +1,243 @@
+---
+/**
+ * Renderizador de las páginas de contenido institucional.
+ *
+ * Publica cualquier entrada de la colección `paginas` en la ruta que indica
+ * su `id`: `documentacion/adjudicaciones.md` sale en
+ * `/documentacion/adjudicaciones` sin declarar nada más.
+ */
+import { getCollection, render, type CollectionEntry } from 'astro:content';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import IndiceDePagina, { MINIMO_SECCIONES } from '@/components/IndiceDePagina.astro';
+import { paginasPublicadas } from '@/lib/publicacion';
+
+type Pagina = CollectionEntry<'paginas'>;
+
+export async function getStaticPaths() {
+  /*
+    El filtro va aquí y no en cada consumidor: `todas` viaja por props, así que
+    las migas, las hermanas y las hijas se calculan sobre el mismo conjunto y no
+    pueden apuntar a una página apagada.
+  */
+  const paginas = paginasPublicadas(await getCollection('paginas'));
+  return paginas.map((pagina) => ({
+    params: { ruta: pagina.id },
+    props: { pagina, todas: paginas },
+  }));
+}
+
+interface Props {
+  pagina: Pagina;
+  todas: Pagina[];
+}
+
+const { pagina, todas } = Astro.props;
+const { Content, headings } = await render(pagina);
+
+/*
+  Índice de la página, sólo cuando hay bastante que indexar. `headings` trae los
+  encabezados del Markdown con su `id` ya puesto: quien escribe pone sus `##` y
+  el índice aparece o no según cuántos haya.
+*/
+const secciones = headings.filter((h) => h.depth === 2);
+const conIndice = secciones.length >= MINIMO_SECCIONES;
+
+const porId = new Map(todas.map((p) => [p.id, p]));
+const segmentos = pagina.id.split('/');
+
+/**
+ * Migas de pan: se reconstruyen subiendo por la ruta.
+ */
+const migas = segmentos.slice(0, -1).map((_, i) => {
+  const id = segmentos.slice(0, i + 1).join('/');
+  return { id, titulo: porId.get(id)?.data.titulo ?? segmentos[i], existe: porId.has(id) };
+});
+
+/** Hermanas: mismas antecesoras, no toda la sección. */
+const prefijo = segmentos.slice(0, -1).join('/');
+const hermanas = todas
+  .filter((p) => {
+    const s = p.id.split('/');
+    return s.length === segmentos.length && s.slice(0, -1).join('/') === prefijo && p.id !== pagina.id;
+  })
+  .sort((a, b) => a.data.orden - b.data.orden);
+
+/** Hijas directas, para que las páginas de índice ofrezcan salida. */
+const hijas = todas
+  .filter((p) => {
+    const s = p.id.split('/');
+    return s.length === segmentos.length + 1 && s.slice(0, -1).join('/') === pagina.id;
+  })
+  .sort((a, b) => a.data.orden - b.data.orden);
+---
+
+<BaseLayout
+  titulo={pagina.data.titulo}
+  descripcion={pagina.data.descripcion}
+  sinIndexar={pagina.data.borrador}
+>
+  <div class="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+    {/*
+      Los enlaces de las migas llevan `inline-flex min-h-6 items-center` para
+      alcanzar los 24px de alto que exige WCAG 2.5.8 como objetivo táctil.
+    */}
+    <nav aria-label="Ruta de navegación" class="mb-10">
+      <ol class="flex flex-wrap items-center gap-x-2 text-sm text-slate-500 dark:text-slate-400">
+        <li>
+          <a
+            href="/"
+            class="inline-flex min-h-6 items-center hover:text-comunidad-700 hover:underline
+                   dark:hover:text-cosecha-400"
+          >
+            Inicio
+          </a>
+        </li>
+        {migas.map((m) => (
+          <>
+            <li aria-hidden="true">/</li>
+            <li>
+              {m.existe ? (
+                <a
+                  href={`/${m.id}`}
+                  class="inline-flex min-h-6 items-center hover:text-comunidad-700 hover:underline
+                         dark:hover:text-cosecha-400"
+                >
+                  {m.titulo}
+                </a>
+              ) : (
+                <span class="inline-flex min-h-6 items-center">{m.titulo}</span>
+              )}
+            </li>
+          </>
+        ))}
+        <li aria-hidden="true">/</li>
+        <li
+          aria-current="page"
+          class="inline-flex min-h-6 items-center font-medium text-slate-700 dark:text-slate-300"
+        >
+          {pagina.data.titulo}
+        </li>
+      </ol>
+    </nav>
+
+    {/*
+      Sólo se ve en desarrollo o en una construcción con `PUBLICAR_BORRADORES`:
+      en producción esta página no existe.
+    */}
+    {
+      pagina.data.borrador && (
+        <p
+          class="mb-8 rounded-xl border border-amber-300 bg-amber-50 px-4 py-3 text-sm
+                 font-medium text-amber-900 dark:border-amber-500/40 dark:bg-amber-500/10
+                 dark:text-amber-200"
+        >
+          <strong>Borrador.</strong> Esta página no se publica: está fuera del menú, del pie y del
+          mapa del sitio. Quite <code>borrador: true</code> de su cabecera para encenderla.
+        </p>
+      )
+    }
+
+    <div class="grid gap-14 lg:grid-cols-[minmax(0,1fr)_16rem]">
+      {/*
+        `min-w-0` no es decorativo: un elemento de rejilla arranca con
+        `min-width: auto` y un bloque ancho (una tabla, una imagen) ensancharía
+        el artículo y sacaría desplazamiento horizontal a toda la página en un
+        móvil. Con esto el bloque ancho se desplaza dentro de su propia caja.
+      */}
+      <article class="min-w-0">
+        <header>
+          {pagina.data.eyebrow && <p class="eyebrow">{pagina.data.eyebrow}</p>}
+          <h1
+            class="mt-3 max-w-3xl font-display text-4xl font-bold tracking-tight
+                   text-slate-900 sm:text-5xl dark:text-white"
+          >
+            {pagina.data.titulo}
+          </h1>
+          <p class="mt-6 max-w-2xl text-lg text-slate-600 dark:text-slate-400">
+            {pagina.data.descripcion}
+          </p>
+        </header>
+
+        {/* El mismo índice, arriba y plegado, para el ancho en que la columna
+            lateral se apila al final del artículo. */}
+        {conIndice && <IndiceDePagina encabezados={headings} variante="movil" />}
+
+        <div class="prosa mt-12">
+          <Content />
+        </div>
+
+        {
+          !pagina.data.ocultarHijas && hijas.length > 0 && (
+            <nav aria-labelledby="subpaginas" class="mt-16 border-t border-slate-200/60 pt-10 dark:border-slate-800">
+              <h2 id="subpaginas" class="eyebrow">
+                En esta sección
+              </h2>
+              <ul class="mt-6 grid gap-4 sm:grid-cols-2">
+                {hijas.map((h) => (
+                  <li>
+                    <a
+                      href={`/${h.id}`}
+                      class="tarjeta block p-5 transition-shadow hover:shadow-lg"
+                    >
+                      <span class="block font-semibold text-slate-900 dark:text-white">
+                        {h.data.titulo}
+                      </span>
+                      <span class="mt-1.5 block text-sm text-slate-600 dark:text-slate-400">
+                        {h.data.descripcion}
+                      </span>
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+          )
+        }
+      </article>
+
+      {/*
+        La columna sale por dos motivos independientes —las páginas hermanas y
+        el índice—. `lg:self-start` acompaña al `lg:sticky` del índice y no es
+        opcional: un elemento de rejilla se estira a todo el alto de su fila, y
+        un bloque tan alto como su contenedor no tiene por dónde deslizarse.
+      */}
+      {
+        (hermanas.length > 0 || conIndice) && (
+          <aside
+            class="lg:sticky lg:top-24 lg:max-h-[calc(100vh-8rem)] lg:self-start
+                   lg:overflow-y-auto lg:pt-2"
+          >
+            {hermanas.length > 0 && (
+              <nav aria-labelledby="mas-nivel">
+                <p id="mas-nivel" class="eyebrow">
+                  Al mismo nivel
+                </p>
+                <ul class="mt-4 space-y-1">
+                  {hermanas.map((h) => (
+                    <li>
+                      <a
+                        href={`/${h.id}`}
+                        class="block rounded-xl px-3 py-2 text-sm text-slate-600 transition-colors
+                               hover:bg-comunidad-50 hover:text-comunidad-800 dark:text-slate-400
+                               dark:hover:bg-slate-800 dark:hover:text-white"
+                      >
+                        {h.data.titulo}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </nav>
+            )}
+
+            {
+              conIndice && (
+                <div class:list={[hermanas.length > 0 && 'mt-10']}>
+                  <IndiceDePagina encabezados={headings} variante="escritorio" />
+                </div>
+              )
+            }
+          </aside>
+        )
+      }
+    </div>
+  </div>
+</BaseLayout>

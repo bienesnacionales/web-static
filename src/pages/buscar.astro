@@ -1,0 +1,38 @@
+---
+/**
+ * Página de búsqueda. Cumple dos funciones: destino del enlace del Header si
+ * la isla no llega a hidratarse, y URL compartible para buscar sin el modal.
+ */
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Buscador from '@/components/Buscador.tsx';
+---
+
+<BaseLayout
+  titulo="Buscar"
+  descripcion="Busque en las páginas, documentación y noticias del sitio del Ministerio de Bienes Nacionales."
+  sinIndexar
+>
+  <div class="mx-auto max-w-3xl px-4 py-16 sm:px-6">
+    <header class="mb-10">
+      <p class="eyebrow">Búsqueda</p>
+      <h1
+        class="mt-3 font-display text-4xl font-bold tracking-tight text-slate-900
+               sm:text-5xl dark:text-white"
+      >
+        Buscar en el sitio
+      </h1>
+      <p class="mt-5 text-lg text-slate-600 dark:text-slate-400">
+        La búsqueda cubre todas las páginas del portal. Desde cualquier página puede
+        abrirla también con <kbd
+          class="rounded border border-slate-300 px-1.5 py-0.5 text-sm dark:border-slate-700"
+          >Ctrl</kbd
+        > + <kbd
+          class="rounded border border-slate-300 px-1.5 py-0.5 text-sm dark:border-slate-700"
+          >K</kbd
+        >.
+      </p>
+    </header>
+
+    <Buscador modo="pagina" client:load />
+  </div>
+</BaseLayout>
