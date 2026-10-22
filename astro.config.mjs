@@ -4,6 +4,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { defineConfig } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
+import { MODO_MANTENCION, SITIO_PUBLICO } from './src/config/sitio.mjs';
 
 /**
  * Sirve el índice de Pagefind durante `astro dev`.
@@ -55,10 +56,8 @@ function indicePagefindEnDesarrollo() {
 /**
  * Anuncia al terminar el build si el sitio es indexable.
  *
- * El estado por defecto —bloqueado a los buscadores— es el correcto mientras el
- * sitio no esté en su dominio definitivo, pero es también el que produce el
- * fallo caro si se olvida el día del lanzamiento. Un aviso al final del log es
- * lo que hace que se note.
+ * Un sitio cerrado a los buscadores en su dominio definitivo es un fallo caro y
+ * silencioso: un aviso al final del log es lo que hace que se note.
  *
  * @returns {import('astro').AstroIntegration}
  */
@@ -67,12 +66,12 @@ function avisoDeIndexacion() {
     name: 'aviso-de-indexacion',
     hooks: {
       'astro:build:done': ({ logger }) => {
-        if (process.env.SITIO_PUBLICO === 'true') {
+        if (SITIO_PUBLICO) {
           logger.info('Sitio PÚBLICO: indexable por buscadores.');
         } else {
           logger.warn(
             'Sitio NO PÚBLICO: noindex en todas las páginas y robots.txt cerrado. ' +
-              'Para el lanzamiento, construya con SITIO_PUBLICO=true.',
+              'Se controla con SITIO_PUBLICO en src/config/sitio.mjs.',
           );
         }
       },
@@ -83,8 +82,8 @@ function avisoDeIndexacion() {
 /**
  * Sitio en mantención: toda URL lleva a la portada.
  *
- * Se activa construyendo con `MODO_MANTENCION=true`. Entonces la portada es la
- * de mantención (`src/pages/index.astro` lee la misma variable) y, al
+ * Se activa con `MODO_MANTENCION` en `src/config/sitio.mjs`. Entonces la
+ * portada es la de mantención (`src/pages/index.astro` lee el mismo valor) y, al
  * terminar el build, cada página HTML salvo la portada se reemplaza por una
  * redirección a `/`. Incluye `404.html`, que es
  * lo que el hosting sirve para las URL que no existen, así que también ésas
@@ -94,13 +93,9 @@ function avisoDeIndexacion() {
  *
  * Se hace aquí y no con reglas del servidor porque el sitio puede alojarse en
  * cualquier hosting de archivos: así funciona en todos sin configurar nada.
- * Las redirecciones no corren en `astro dev`: con la variable puesta sólo
- * cambia la portada, y el resto del sitio se puede seguir trabajando.
- *
- * Se lee aquí y no se importa de `src/lib/publicacion.ts`, igual que
- * `SITIO_PUBLICO`: la configuración se carga antes que el código del sitio.
+ * Las redirecciones no corren en `astro dev`: en mantención sólo cambia la
+ * portada, y el resto del sitio se puede seguir trabajando.
  */
-const MODO_MANTENCION = process.env.MODO_MANTENCION === 'true';
 
 /*
   `location.replace` además del `refresh`: no deja la URL vieja en el
@@ -148,7 +143,7 @@ function modoMantencion() {
 
         logger.warn(
           `Sitio EN MANTENCIÓN: ${paginas.length} páginas redirigen a la portada. ` +
-            'Para salir, construya sin MODO_MANTENCION=true.',
+            'Para publicar el sitio, MODO_MANTENCION = false en src/config/sitio.mjs.',
         );
       },
     },

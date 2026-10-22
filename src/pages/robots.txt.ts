@@ -19,7 +19,7 @@ export const GET: APIRoute = ({ site }) => {
     ? ['User-agent: *', 'Allow: /', '', `Sitemap: ${new URL('sitemap-index.xml', site)}`]
     : [
         '# Sitio en preparación: no debe indexarse.',
-        '# Se abre poniendo SITIO_PUBLICO=true al construir.',
+        '# Se abre con SITIO_PUBLICO en src/config/sitio.mjs.',
         'User-agent: *',
         'Disallow: /',
       ];

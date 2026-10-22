@@ -1,7 +1,7 @@
 ---
 /*
-  La portada depende del modo del build: con `MODO_MANTENCION=true` es la de
-  «Sitio en Mantención»; sin él, la portada del sitio.
+  La portada depende de `MODO_MANTENCION` (src/config/sitio.mjs): activo, es la
+  de «Sitio en Mantención»; apagado, la portada del sitio.
 */
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import Mantencion from '@/components/Mantencion.astro';

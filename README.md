@@ -146,26 +146,22 @@ simplemente no aparece hasta que exista.
 
 ## Publicación
 
-Dos interruptores, en `src/lib/publicacion.ts`:
+Dos interruptores, escritos en `src/config/sitio.mjs`. El valor que se publica
+es el del archivo: para cambiar el estado del sitio se edita y se despliega.
 
-- **`borrador: true`** en el *frontmatter* apaga una página: fuera del menú,
-  del pie, del buscador, del sitemap, y su URL devuelve 404. El apagado
-  arrastra a las páginas hijas. En `astro dev` sí se ve, con un distintivo.
-  Para construir una vista previa con borradores:
-  `PUBLICAR_BORRADORES=true npm run build`.
-- **`SITIO_PUBLICO`**: mientras no sea `true`, cada página sale con
-  `noindex, nofollow` y `robots.txt` bloquea el rastreo entero. Es el estado
-  correcto para servidores de revisión. **El día del lanzamiento** hay que
-  construir con `SITIO_PUBLICO=true` (el build lo recuerda con un aviso al
-  final del log).
+- **`MODO_MANTENCION`** (hoy `true`): la portada es «Sitio en Mantención» y el
+  resto de las URL redirige a ella. **`false` publica el sitio completo.**
+- **`SITIO_PUBLICO`** (hoy `true`): sitio indexable. Con `false`, cada página
+  sale con `noindex, nofollow` y `robots.txt` bloquea el rastreo entero: sirve
+  para un servidor de revisión, nunca para www.bienesnacionales.cl.
 
-Variables de entorno (todas opcionales):
+Una variable de entorno con el mismo nombre sobrescribe el valor, para probar
+el otro estado en local: `MODO_MANTENCION=false npm run dev`.
+
+Otras variables de entorno (opcionales):
 
 | Variable | Efecto |
 | --- | --- |
-| `SITIO_PUBLICO=true` | Sitio indexable por buscadores |
-| `PUBLICAR_BORRADORES=true` | El build incluye las páginas en borrador |
-| `MODO_MANTENCION=true` | Portada «Sitio en Mantención»; el resto de las URL redirige a ella |
 | `PUBLIC_SITE_URL` | URL canónica (por defecto `https://www.bienesnacionales.cl`) |
 | `PUBLIC_GA_ID` | Activa Google Analytics 4 y ajusta la CSP en consecuencia |
 

@@ -1,7 +1,7 @@
 ---
 /*
   Portada de mantención. `src/pages/index.astro` la sirve en lugar de la
-  portada real cuando se construye con `MODO_MANTENCION=true`.
+  portada real mientras `MODO_MANTENCION` esté activo (src/config/sitio.mjs).
 
   No usa BaseLayout a propósito: sin cabecera, pie ni menú, que llevarían a
   secciones que se presentan como en mantención.
