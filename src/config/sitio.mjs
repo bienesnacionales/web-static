@@ -23,7 +23,7 @@ function interruptor(nombre, porDefecto) {
  * Sitio en mantención: la portada es «Sitio en Mantención» y el resto de las
  * URL redirige a ella. **`false` publica el sitio completo.**
  */
-export const MODO_MANTENCION = interruptor('MODO_MANTENCION', true);
+export const MODO_MANTENCION = interruptor('MODO_MANTENCION', false);
 
 /**
  * Sitio indexable por los buscadores. Con `false`, cada página sale con
