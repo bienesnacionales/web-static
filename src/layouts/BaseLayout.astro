@@ -9,7 +9,7 @@
  */
 import cabecera from '@/contenido/marco/cabecera.html?raw';
 import pie from '@/contenido/marco/pie.html?raw';
-import extrasPortada from '@/contenido/marco/portada.html?raw';
+// import extrasPortada from '@/contenido/marco/portada.html?raw';
 import estilos from '@/contenido/marco/head.html?raw';
 import config from '@/contenido/marco/scripts.json';
 import { SITIO_PUBLICO } from '@/lib/publicacion';
@@ -106,7 +106,8 @@ const componentesTras = [
 
     {/* Estilos del tema y el script que aplica contraste y tamaño de texto antes del primer pintado. */}
     <Fragment set:html={estilos} />
-    {portada && <link rel="stylesheet" href="/uploads/pum/pum-site-styles.css" />}
+    {/* Aviso emergente de la portada, oculto por ahora. */}
+    {/* {portada && <link rel="stylesheet" href="/uploads/pum/pum-site-styles.css" />} */}
     <script is:inline src="/tema/js/large-screen.js"></script>
   </head>
 
@@ -114,13 +115,17 @@ const componentesTras = [
     <Fragment set:html={cabecera} />
     <slot />
     <Fragment set:html={pie} />
-    {portada && <Fragment set:html={extrasPortada} />}
+    {/* Aviso emergente y encuesta de satisfacción de la portada, ocultos por ahora. */}
+    {/* {portada && <Fragment set:html={extrasPortada} />} */}
 
-    {/* Asistente virtual. Sin backend, cae en su aviso de «no disponible». */}
-    <script is:inline src="/chatbot/history.js"></script>
+    {/*
+      Asistente virtual («¿En qué te podemos ayudar?»), oculto por ahora junto con
+      su marcado en `pie.html`. Sin backend, cae en su aviso de «no disponible».
+    */}
+    {/* <script is:inline src="/chatbot/history.js"></script>
     <script is:inline src="/chatbot/conversation.js"></script>
     <script is:inline set:html={`window.MBNChatbot=${JSON.stringify(config.chatbot)};`} />
-    <script is:inline src="/chatbot/chatbot.js"></script>
+    <script is:inline src="/chatbot/chatbot.js"></script> */}
     {conFaq && <script is:inline src="/chatbot/faq-links.js"></script>}
 
     {componentes.map((src) => <script is:inline src={src}></script>)}
@@ -128,8 +133,8 @@ const componentesTras = [
     <script is:inline src="/tema/js/components/pdf-viewer.js"></script>
     {componentesTras.map((src) => <script is:inline src={src}></script>)}
 
-    {portada && <script is:inline src="/tema/js/survey.js"></script>}
-    {portada && <script is:inline src="/js/aviso-portada.js"></script>}
+    {/* {portada && <script is:inline src="/tema/js/survey.js"></script>}
+    {portada && <script is:inline src="/js/aviso-portada.js"></script>} */}
     {instagram && <script is:inline async src="https://www.instagram.com/embed.js"></script>}
   </body>
 </html>
