@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none" overflow="visible" style="display: block;" width="36" height="36" viewBox="0 0 36 36" fill="none">
+  <g id="payments">
+    <path id="Vector" d="M28.5 21V9C28.5 7.35 27.15 6 25.5 6H4.5C2.85 6 1.5 7.35 1.5 9V21C1.5 22.65 2.85 24 4.5 24H25.5C27.15 24 28.5 22.65 28.5 21ZM25.5 21H4.5V9H25.5V21ZM15 10.5C12.51 10.5 10.5 12.51 10.5 15C10.5 17.49 12.51 19.5 15 19.5C17.49 19.5 19.5 17.49 19.5 15C19.5 12.51 17.49 10.5 15 10.5ZM34.5 10.5V27C34.5 28.65 33.15 30 31.5 30H6V27H31.5V10.5H34.5Z" fill="#0F5AC4"></path>
+  </g>
+</svg>

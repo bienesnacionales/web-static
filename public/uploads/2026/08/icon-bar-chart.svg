@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none" overflow="visible" style="display: block;" width="72" height="72" viewBox="0 0 72 72" fill="none">
+  <g id="bar_chart">
+    <g id="Vector">
+      <path d="M24 27H12V60H24V27Z" fill="#B3B3B3"></path>
+      <path d="M60 39H48V60H60V39Z" fill="#B3B3B3"></path>
+      <path d="M42 12H30V60H42V12Z" fill="#B3B3B3"></path>
+    </g>
+  </g>
+</svg>

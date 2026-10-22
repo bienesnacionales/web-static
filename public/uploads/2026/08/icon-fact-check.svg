@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none" overflow="visible" style="display: block;" width="72" height="72" viewBox="0 0 72 72" fill="none">
+  <g id="fact_check">
+    <g id="Vector">
+      <path fill-rule="evenodd" clip-rule="evenodd" d="M60 9H12C8.7 9 6 11.7 6 15V57C6 60.3 8.7 63 12 63H60C63.3 63 66 60.3 66 57V15C66 11.7 63.3 9 60 9ZM60 57H12V15H60V57Z" fill="#B3B3B3"></path>
+      <path fill-rule="evenodd" clip-rule="evenodd" d="M58.23 31.26L53.97 27L44.46 36.51L40.23 32.25L36 36.48L44.46 45L58.23 31.26Z" fill="#B3B3B3"></path>
+      <path d="M30 21H15V27H30V21Z" fill="#B3B3B3"></path>
+      <path d="M30 33H15V39H30V33Z" fill="#B3B3B3"></path>
+      <path d="M30 45H15V51H30V45Z" fill="#B3B3B3"></path>
+    </g>
+  </g>
+</svg>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none" overflow="visible" style="display: block;" width="72" height="72" viewBox="0 0 72 72" fill="none">
+  <g id="smart_display">
+    <g id="Vector">
+      <path d="M28.5 22.5V49.5L49.5 36L28.5 22.5Z" fill="#B3B3B3"></path>
+      <path d="M60 12H12C8.7 12 6 14.7 6 18V54C6 57.3 8.7 60 12 60H60C63.3 60 66 57.3 66 54V18C66 14.7 63.3 12 60 12ZM60 54.03H12V17.97H60V54.03Z" fill="#B3B3B3"></path>
+    </g>
+  </g>
+</svg>

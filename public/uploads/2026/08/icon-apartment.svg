@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none" overflow="visible" style="display: block;" width="72" height="72" viewBox="0 0 72 72" fill="none">
+  <g id="apartment">
+    <path id="Vector" d="M51 33V9H21V21H9V63H33V51H39V63H63V33H51ZM21 57H15V51H21V57ZM21 45H15V39H21V45ZM21 33H15V27H21V33ZM33 45H27V39H33V45ZM33 33H27V27H33V33ZM33 21H27V15H33V21ZM45 45H39V39H45V45ZM45 33H39V27H45V33ZM45 21H39V15H45V21ZM57 57H51V51H57V57ZM57 45H51V39H57V45Z" fill="#B3B3B3"></path>
+  </g>
+</svg>

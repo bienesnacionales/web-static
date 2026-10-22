@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none" overflow="visible" style="display: block;" width="36" height="36" viewBox="0 0 36 36" fill="none">
+  <g id="card_membership">
+    <path id="Vector" d="M30 3H6C4.335 3 3 4.335 3 6V22.5C3 24.165 4.335 25.5 6 25.5H12V33L18 30L24 33V25.5H30C31.665 25.5 33 24.165 33 22.5V6C33 4.335 31.665 3 30 3ZM30 22.5H6V19.5H30V22.5ZM30 15H6V6H30V15Z" fill="#0F5AC4"></path>
+  </g>
+</svg>
