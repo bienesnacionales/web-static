@@ -1,0 +1,189 @@
+/* ============================================================
+ * Plantilla — Detalle de noticia (single.php)
+ * Maqueta: Figma 364:4962 (frame 1440x1750; contenido de 1120 con
+ * columnas de 728 y 368 separadas por 24).
+ *
+ * Este archivo solo tiene el andamiaje de la página: los cuatro bloques
+ * (migas, compartir, carruseles y «Otras Noticias») son componentes
+ * globales y traen su propia hoja.
+ *
+ * Ojo con base.css (el Base Kit de Siigsa): declara reglas de elemento
+ * para `main p`, `main a` y `h1`, algunas con !important. Las de este
+ * archivo las pisan por especificidad de clase; donde hace falta
+ * !important está anotado.
+ * ============================================================ */
+
+.mbn-single {
+	padding-block: var(--mbn-space-page-top, 24px) var(--mbn-space-section, 36px);
+	background: var(--mbn-surface-white, #FFFFFF);
+}
+
+.mbn-single__container {
+	display: flex;
+	flex-direction: column;
+	gap: 24px;
+}
+
+/* base.css: `h1 { font-size: 3rem; line-height: 4.5rem; font-weight: 700
+   !important; font-family: Roboto Slab !important }`. La familia coincide con
+   la maqueta (Heading/Slab/Large); el peso 500 necesita !important para
+   ganarle. */
+.mbn-single__title {
+	margin: 0;
+	font-family: var(--mbn-roboto-slab-large-font-family, "Roboto Slab", serif) !important;
+	font-weight: var(--mbn-roboto-slab-large-font-weight, 500) !important;
+	font-size: calc(28px * var(--mbn-text-scale, 1));
+	line-height: 1.5;
+	color: var(--mbn-text-primary, #333333);
+}
+
+/* ---------- Layout de dos columnas ---------- */
+
+.mbn-single__layout {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr);
+	gap: 24px;
+	align-items: start;
+}
+
+.mbn-single__main {
+	display: flex;
+	flex-direction: column;
+	/* 8px es el gap del Figma (359:8991) entre la fotografía, el texto y la
+	   segunda fotografía. Funciona porque el contenido no aporta márgenes en
+	   sus extremos: ver el reset de :first-child / :last-child más abajo. */
+	gap: 8px;
+	min-width: 0;
+}
+
+.mbn-single__aside {
+	min-width: 0;
+}
+
+/* ---------- Cuerpo de la noticia ---------- */
+
+/* === tipografia-migrada:inicio ===
+   Toda la tipografía del cuerpo es la del sitio, gane lo que gane el HTML
+   migrado. Hace falta `!important` por dos motivos, los dos medidos sobre las
+   673 noticias del servidor (harness `.harness/tipografia-noticia.php`):
+
+   1. **`base.css` declara `h2`–`h6` con `font-family: Roboto !important`, sin
+      familia genérica de reserva**, mientras el resto del cuerpo usa
+      `"Roboto", sans-serif`. Como el theme **no sirve Roboto** —solo Roboto
+      Slab (§6)—, en un equipo que no la tenga instalada los subtítulos caen a
+      la fuente por defecto del navegador (serif en Chrome) y el resto del
+      texto al sans-serif del sistema: la noticia mezcla dos tipografías. En un
+      equipo que sí la tenga no se nota; medido el 2026-09-29, la máquina de
+      desarrollo la tiene y las capturas antes/después salen idénticas byte a
+      byte. Lo que no depende del equipo —y es lo que mide el harness— es la
+      familia computada. Solo se le gana con `!important`.
+   2. **Cuatro noticias traen `font-family` en un `style=` en línea** (los
+      bloques de Instagram, en `Arial,sans-serif`), y un estilo en línea gana a
+      cualquier regla de autor que no sea `!important`.
+
+   Se exceptúan `pre`, `code`, `kbd` y `samp`: ahí la monoespaciada es
+   significativa, no un resto de la migración.
+
+   Nota sobre Instagram: cuando su `<script>` carga, sustituye el bloque por un
+   iframe suyo y la tipografía la decide Instagram, no esta hoja. Lo que esta
+   regla uniforma es el bloque de reserva, que es lo que se ve sin red o con el
+   script bloqueado. */
+.mbn-single__content,
+.mbn-single__content :not(pre):not(code):not(kbd):not(samp) {
+	font-family: var(--mbn-roboto-body-small-font-family, "Roboto", sans-serif) !important;
+}
+/* === tipografia-migrada:fin === */
+
+.mbn-single__content p,
+.mbn-single__content li {
+	font-family: var(--mbn-roboto-body-small-font-family, "Roboto", sans-serif);
+	font-size: var(--mbn-roboto-body-small-font-size, 16px);
+	line-height: 1.5;
+	color: var(--mbn-text-primary, #333333);
+}
+
+.mbn-single__content p {
+	margin-bottom: 24px;
+}
+
+.mbn-single__content > :first-child {
+	margin-top: 0;
+}
+
+.mbn-single__content > :last-child {
+	margin-bottom: 0;
+}
+
+.mbn-single__content a {
+	color: var(--mbn-action-primary, #0046A8);
+	text-decoration: underline;
+}
+
+.mbn-single__content a:hover,
+.mbn-single__content a:focus-visible {
+	color: var(--mbn-brand-blue-dark, #00268D);
+}
+
+/* base.css declara la familia y el peso de h2-h6 con !important, así que los
+   subtítulos que el editor escriba dentro del cuerpo se quedan con los del kit;
+   aquí solo se ajustan tamaño, color y ritmo vertical. */
+.mbn-single__content h2,
+.mbn-single__content h3,
+.mbn-single__content h4 {
+	margin-top: 32px;
+	margin-bottom: 16px;
+	color: var(--mbn-text-primary, #333333);
+}
+
+.mbn-single__content h2 {
+	font-size: calc(24px * var(--mbn-text-scale, 1));
+	line-height: 1.5;
+}
+
+.mbn-single__content h3 {
+	font-size: calc(19px * var(--mbn-text-scale, 1));
+	line-height: 1.5;
+}
+
+.mbn-single__content img,
+.mbn-single__content iframe {
+	max-width: 100%;
+	height: auto;
+	border-radius: var(--mbn-card-radius, 16px);
+}
+
+.mbn-single__content figure {
+	margin: 24px 0;
+}
+
+.mbn-single__content blockquote {
+	margin: 24px 0;
+	padding-left: 16px;
+	border-left: 4px solid var(--mbn-action-primary, #0046A8);
+	color: var(--mbn-text-primary, #333333);
+}
+
+/* ---------- md ≥ 768px ---------- */
+
+@media (min-width: 768px) {
+	.mbn-single__title {
+		font-size: calc(32px * var(--mbn-text-scale, 1));
+	}
+}
+
+/* ---------- xl ≥ 1200px (canvas 1440 del Figma) ----------
+   Las dos columnas aparecen solo aquí. Entre 768 y 1199px el texto se
+   quedaría en unos 390px de ancho —demasiado estrecho para un artículo— y
+   el Figma no tiene canvas para esos anchos, así que la columna lateral se
+   apila debajo del cuerpo, que es donde también la coloca el flujo del DOM
+   para un lector de pantalla. */
+
+@media (min-width: 1200px) {
+	.mbn-single__title {
+		font-size: var(--mbn-roboto-slab-large-font-size, 36px);
+	}
+
+	.mbn-single__layout {
+		grid-template-columns: minmax(0, 1fr) 368px;
+	}
+}

@@ -1,0 +1,225 @@
+/* ============================================================
+ * Componente global — Acordeón
+ * Maqueta: Figma 285:3383 («Expansion Panel»), en el detalle de trámite
+ * 169:3365. Encabezado activo azul, como Preguntas Frecuentes, con título en 19px y chevron de
+ * 24px; cuerpo blanco con borde #CCCCCC. Padding 24 x 16 en ambos.
+ *
+ * Es el `accordion` de Bootstrap: aquí solo se redefinen sus variables
+ * `--bs-accordion-*` (§7.3). Nada de este archivo reimplementa el plegado.
+ * ============================================================ */
+
+.mbn-accordion {
+	width: 100%;
+}
+
+/* base.css declara font-family y font-weight de h1-h6 con !important, así que
+   la tipografía del título de bloque solo se puede imponer con !important. */
+.mbn-accordion__title {
+	margin: 0 0 16px;
+	font-family: var(--mbn-roboto-slab-large-font-family, "Roboto Slab", serif) !important;
+	font-weight: 500 !important;
+	font-size: calc(24px * var(--mbn-text-scale, 1));
+	line-height: 1.5;
+	color: var(--mbn-text-primary, #333333);
+}
+
+.mbn-accordion__list {
+	--bs-accordion-color: var(--mbn-text-primary, #333333);
+	--bs-accordion-bg: var(--mbn-surface-white, #FFFFFF);
+	--bs-accordion-border-color: var(--mbn-border-default, #CCCCCC);
+	--bs-accordion-border-width: 1px;
+	--bs-accordion-border-radius: 4px;
+	--bs-accordion-inner-border-radius: 4px;
+	--bs-accordion-btn-padding-x: 24px;
+	--bs-accordion-btn-padding-y: 16px;
+	--bs-accordion-btn-color: var(--mbn-text-primary, #333333);
+	/* Barra cerrada blanca; barra abierta azul en todas las variantes. */
+	--bs-accordion-btn-bg: var(--mbn-surface-white, #FFFFFF);
+	--bs-accordion-btn-icon-width: 24px;
+	--bs-accordion-btn-focus-box-shadow: none;
+	--bs-accordion-body-padding-x: 24px;
+	--bs-accordion-body-padding-y: 16px;
+	--bs-accordion-active-color: var(--mbn-text-on-brand-soft, rgba(255, 255, 255, 0.95));
+	--bs-accordion-active-bg: var(--mbn-brand-blue, #0F69C4);
+	/* El chevron lo inyecta el template como URL absoluta: ver el docblock de
+	   template-parts/components/accordion.php. */
+	--bs-accordion-btn-icon: var(--mbn-accordion-icon);
+	--bs-accordion-btn-active-icon: var(--mbn-accordion-icon);
+}
+
+/* El header no lleva borde en la maqueta; el cuerpo sí. El `.accordion-item` de
+   Bootstrap dibuja el borde alrededor de los dos, así que se traslada al
+   cuerpo. */
+.mbn-accordion .accordion-item {
+	border: 0;
+	border-radius: var(--bs-accordion-border-radius);
+}
+
+.mbn-accordion .accordion-body {
+	border: var(--bs-accordion-border-width) solid var(--bs-accordion-border-color);
+	border-bottom-left-radius: 8px;
+	border-bottom-right-radius: 8px;
+}
+
+/* ---------- Variante por defecto: borde de la barra cerrada ----------
+   Conserva los bordes y radios del detalle de trámite y de content-tabs.
+   El estado abierto comparte el azul de Preguntas Frecuentes. */
+
+.mbn-accordion--default .accordion-button.collapsed {
+	border: var(--bs-accordion-border-width) solid var(--bs-accordion-border-color);
+	border-radius: 0 0 8px 8px;
+}
+
+/* Dos barras cerradas contiguas sumarían sus bordes en una línea de 2px; el
+   `:has()` restringe el solape a ese caso, para no comerse el borde inferior
+   del cuerpo cuando el panel de arriba está abierto. */
+.mbn-accordion--default .accordion-item:has(.accordion-button.collapsed) + .accordion-item:has(.accordion-button.collapsed) {
+	margin-top: -1px;
+}
+
+.mbn-accordion__button {
+	/* Un `<button>` hereda la tipografía de su contenedor (reset de Bootstrap),
+	   que aquí es el encabezado: sin esta declaración saldría con la familia y
+	   el tamaño que base.css impone a h2-h4. */
+	font-family: var(--mbn-roboto-sans-small-font-family, "Roboto", sans-serif);
+	font-weight: var(--mbn-roboto-sans-small-font-weight, 500);
+	font-size: var(--mbn-roboto-sans-small-font-size, 19px);
+	line-height: 1.5;
+	text-align: left;
+}
+
+/* El icono exportado del Figma apunta hacia ARRIBA, que es el estado abierto.
+   Bootstrap solo rota el del panel expandido, así que la rotación se invierte
+   aquí: el panel plegado muestra el chevron hacia abajo y el abierto, sin
+   rotar. El descendiente sube la especificidad a (0,2,1) para no depender del
+   orden de carga de las hojas. */
+.mbn-accordion .accordion-button::after {
+	transform: rotate(180deg);
+	transition: transform 200ms ease-out;
+}
+
+.mbn-accordion .accordion-button:not(.collapsed)::after {
+	transform: rotate(0deg);
+}
+
+/* El foco del theme es un outline de 3px, no el anillo de Bootstrap. El offset
+   negativo lo mantiene dentro de la caja del encabezado. */
+.mbn-accordion .accordion-button:focus-visible {
+	outline: 3px solid var(--mbn-brand-blue, #0F69C4);
+	outline-offset: -3px;
+}
+
+.mbn-accordion .accordion-button:not(.collapsed):focus-visible {
+	outline-color: var(--mbn-surface-white, #FFFFFF);
+}
+
+/* ---------- Cuerpo del panel ---------- */
+
+.mbn-accordion__body > :first-child {
+	margin-top: 0;
+}
+
+.mbn-accordion__body > :last-child {
+	margin-bottom: 0;
+}
+
+.mbn-accordion__body p,
+.mbn-accordion__body li {
+	font-family: var(--mbn-roboto-body-small-font-family, "Roboto", sans-serif);
+	font-size: var(--mbn-roboto-body-small-font-size, 16px);
+	line-height: 1.5;
+	color: var(--mbn-text-primary, #333333);
+}
+
+.mbn-accordion__body ul,
+.mbn-accordion__body ol {
+	margin: 0 0 16px;
+	padding-left: 24px;
+}
+
+.mbn-accordion__body li + li {
+	margin-top: 4px;
+}
+
+.mbn-accordion__body a {
+	color: var(--mbn-action-primary, #0046A8);
+	text-decoration: underline;
+}
+
+.mbn-accordion__body a:hover,
+.mbn-accordion__body a:focus-visible {
+	color: var(--mbn-brand-blue-dark, #00268D);
+}
+
+/* ---------- Reducción de movimiento ---------- */
+
+@media (prefers-reduced-motion: reduce) {
+	.mbn-accordion .accordion-button::after {
+		transition: none;
+	}
+}
+
+/* ============================================================
+ * Variante `brand` — barras rectangulares para Ministerio y FAQ.
+ * Todas las variantes comparten el azul activo de Preguntas Frecuentes.
+ * ============================================================ */
+
+.mbn-accordion--brand .mbn-accordion__list {
+	--bs-accordion-border-radius: 0;
+	--bs-accordion-inner-border-radius: 0;
+	--bs-accordion-btn-bg: var(--mbn-surface-white, #FFFFFF);
+	--bs-accordion-active-bg: var(--mbn-brand-blue, #0F69C4);
+	--bs-accordion-active-color: var(--mbn-text-on-brand-soft, rgba(255, 255, 255, 0.95));
+	--bs-accordion-body-padding-x: 24px;
+	--bs-accordion-body-padding-y: 24px;
+}
+
+/* En esta variante el borde sí rodea la barra cerrada, así que vuelve al
+   `accordion-item` y se le quita al cuerpo (donde lo puso la variante por
+   defecto). Los bordes de barras contiguas se solapan con el margen negativo
+   para que no salga una línea de 2px entre ellas. */
+.mbn-accordion--brand .accordion-item {
+	border: var(--bs-accordion-border-width) solid var(--bs-accordion-border-color);
+	border-radius: 0;
+}
+
+.mbn-accordion--brand .accordion-item + .accordion-item {
+	margin-top: -1px;
+}
+
+.mbn-accordion--brand .accordion-body {
+	border: 0;
+	border-radius: 0;
+}
+
+/* La barra abierta pierde su borde: sobre el azul dibujaría un halo claro. Lo
+   recupera el cuerpo, en el gris del resto y sin la línea de arriba, que caería
+   justo debajo de la barra azul. Es lo que dibujan las dos maquetas —el cuerpo
+   abierto va con borde #CCC en 287:2996 y en 359:10015—; pintar el borde del
+   item entero del color de la barra dejaba el texto enmarcado en azul. */
+.mbn-accordion--brand .accordion-item:has(.accordion-button:not(.collapsed)) {
+	border: 0;
+}
+
+.mbn-accordion--brand .accordion-item:has(.accordion-button:not(.collapsed)) .accordion-body {
+	border: var(--bs-accordion-border-width) solid var(--bs-accordion-border-color);
+	border-top: 0;
+}
+
+/* El chevron se pinta con `mask-image` y no con el `background-image` de
+   Bootstrap: aquí tiene que cambiar de color —negro sobre blanco, blanco sobre
+   azul— y un SVG servido como imagen de fondo no toma `currentColor` (§8).
+   Propiedades largas, no el atajo `mask`: un var() dentro del atajo no se
+   resuelve de forma fiable. */
+.mbn-accordion .accordion-button::after {
+	background-image: none;
+	background-color: currentColor;
+	mask-image: var(--mbn-accordion-icon);
+	mask-repeat: no-repeat;
+	mask-position: center;
+	mask-size: contain;
+	-webkit-mask-image: var(--mbn-accordion-icon);
+	-webkit-mask-repeat: no-repeat;
+	-webkit-mask-position: center;
+	-webkit-mask-size: contain;
+}

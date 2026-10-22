@@ -26,4 +26,14 @@ Thumbs.db
 .idea/
  
 # Configuración local de agentes: rutas de la máquina, no compartible.
-.claude/
+.claude/ 
+# Documentos y videos del contenido (PDF, planillas, presentaciones, videos):
+# pesan cientos de MB y no se versionan. Las imágenes de public/uploads sí.
+public/uploads/**/*.pdf
+public/uploads/**/*.mp4
+public/uploads/**/*.pptx
+public/uploads/**/*.xlsx
+public/uploads/**/*.docx
+ 
+# Informes generados (Excel de enlaces rotos).
+informes/

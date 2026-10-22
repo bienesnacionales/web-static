@@ -1,0 +1,125 @@
+/* ============================================================
+ * Plantilla — Ministerio y Autoridades (template-ministerio.php)
+ * Maqueta: Figma 292:3317 (frame 1440; contenido de 1120).
+ *
+ * Este archivo solo aporta el andamiaje de la página y las piezas que no son
+ * componentes: el título y la descripción. Las pestañas y el organigrama son
+ * componentes globales y traen su propia hoja
+ * (`components/authorities.css` y `components/org-chart.css`).
+ *
+ * Ojo con base.css (el Base Kit de Siigsa): `main p` fija color, tamaño y un
+ * `font-weight: 400 !important`, y `h1` fuerza familia y peso. Donde hace
+ * falta !important para ganarle está anotado.
+ * ============================================================ */
+
+.mbn-ministerio {
+	padding-block: var(--mbn-space-page-top, 24px) var(--mbn-space-section, 36px);
+	background: var(--mbn-surface-white, #FFFFFF);
+}
+
+.mbn-ministerio__container {
+	display: flex;
+	flex-direction: column;
+	/* 24 + los 12 de padding propio de las migas = los 36 (spacing-l) que
+	   separan la fila de migas del contenido, igual que en el detalle de
+	   trámite. */
+	gap: 24px;
+}
+
+/* El bloque «título + descripción» es una sola pieza y va con gap 8, no con
+   los 24 que separan las secciones. */
+.mbn-ministerio__intro {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+	min-width: 0;
+}
+
+/* base.css: `h1 { font-weight: 700 !important; font-family: Roboto Slab
+   !important }`. La familia coincide con la maqueta (Heading/Slab/Large); el
+   peso 500 necesita !important para ganarle. */
+.mbn-ministerio__title {
+	margin: 0;
+	font-family: var(--mbn-roboto-slab-large-font-family, "Roboto Slab", serif) !important;
+	font-weight: var(--mbn-roboto-slab-large-font-weight, 500) !important;
+	font-size: calc(28px * var(--mbn-text-scale, 1));
+	line-height: 1.5;
+	color: var(--mbn-text-black, #000000);
+}
+
+.mbn-ministerio__content p,
+.mbn-ministerio__content li {
+	font-family: var(--mbn-roboto-body-small-font-family, "Roboto", sans-serif);
+	font-size: var(--mbn-roboto-body-small-font-size, 16px);
+	line-height: 1.5;
+	color: var(--mbn-text-primary, #333333);
+}
+
+.mbn-ministerio__content p {
+	margin-bottom: 16px;
+}
+
+.mbn-ministerio__content > :first-child {
+	margin-top: 0;
+}
+
+.mbn-ministerio__content > :last-child {
+	margin-bottom: 0;
+}
+
+.mbn-ministerio__content ul,
+.mbn-ministerio__content ol {
+	margin: 0 0 16px;
+	padding-left: 24px;
+}
+
+.mbn-ministerio__content a {
+	color: var(--mbn-action-primary, #0046A8);
+	text-decoration: underline;
+}
+
+.mbn-ministerio__content a:hover,
+.mbn-ministerio__content a:focus-visible {
+	color: var(--mbn-brand-blue-dark, #00268D);
+}
+
+/* base.css declara familia y peso de h2-h6 con !important, así que los
+   subtítulos que el editor escriba se quedan con los del kit; aquí solo se
+   ajustan tamaño, color y ritmo vertical. */
+.mbn-ministerio__content h2,
+.mbn-ministerio__content h3 {
+	margin-top: 32px;
+	margin-bottom: 16px;
+	color: var(--mbn-text-primary, #333333);
+}
+
+.mbn-ministerio__content h2 {
+	font-size: calc(24px * var(--mbn-text-scale, 1));
+	line-height: 1.5;
+}
+
+.mbn-ministerio__content h3 {
+	font-size: calc(19px * var(--mbn-text-scale, 1));
+	line-height: 1.5;
+}
+
+.mbn-ministerio__content img {
+	max-width: 100%;
+	height: auto;
+}
+
+/* ---------- md ≥ 768px ---------- */
+
+@media (min-width: 768px) {
+	.mbn-ministerio__title {
+		font-size: calc(32px * var(--mbn-text-scale, 1));
+	}
+}
+
+/* ---------- xl ≥ 1200px (canvas 1440 del Figma) ---------- */
+
+@media (min-width: 1200px) {
+	.mbn-ministerio__title {
+		font-size: var(--mbn-roboto-slab-large-font-size, 36px);
+	}
+}

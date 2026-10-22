@@ -1,0 +1,499 @@
+/* ============================================================
+ * Componente global — Organigrama
+ * Maqueta: Figma 294:3323, segunda sección de la página «Ministerio»
+ * (292:3317).
+ *
+ * Tres tipos de sección, tres pieles:
+ *   - `authority` — caja con degradado azul centrada + unidades en 2 columnas.
+ *   - `groups`    — encabezado con bajada + unidades en 2 columnas.
+ *   - `seremis`   — encabezado con bajada + tarjetas compactas en 3 columnas.
+ *
+ * Cada sección son listas anidadas y las líneas punteadas son pseudo-elementos:
+ * sin CSS la jerarquía se sigue leyendo como una lista con sublistas.
+ *
+ * El plegado es el `collapse` de Bootstrap. Los dos textos del botón viven en
+ * el marcado y este archivo enseña uno u otro según `aria-expanded`, de modo
+ * que el componente no necesita JavaScript propio.
+ *
+ * Ojo con base.css (el Base Kit de Siigsa): la escala de h1-h6 y
+ * `main p { font-weight: 400 !important }`.
+ * ============================================================ */
+
+.mbn-org-chart {
+	width: 100%;
+}
+
+/* ---------- Cabecera ---------- */
+
+.mbn-org-chart__header {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: space-between;
+	gap: 16px;
+	margin-bottom: 24px;
+}
+
+/* base.css declara font-family y font-weight de h1-h6 con !important. */
+.mbn-org-chart__title {
+	margin: 0;
+	font-family: var(--mbn-roboto-slab-large-font-family, "Roboto Slab", serif) !important;
+	font-weight: var(--mbn-roboto-slab-large-font-weight, 500) !important;
+	font-size: calc(24px * var(--mbn-text-scale, 1));
+	line-height: 1.5;
+	color: var(--mbn-text-primary, #333333);
+}
+
+/* Botón sólido del design system: `btn` de Bootstrap con sus variables (§7.3). */
+.mbn-org-chart__toggle {
+	--bs-btn-bg: var(--mbn-action-primary, #0046A8);
+	--bs-btn-border-color: var(--mbn-action-primary, #0046A8);
+	--bs-btn-color: var(--mbn-text-on-primary, #E7ECFF);
+	--bs-btn-hover-bg: var(--mbn-brand-blue-dark, #00268D);
+	--bs-btn-hover-border-color: var(--mbn-brand-blue-dark, #00268D);
+	--bs-btn-hover-color: var(--mbn-text-on-primary, #E7ECFF);
+	--bs-btn-active-bg: var(--mbn-brand-blue-dark, #00268D);
+	--bs-btn-active-border-color: var(--mbn-brand-blue-dark, #00268D);
+	--bs-btn-active-color: var(--mbn-text-on-primary, #E7ECFF);
+	--bs-btn-padding-x: 24px;
+	--bs-btn-padding-y: 12px;
+	--bs-btn-font-family: var(--mbn-roboto-body-button-large-font-family, "Roboto", sans-serif);
+	--bs-btn-font-size: var(--mbn-roboto-body-button-large-font-size, 19px);
+	--bs-btn-font-weight: 700;
+	--bs-btn-line-height: 1.5;
+	--bs-btn-border-radius: 24px;
+	white-space: nowrap;
+}
+
+.mbn-org-chart__toggle:focus-visible {
+	outline: 3px solid var(--mbn-brand-blue, #0F69C4);
+	outline-offset: 2px;
+	box-shadow: none;
+}
+
+/* El texto del botón lo decide el estado que mantiene Bootstrap, no un script:
+   así el nombre accesible nunca puede quedar desincronizado de lo que se ve. */
+.mbn-org-chart__toggle[aria-expanded="true"] .mbn-org-chart__toggle-show,
+.mbn-org-chart__toggle[aria-expanded="false"] .mbn-org-chart__toggle-hide {
+	display: none;
+}
+
+/* ---------- Panel ---------- */
+
+.mbn-org-chart__panel {
+	display: flex;
+	flex-direction: column;
+	gap: 36px;
+	padding: 24px 16px;
+	background: var(--mbn-surface-soft, #F9F9F9);
+	border-radius: 12px;
+}
+
+.mbn-org-chart__section {
+	display: flex;
+	flex-direction: column;
+	gap: 16px;
+}
+
+/* ---------- Encabezado de sección ---------- */
+
+.mbn-org-chart__section-title {
+	margin: 0;
+	font-family: var(--mbn-roboto-slab-medium-font-family, "Roboto Slab", serif) !important;
+	font-weight: var(--mbn-roboto-slab-medium-font-weight, 500) !important;
+	font-size: var(--mbn-roboto-slab-medium-font-size, 24px);
+	line-height: 1.5;
+	color: var(--mbn-surface-footer, #01084D);
+}
+
+/* base.css: `main p { font-weight: 400 !important }` — aquí el peso ya es 400,
+   así que no hace falta pelear. */
+.mbn-org-chart__section-subtitle {
+	margin: 4px 0 0;
+	font-family: var(--mbn-roboto-body-small-font-family, "Roboto", sans-serif);
+	font-size: calc(15px * var(--mbn-text-scale, 1));
+	line-height: 1.5;
+	color: var(--mbn-org-node-muted, #555555);
+}
+
+/* ---------- Autoridad destacada ---------- */
+
+.mbn-org-chart__authority {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	align-self: center;
+	max-width: 100%;
+	padding: 17px 24px;
+	background: var(--mbn-org-authority-gradient, linear-gradient(168.88deg, #0046A8 0%, #01084D 100%));
+	border-radius: 16px;
+	box-shadow: 0 1px 1.5px rgba(0, 0, 0, 0.1), 0 1px 1px rgba(0, 0, 0, 0.1);
+}
+
+.mbn-org-chart__authority-icon {
+	display: block;
+	flex: 0 0 auto;
+	width: 48px;
+	height: 48px;
+	background-color: rgba(255, 255, 255, 0.15);
+	border-radius: 14px;
+	/* El glifo va dentro de la caja translúcida: se pinta con la máscara sobre
+	   un segundo fondo, porque el SVG exportado es de trazo blanco y así sigue
+	   al color del texto si algún día cambia (§8). */
+	mask-image: none;
+	position: relative;
+}
+
+.mbn-org-chart__authority-icon::before {
+	content: "";
+	position: absolute;
+	inset: 12px;
+	background-color: var(--mbn-surface-white, #FFFFFF);
+	mask-image: var(--mbn-org-chart-icon);
+	mask-repeat: no-repeat;
+	mask-position: center;
+	mask-size: contain;
+	-webkit-mask-image: var(--mbn-org-chart-icon);
+	-webkit-mask-repeat: no-repeat;
+	-webkit-mask-position: center;
+	-webkit-mask-size: contain;
+}
+
+.mbn-org-chart__authority-text {
+	display: flex;
+	flex-direction: column;
+	min-width: 0;
+}
+
+.mbn-org-chart__authority-title {
+	font-family: var(--mbn-roboto-body-small-font-family, "Roboto", sans-serif);
+	font-weight: 700;
+	font-size: calc(18px * var(--mbn-text-scale, 1));
+	line-height: 1.25;
+	color: var(--mbn-surface-white, #FFFFFF);
+}
+
+.mbn-org-chart__authority .mbn-org-chart__person-name {
+	color: var(--mbn-org-on-brand-muted, #BCD4FF);
+}
+
+.mbn-org-chart__authority .mbn-org-chart__person-icon {
+	background-color: var(--mbn-org-on-brand-muted, #BCD4FF);
+}
+
+/* ---------- Unidades ---------- */
+
+.mbn-org-chart__units {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	display: grid;
+	grid-template-columns: minmax(0, 1fr);
+	gap: 16px;
+}
+
+/* Cada unidad es una caja contenedora: la maqueta la separa del fondo con un
+   blanco al 60% y un borde muy claro. */
+.mbn-org-chart__units--authority > .mbn-org-chart__unit,
+.mbn-org-chart__units--groups > .mbn-org-chart__unit {
+	padding: 21px;
+	background: rgba(255, 255, 255, 0.6);
+	border: 1px solid var(--mbn-org-card-border, #E2E2E2);
+	border-radius: 24px;
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+/* ---------- Caja ---------- */
+
+.mbn-org-chart__node {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	padding: 17px;
+	background: var(--mbn-surface-white, #FFFFFF);
+	border: 1px solid var(--mbn-org-card-border, #E2E2E2);
+	border-radius: 16px;
+	box-shadow: 0 1px 1.5px rgba(0, 0, 0, 0.1), 0 1px 1px rgba(0, 0, 0, 0.1);
+	text-decoration: none;
+	transition: border-color 120ms ease-out, box-shadow 120ms ease-out;
+}
+
+/* La caja que encabeza un grupo lleva el borde azul de la maqueta. */
+.mbn-org-chart__node--unit {
+	border-color: rgba(0, 70, 168, 0.3);
+}
+
+.mbn-org-chart__avatar {
+	display: flex;
+	flex: 0 0 auto;
+	align-items: center;
+	justify-content: center;
+	width: 44px;
+	height: 44px;
+	background: var(--mbn-text-on-primary, #E7ECFF);
+	border-radius: 14px;
+	font-family: var(--mbn-roboto-body-small-font-family, "Roboto", sans-serif);
+	font-weight: 700;
+	font-size: calc(14px * var(--mbn-text-scale, 1));
+	line-height: 1.5;
+	color: var(--mbn-action-primary, #0046A8);
+}
+
+.mbn-org-chart__node--child .mbn-org-chart__avatar {
+	background: rgba(0, 70, 168, 0.1);
+}
+
+/* `flex: 1 1 auto` es lo que mantiene el texto pegado al avatar cuando la caja
+   lleva chevron: con `justify-content: space-between` y un texto que no crece,
+   el bloque se iría al centro de la caja. */
+.mbn-org-chart__node-text {
+	display: flex;
+	flex: 1 1 auto;
+	flex-direction: column;
+	min-width: 0;
+	text-align: left;
+}
+
+.mbn-org-chart__node-title {
+	font-family: var(--mbn-roboto-body-small-font-family, "Roboto", sans-serif);
+	font-weight: 500;
+	font-size: calc(15px * var(--mbn-text-scale, 1));
+	line-height: 1.25;
+	color: var(--mbn-org-node-title, #222222);
+}
+
+.mbn-org-chart__node--unit .mbn-org-chart__node-title {
+	color: var(--mbn-surface-footer, #01084D);
+}
+
+/* ---------- Persona a cargo ---------- */
+
+.mbn-org-chart__person {
+	display: flex;
+	align-items: center;
+	gap: 4px;
+	margin-top: 2px;
+	min-width: 0;
+}
+
+/* El icono se tiñe con `mask-image`: el SVG exportado viene con su propio
+   color y aquí tiene que seguir al del texto (§8). Propiedades largas, no el
+   atajo `mask`: un var() dentro del atajo no se resuelve de forma fiable. */
+.mbn-org-chart__person-icon {
+	display: block;
+	flex: 0 0 auto;
+	width: 14px;
+	height: 14px;
+	background-color: var(--mbn-brand-blue, #0F69C4);
+	mask-image: var(--mbn-org-chart-person-icon);
+	mask-repeat: no-repeat;
+	mask-position: center;
+	mask-size: contain;
+	-webkit-mask-image: var(--mbn-org-chart-person-icon);
+	-webkit-mask-repeat: no-repeat;
+	-webkit-mask-position: center;
+	-webkit-mask-size: contain;
+}
+
+.mbn-org-chart__person-name {
+	font-family: var(--mbn-roboto-body-small-font-family, "Roboto", sans-serif);
+	font-size: calc(13px * var(--mbn-text-scale, 1));
+	line-height: 1.5;
+	color: var(--mbn-brand-blue, #0F69C4);
+}
+
+/* ---------- Subunidades ---------- */
+
+.mbn-org-chart__children {
+	list-style: none;
+	margin: 12px 0 0 20px;
+	padding-left: 22px;
+	/* La línea punteada que une la unidad con sus subunidades. */
+	border-left: 2px dashed var(--mbn-org-line, #C9D6EE);
+}
+
+.mbn-org-chart__child + .mbn-org-chart__child {
+	margin-top: 12px;
+}
+
+/* ---------- Oficinas provinciales (sección `seremis`) ---------- */
+
+.mbn-org-chart__offices {
+	display: flex;
+	flex-direction: column;
+	margin-top: 4px;
+	padding-top: 9px;
+	border-top: 1px dashed var(--mbn-org-line-soft, #DBE4F5);
+}
+
+.mbn-org-chart__office {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	padding: 4px 8px;
+	font-family: var(--mbn-roboto-body-small-font-family, "Roboto", sans-serif);
+	font-size: calc(13px * var(--mbn-text-scale, 1));
+	line-height: 1.5;
+	color: var(--mbn-org-node-muted, #555555);
+}
+
+.mbn-org-chart__office::before {
+	content: "";
+	flex: 0 0 auto;
+	width: 6px;
+	height: 6px;
+	border-radius: 50%;
+	background: var(--mbn-state-alert, #FF0031);
+}
+
+/* ---------- Tarjeta de Seremi ----------
+   Es la caja compacta de la maqueta: sin contenedor aparte, avatar de 32 y
+   tipografía un punto menor. **Las oficinas van DENTRO de la caja**, bajo una
+   línea punteada horizontal, no como lista hermana. */
+
+.mbn-org-chart__units--seremis .mbn-org-chart__unit {
+	display: flex;
+}
+
+.mbn-org-chart__units--seremis .mbn-org-chart__node {
+	flex-direction: column;
+	align-items: stretch;
+	gap: 8px;
+	width: 100%;
+	border-color: var(--mbn-org-card-border, #E2E2E2);
+}
+
+.mbn-org-chart__node-head {
+	display: flex;
+	align-items: flex-start;
+	gap: 8px;
+	min-width: 0;
+}
+
+.mbn-org-chart__units--seremis .mbn-org-chart__avatar {
+	width: 32px;
+	height: 32px;
+	border-radius: 10px;
+	font-size: calc(12px * var(--mbn-text-scale, 1));
+}
+
+.mbn-org-chart__units--seremis .mbn-org-chart__node-title {
+	font-size: calc(14px * var(--mbn-text-scale, 1));
+}
+
+.mbn-org-chart__units--seremis .mbn-org-chart__person-name {
+	font-size: calc(12px * var(--mbn-text-scale, 1));
+}
+
+/* ---------- Plegado por unidad ----------
+   La cabecera de un grupo con subunidades es el botón del `collapse`. El
+   chevron se tiñe con `mask-image` para que siga al color del texto (§8) y
+   rota al abrirse, que es lo que dibuja la maqueta. */
+
+button.mbn-org-chart__node {
+	width: 100%;
+	text-align: left;
+	font: inherit;
+}
+
+.mbn-org-chart__node--foldable {
+	justify-content: space-between;
+	cursor: pointer;
+}
+
+.mbn-org-chart__chevron {
+	display: block;
+	flex: 0 0 auto;
+	width: 24px;
+	height: 24px;
+	background-color: var(--mbn-icon-muted, #4D4D4D);
+	mask-image: var(--mbn-org-chart-chevron);
+	mask-repeat: no-repeat;
+	mask-position: center;
+	mask-size: contain;
+	-webkit-mask-image: var(--mbn-org-chart-chevron);
+	-webkit-mask-repeat: no-repeat;
+	-webkit-mask-position: center;
+	-webkit-mask-size: contain;
+	transition: transform 200ms ease-out;
+}
+
+/* El icono exportado apunta hacia abajo, que es el estado plegado. */
+.mbn-org-chart__node--foldable[aria-expanded="true"] .mbn-org-chart__chevron {
+	transform: rotate(180deg);
+}
+
+.mbn-org-chart__node--foldable:focus-visible {
+	outline: 3px solid var(--mbn-brand-blue, #0F69C4);
+	outline-offset: 2px;
+}
+
+/* ---------- Enlaces ----------
+   Solo las cajas con enlace reaccionan: un realce sobre algo que no lleva a
+   ningún sitio promete una interacción que no existe. */
+
+a.mbn-org-chart__node:hover {
+	border-color: var(--mbn-action-primary, #0046A8);
+	box-shadow: var(--mbn-shadow-elevation-2);
+}
+
+a.mbn-org-chart__node:focus-visible {
+	outline: 3px solid var(--mbn-brand-blue, #0F69C4);
+	outline-offset: 2px;
+}
+
+a.mbn-org-chart__node .mbn-org-chart__node-title {
+	text-decoration: underline;
+}
+
+/* ---------- md ≥ 768px ---------- */
+
+@media (min-width: 768px) {
+	.mbn-org-chart__panel {
+		padding: 48px 24px;
+	}
+
+	/* Dos columnas para las unidades, tres para las tarjetas de Seremi: es la
+	   rejilla de la maqueta sobre el contenido de 1056. */
+	.mbn-org-chart__units--authority,
+	.mbn-org-chart__units--groups {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		gap: 24px;
+		align-items: start;
+	}
+
+	.mbn-org-chart__units--seremis {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		gap: 12px;
+	}
+}
+
+/* ---------- xl ≥ 1200px (canvas 1440 del Figma) ---------- */
+
+@media (min-width: 1200px) {
+	.mbn-org-chart__title {
+		font-size: var(--mbn-roboto-slab-large-font-size, 36px);
+	}
+
+	.mbn-org-chart__panel {
+		gap: 48px;
+		padding: 64px 32px;
+	}
+
+	.mbn-org-chart__authority {
+		padding-inline: 33px;
+	}
+
+	.mbn-org-chart__units--seremis {
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+	}
+}
+
+/* ---------- Reducción de movimiento ---------- */
+
+@media (prefers-reduced-motion: reduce) {
+	.mbn-org-chart__node,
+	.mbn-org-chart__collapse.collapsing {
+		transition: none;
+	}
+}

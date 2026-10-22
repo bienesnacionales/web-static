@@ -1,0 +1,624 @@
+/* ============================================================
+ * Encuesta de satisfacción — botón flotante y diálogo
+ * (template-parts/survey/, inc/survey-frontend.php)
+ *
+ * Figma: 885:11943 (botón flotante), 885:8370 (su posición en la página),
+ * 918:12068 / 918:12372 / 918:12756 / 918:12874 (los pasos), 918:12999
+ * (agradecimiento) y 885:8257 (pregunta única y estrellas seleccionadas).
+ *
+ * Es el `modal` de Bootstrap con las variables `--bs-modal-*` redefinidas
+ * (§7.3), como `external-link.css` y `pdf-viewer.css`.
+ *
+ * Dos notas que no se ven en el código:
+ *   - `h2` llega con `font-weight: 500 !important` y `font-family: Roboto
+ *     !important` desde `base.css`, el Base Kit de Siigsa (§6). La pregunta y
+ *     el título de agradecimiento son negrita en el Figma, así que su
+ *     `font-weight` necesita `!important` para ganar; el tamaño y el interlineado
+ *     no, porque ahí base.css no lo usa.
+ *   - Las estrellas se pintan con `mask-image` y no con `<img>`: el valor
+ *     elegido cambia de **forma** (contorno → relleno) y de color, y un `<img>`
+ *     no toma color del CSS (§8). Las dos siluetas son el mismo vector del
+ *     Figma en dos pinturas.
+ *
+ * El móvil no está maquetado: el Figma sólo trae el canvas de 1440. La
+ * adaptación es propia —diálogo fluido con 16px de aire, estrellas de 32px y
+ * botones apilados— y no un escalado del desktop (§12 del encargo).
+ * ============================================================ */
+
+/* ---------- Botón flotante ---------- */
+
+/* El Figma lo ancla en `x = 0` a media altura del alto de la página. Aquí es
+   `fixed` y centrado en la ventana: el botón tiene que seguir alcanzable al
+   desplazarse, que es lo que significa «flotante».
+
+   ⚠️ `left`/`top` FÍSICOS, no `inset-inline-start`/`inset-block-start`: las
+   propiedades lógicas se resuelven contra el modo de escritura del propio
+   elemento, y este es `vertical-rl`, así que las lógicas intercambian los ejes
+   y el botón se iba al centro del borde superior. */
+.mbn-survey-launcher {
+	position: fixed;
+	left: 0;
+	top: 23%;
+	transform: translateY(-50%);
+	/* Por encima del header (1020) y de los dropdowns (1030), por debajo del
+	   offcanvas (1045) y del propio diálogo (1055). */
+	z-index: 1035;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 8px;
+	/* El atajo `padding` es físico y no gira con el modo de escritura: 24px
+	   arriba y abajo —el aire que el Figma pone antes de la estrella y después
+	   del texto— y 12px a los lados, que con la línea de 28.5px del texto dan
+	   los 53px de ancho de la maqueta. */
+	padding: 24px 12px;
+	border: 0;
+	border-radius: 0;
+	background-color: var(--mbn-action-primary, #0046A8);
+	color: var(--mbn-text-on-primary, #E7ECFF);
+	font-family: var(--mbn-roboto-sans-small-font-family, "Roboto", sans-serif);
+	font-size: var(--mbn-roboto-sans-small-font-size, 19px);
+	font-weight: 700;
+	line-height: 1.5;
+	text-align: center;
+	cursor: pointer;
+	/* Texto de abajo arriba, como en la maqueta. */
+	writing-mode: vertical-rl;
+	rotate: 180deg;
+}
+
+.mbn-survey-launcher:hover,
+.mbn-survey-launcher:focus-visible {
+	background-color: var(--mbn-brand-blue-dark, #00268D);
+	color: var(--mbn-text-on-primary, #E7ECFF);
+}
+
+.mbn-survey-launcher[hidden] {
+	display: none;
+}
+
+/* La rotación del botón voltearía también la estrella: se compensa para que
+   quede derecha (ver el docblock del template). */
+.mbn-survey-launcher__icon {
+	flex: 0 0 auto;
+	width: 24px;
+	height: 24px;
+	rotate: 180deg;
+	background-color: currentColor;
+	mask-image: var(--mbn-survey-launcher-icon);
+	mask-repeat: no-repeat;
+	mask-position: center;
+	mask-size: 24px 24px;
+	-webkit-mask-image: var(--mbn-survey-launcher-icon);
+	-webkit-mask-repeat: no-repeat;
+	-webkit-mask-position: center;
+	-webkit-mask-size: 24px 24px;
+}
+
+/* la barra móvil solo ocupa espacio mientras la encuesta esté disponible */
+.mbn-survey-mobile-dock {
+	display: none;
+}
+
+@media (max-width: 767.98px) {
+	body:has(.mbn-survey-launcher:not([hidden])) {
+		padding-bottom: calc(80px + env(safe-area-inset-bottom, 0px));
+	}
+
+	body:has(.mbn-survey-launcher:not([hidden])) .mbn-survey-mobile-dock {
+		display: block;
+		position: fixed;
+		inset: auto 0 0;
+		height: calc(76px + env(safe-area-inset-bottom, 0px));
+		background: var(--mbn-surface-white, #FFFFFF);
+		border-top: 1px solid var(--mbn-border-divider, #E6E6E6);
+		box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.03);
+		z-index: 1034;
+	}
+
+	.mbn-survey-launcher {
+		left: 16px;
+		right: 16px;
+		top: auto;
+		bottom: calc(14px + env(safe-area-inset-bottom, 0px));
+		height: 48px;
+		padding: 3px 12px;
+		border: 1px solid var(--mbn-action-primary, #0046A8);
+		border-radius: 24px;
+		background-color: var(--mbn-surface-white, #FFFFFF);
+		color: var(--mbn-action-primary, #0046A8);
+		font-size: calc(14px * var(--mbn-text-scale, 1));
+		line-height: 20px;
+		writing-mode: horizontal-tb;
+		rotate: none;
+		transform: none;
+	}
+
+	body:has(.mbn-chat) .mbn-survey-launcher {
+		right: 80px;
+	}
+
+	.mbn-survey-launcher__icon {
+		width: 20px;
+		height: 20px;
+		rotate: none;
+		mask-image: var(--mbn-survey-launcher-mobile-icon, var(--mbn-survey-launcher-icon));
+		-webkit-mask-image: var(--mbn-survey-launcher-mobile-icon, var(--mbn-survey-launcher-icon));
+		mask-size: 20px 20px;
+		-webkit-mask-size: 20px 20px;
+	}
+
+	.mbn-survey-launcher__label {
+		min-width: 0;
+	}
+
+	/* comparte la fila con el chat existente, sin cambiar su nombre accesible */
+	body:has(.mbn-survey-launcher:not([hidden])) .mbn-chat {
+		right: 16px;
+		bottom: calc(14px + env(safe-area-inset-bottom, 0px));
+	}
+
+	body:has(.mbn-survey-launcher:not([hidden])) .mbn-chat .mbn-chat__launcher {
+		width: 48px;
+		height: 48px;
+		padding: 0;
+		gap: 0;
+		border-radius: 50%;
+		box-shadow: 0 3px 10px rgba(0, 0, 0, 0.13);
+	}
+
+	body:has(.mbn-survey-launcher:not([hidden])) .mbn-chat__launcher-label {
+		display: none;
+	}
+
+	html.mbn-contrast body:has(.mbn-survey-launcher:not([hidden])) .mbn-survey-mobile-dock {
+		background: #000000;
+		border-top-color: #FCFF3C;
+	}
+}
+
+/* ---------- Diálogo ---------- */
+
+.mbn-survey {
+	--bs-modal-width: 448px;
+	--bs-modal-color: var(--mbn-text-primary, #333333);
+	--bs-modal-bg: var(--mbn-surface-white, #FFFFFF);
+	--bs-modal-border-width: 0;
+	--bs-modal-border-radius: 16px;
+	--bs-modal-inner-border-radius: 16px;
+	--bs-modal-box-shadow: 0 25px 25px rgba(0, 0, 0, 0.25);
+	--bs-modal-padding: 16px 32px;
+}
+
+.mbn-survey__content {
+	/* La franja superior es hija directa del contenido y tiene que respetar el
+	   radio de 16px de las esquinas. */
+	overflow: hidden;
+}
+
+.mbn-survey__flag {
+	display: flex;
+	height: 8px;
+	margin: 0;
+}
+
+/* 165.758 de 448 en el Figma. */
+.mbn-survey__flag-blue {
+	flex: 0 0 37%;
+	background-color: var(--mbn-brand-blue, #0F69C4);
+}
+
+.mbn-survey__flag-red {
+	flex: 1 1 auto;
+	background-color: var(--mbn-survey-flag-red, #FF2930);
+}
+
+.mbn-survey__body {
+	display: flex;
+	flex-direction: column;
+	gap: 14px;
+	padding: var(--bs-modal-padding);
+}
+
+/* ---------- Cabecera ---------- */
+
+.mbn-survey__header {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+
+.mbn-survey__eyebrow {
+	flex: 1 1 auto;
+	min-width: 0;
+	margin: 0;
+	color: var(--mbn-action-primary, #0046A8);
+	font-family: var(--mbn-roboto-body-small-font-family, "Roboto", sans-serif);
+	font-size: calc(12px * var(--mbn-text-scale, 1));
+	font-weight: 500;
+	line-height: calc(16px * var(--mbn-text-scale, 1));
+	letter-spacing: 1.2px;
+	text-transform: uppercase;
+}
+
+.mbn-survey__close {
+	display: flex;
+	flex: 0 0 auto;
+	align-items: center;
+	justify-content: center;
+	width: 28px;
+	height: 28px;
+	padding: 0;
+	border: 0;
+	border-radius: 50%;
+	background-color: transparent;
+	cursor: pointer;
+}
+
+.mbn-survey__close:hover,
+.mbn-survey__close:focus-visible {
+	background-color: var(--mbn-surface-hover, #F2F2F2);
+}
+
+.mbn-survey__close-icon {
+	width: 16px;
+	height: 16px;
+	background-color: var(--mbn-survey-close-color, #99A1AF);
+	mask-image: var(--mbn-survey-close);
+	mask-repeat: no-repeat;
+	mask-position: center;
+	mask-size: 16px 16px;
+	-webkit-mask-image: var(--mbn-survey-close);
+	-webkit-mask-repeat: no-repeat;
+	-webkit-mask-position: center;
+	-webkit-mask-size: 16px 16px;
+}
+
+.mbn-survey__header[hidden] {
+	display: none;
+}
+
+/* ---------- Indicador de pasos ---------- */
+
+/* Un punto por pregunta activa, unidos por la línea del stepper del design
+   system. Con una o dos preguntas el PHP no lo imprime. */
+.mbn-survey__steps {
+	display: flex;
+	align-items: center;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.mbn-survey__step-dot {
+	position: relative;
+	flex: 1 1 0;
+	height: 32px;
+}
+
+.mbn-survey__step-dot:last-child {
+	flex: 0 0 32px;
+}
+
+.mbn-survey__step-dot::before {
+	content: "";
+	position: absolute;
+	inset-block: 0;
+	inset-inline-start: 0;
+	width: 32px;
+	border: 2px solid var(--mbn-brand-blue, #0F69C4);
+	border-radius: 50%;
+	background-color: var(--mbn-surface-white, #FFFFFF);
+}
+
+.mbn-survey__step-dot:not(:last-child)::after {
+	content: "";
+	position: absolute;
+	inset-block-start: 15px;
+	inset-inline-start: 30px;
+	inset-inline-end: 0;
+	height: 2px;
+	background-color: var(--mbn-brand-blue, #0F69C4);
+}
+
+/* El paso actual y los ya respondidos van rellenos; los pendientes, en
+   contorno. */
+.mbn-survey__step-dot.is-done::before,
+.mbn-survey__step-dot.is-current::before {
+	background-color: var(--mbn-brand-blue, #0F69C4);
+}
+
+/* ---------- Paso ---------- */
+
+.mbn-survey__form {
+	display: flex;
+	flex-direction: column;
+	gap: 14px;
+}
+
+.mbn-survey__step {
+	display: flex;
+	flex-direction: column;
+	gap: 14px;
+}
+
+.mbn-survey__step[hidden] {
+	display: none;
+}
+
+.mbn-survey__question {
+	margin: 0;
+	padding-top: 4px;
+	color: var(--mbn-text-primary, #333333);
+	font-family: var(--mbn-roboto-body-small-font-family, "Roboto", sans-serif);
+	font-size: calc(20px * var(--mbn-text-scale, 1));
+	/* Gana a `h2 { font-weight: 500 !important }` de base.css (§6). */
+	font-weight: 700 !important;
+	line-height: calc(27.5px * var(--mbn-text-scale, 1));
+}
+
+/* El enunciado recibe el foco al cambiar de paso para que un lector de pantalla
+   lo lea (assets/js/survey.js). No es un control —no se alcanza con el
+   tabulador— así que no dibuja el anillo de foco: sería un recuadro azul
+   permanente alrededor del texto para quien navega con ratón. */
+.mbn-survey__question:focus,
+.mbn-survey__question:focus-visible {
+	outline: none;
+}
+
+/* ---------- Escala de 7 estrellas ---------- */
+
+.mbn-survey__scale {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 12px;
+	justify-content: center;
+}
+
+.mbn-survey__star {
+	flex: 0 0 auto;
+	width: 40px;
+	height: 40px;
+	padding: 0;
+	border: 0;
+	background-color: var(--mbn-survey-star-empty, #CCCCCC);
+	cursor: pointer;
+	mask-image: var(--mbn-survey-star-outline);
+	mask-repeat: no-repeat;
+	mask-position: center;
+	mask-size: 40px 40px;
+	-webkit-mask-image: var(--mbn-survey-star-outline);
+	-webkit-mask-repeat: no-repeat;
+	-webkit-mask-position: center;
+	-webkit-mask-size: 40px 40px;
+}
+
+/* Elegido el valor 5, las estrellas 1 a 5 quedan rellenas: cambia la silueta,
+   no sólo el color. */
+.mbn-survey__star.is-filled {
+	background-color: var(--mbn-survey-star-active, #0F5AC4);
+	mask-image: var(--mbn-survey-star-filled);
+	-webkit-mask-image: var(--mbn-survey-star-filled);
+}
+
+/* Anticipo al pasar el ratón o al recorrer la escala con el teclado, en el azul
+   de marca para distinguirlo de lo ya elegido. */
+.mbn-survey__star.is-preview {
+	background-color: var(--mbn-brand-blue, #0F69C4);
+	mask-image: var(--mbn-survey-star-filled);
+	-webkit-mask-image: var(--mbn-survey-star-filled);
+}
+
+.mbn-survey__scale-labels {
+	display: flex;
+	justify-content: space-between;
+	gap: 16px;
+	margin: 0;
+	color: var(--mbn-text-placeholder, #999999);
+	font-family: var(--mbn-roboto-body-small-font-family, "Roboto", sans-serif);
+	font-size: calc(12px * var(--mbn-text-scale, 1));
+	line-height: calc(16px * var(--mbn-text-scale, 1));
+}
+
+.mbn-survey__scale-max {
+	text-align: end;
+}
+
+/* ---------- Aviso de error ---------- */
+
+.mbn-survey__alert {
+	margin: 0;
+	padding: 12px 16px;
+	border-inline-start: 4px solid var(--mbn-state-alert, #FF0031);
+	background-color: var(--mbn-surface-soft, #F9F9F9);
+	color: var(--mbn-text-primary, #333333);
+	font-family: var(--mbn-roboto-body-small-font-family, "Roboto", sans-serif);
+	font-size: calc(14px * var(--mbn-text-scale, 1));
+	line-height: 1.5;
+}
+
+.mbn-survey__alert[hidden] {
+	display: none;
+}
+
+/* ---------- Botones ---------- */
+
+.mbn-survey__actions {
+	display: flex;
+	gap: 14px;
+}
+
+/* Clase de Bootstrap + variables `--bs-btn-*` redefinidas (§7.3) en vez de
+   declaraciones sueltas: `.btn:disabled` tiene más especificidad que una clase
+   propia, así que un `background-color` a secas se perdía justo en el estado
+   deshabilitado, que es el que pinta el Figma en el primer paso. */
+.mbn-survey__button {
+	--bs-btn-padding-y: 8px;
+	--bs-btn-padding-x: 16px;
+	--bs-btn-border-radius: 24px;
+	--bs-btn-border-width: 0;
+	--bs-btn-font-family: var(--mbn-roboto-body-button-font-family, "Roboto", sans-serif);
+	--bs-btn-font-size: var(--mbn-roboto-body-small-font-size, 16px);
+	--bs-btn-font-weight: 700;
+	--bs-btn-line-height: 1.5;
+	flex: 1 1 0;
+}
+
+.mbn-survey__button[hidden] {
+	display: none;
+}
+
+.mbn-survey__button--primary {
+	--bs-btn-bg: var(--mbn-action-primary, #0046A8);
+	--bs-btn-color: var(--mbn-text-on-primary, #E7ECFF);
+	--bs-btn-border-color: transparent;
+	--bs-btn-hover-bg: var(--mbn-brand-blue-dark, #00268D);
+	--bs-btn-hover-color: var(--mbn-text-on-primary, #E7ECFF);
+	--bs-btn-hover-border-color: transparent;
+	--bs-btn-active-bg: var(--mbn-brand-blue-dark, #00268D);
+	--bs-btn-active-color: var(--mbn-text-on-primary, #E7ECFF);
+	/* El Figma pinta «Siguiente» deshabilitado al 36% del mismo azul, no en
+	   gris: sigue leyéndose como el botón principal, apagado. */
+	--bs-btn-disabled-bg: var(--mbn-action-primary, #0046A8);
+	--bs-btn-disabled-color: var(--mbn-text-on-primary, #E7ECFF);
+	--bs-btn-disabled-border-color: transparent;
+	--bs-btn-disabled-opacity: 0.36;
+}
+
+.mbn-survey__button--ghost {
+	--bs-btn-bg: transparent;
+	--bs-btn-color: var(--mbn-brand-blue-dark, #00268D);
+	--bs-btn-border-color: transparent;
+	--bs-btn-hover-bg: var(--mbn-surface-hover, #F2F2F2);
+	--bs-btn-hover-color: var(--mbn-brand-blue-dark, #00268D);
+	--bs-btn-hover-border-color: transparent;
+	--bs-btn-active-bg: var(--mbn-surface-hover, #F2F2F2);
+	--bs-btn-active-color: var(--mbn-brand-blue-dark, #00268D);
+}
+
+.mbn-survey__button--compact {
+	flex: 0 0 auto;
+	align-self: center;
+	min-width: 77px;
+}
+
+/* ---------- Privacidad ---------- */
+
+.mbn-survey__privacy {
+	margin: 0;
+	color: var(--mbn-text-subtle, #666666);
+	font-family: var(--mbn-roboto-body-small-font-family, "Roboto", sans-serif);
+	font-size: calc(12px * var(--mbn-text-scale, 1));
+	line-height: calc(16px * var(--mbn-text-scale, 1));
+	text-align: center;
+}
+
+.mbn-survey__privacy-link {
+	color: var(--mbn-link-default, #1D70B8);
+	text-decoration: underline;
+}
+
+/* ---------- Pantalla de agradecimiento ---------- */
+
+.mbn-survey__done {
+	display: flex;
+	flex-direction: column;
+	gap: 14px;
+	align-items: center;
+	text-align: center;
+}
+
+.mbn-survey__done[hidden] {
+	display: none;
+}
+
+.mbn-survey__done-icon {
+	display: block;
+	width: 64px;
+	height: 64px;
+	border-radius: 50%;
+	background-color: var(--mbn-surface-brand-soft, #E8F0FE);
+	/* El visto se compone dentro del círculo: el fondo es del círculo y la
+	   máscara recorta la marca sobre el color de acción. */
+	background-image: none;
+	position: relative;
+}
+
+.mbn-survey__done-icon::after {
+	content: "";
+	position: absolute;
+	inset: 16px;
+	background-color: var(--mbn-action-primary, #0046A8);
+	mask-image: var(--mbn-survey-check);
+	mask-repeat: no-repeat;
+	mask-position: center;
+	mask-size: 32px 32px;
+	-webkit-mask-image: var(--mbn-survey-check);
+	-webkit-mask-repeat: no-repeat;
+	-webkit-mask-position: center;
+	-webkit-mask-size: 32px 32px;
+}
+
+.mbn-survey__done-title {
+	margin: 0;
+	color: var(--mbn-text-primary, #333333);
+	font-family: var(--mbn-roboto-body-small-font-family, "Roboto", sans-serif);
+	font-size: calc(24px * var(--mbn-text-scale, 1));
+	font-weight: 700 !important;
+	line-height: calc(32px * var(--mbn-text-scale, 1));
+}
+
+.mbn-survey__done-text {
+	margin: 0;
+	color: var(--mbn-text-subtle, #666666);
+	font-family: var(--mbn-roboto-body-small-font-family, "Roboto", sans-serif);
+	font-size: calc(14px * var(--mbn-text-scale, 1));
+	line-height: calc(22.75px * var(--mbn-text-scale, 1));
+}
+
+/* ---------- Móvil y tablet ---------- */
+
+@media (max-width: 767.98px) {
+	.mbn-survey {
+		--bs-modal-padding: 16px 20px;
+	}
+
+	.mbn-survey .modal-dialog {
+		margin: 16px;
+	}
+
+	.mbn-survey__question {
+		font-size: calc(18px * var(--mbn-text-scale, 1));
+		line-height: calc(25px * var(--mbn-text-scale, 1));
+	}
+
+	/* Siete estrellas de 40 no caben en 402px de ancho: 32 con 8 de aire sí, y
+	   siguen por encima del área táctil mínima. */
+	.mbn-survey__scale {
+		gap: 8px;
+	}
+
+	.mbn-survey__star {
+		width: 32px;
+		height: 32px;
+		mask-size: 32px 32px;
+		-webkit-mask-size: 32px 32px;
+	}
+
+	.mbn-survey__step-dot {
+		height: 24px;
+	}
+
+	.mbn-survey__step-dot:last-child {
+		flex: 0 0 24px;
+	}
+
+	.mbn-survey__step-dot::before {
+		width: 24px;
+	}
+
+	.mbn-survey__step-dot:not(:last-child)::after {
+		inset-block-start: 11px;
+		inset-inline-start: 22px;
+	}
+}

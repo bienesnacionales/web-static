@@ -1,0 +1,414 @@
+/* ============================================================
+ * Componente — Visor de PDF (template-parts/components/pdf-viewer.php)
+ *
+ * Sin maqueta de Figma: ver el docblock de `inc/components/pdf-viewer.php`. El
+ * título copia la escala de las páginas hermanas —28 / 32 / 36 en base, `md` y
+ * `xl`, la de `siac.css`, `faq.css` y `participacion.css`— y el visor, la piel
+ * de panel de `components/embed.css`: radio 8 y `--mbn-surface-soft`.
+ *
+ * El componente no trae contenedor ni relleno de sección: dentro de una
+ * plantilla los pone la plantilla, y en el Contenido flexible,
+ * `.mbn-sections__group` (base_custom.css).
+ * ============================================================ */
+
+.mbn-pdf-viewer {
+	display: flex;
+	flex-direction: column;
+	gap: 24px;
+}
+
+/* base.css: `h1 { font-weight: 700 !important; font-family: Roboto Slab
+   !important }` y `h2 { font-weight: 500 !important; font-family: Roboto
+   !important }`. El peso 500 del h1 y la Roboto Slab del h2 necesitan
+   !important para ganarle. */
+.mbn-pdf-viewer__title {
+	margin: 0;
+	font-family: var(--mbn-roboto-slab-large-font-family, "Roboto Slab", serif) !important;
+	font-weight: var(--mbn-roboto-slab-large-font-weight, 500) !important;
+	line-height: 1.5;
+	color: var(--mbn-text-primary, #333333);
+}
+
+/* Heading/Slab/Large, escalonado como en las páginas hermanas. */
+.mbn-pdf-viewer__title--h1 {
+	font-size: calc(28px * var(--mbn-text-scale, 1));
+}
+
+/* Heading/Slab/Medium: el mismo tamaño en los tres anchos. */
+.mbn-pdf-viewer__title--h2 {
+	font-size: var(--mbn-roboto-slab-medium-font-size, 24px);
+}
+
+/* ---------- El visor ----------
+   Mientras el navegador pinta el PDF, el <object> es un elemento reemplazado:
+   el `display: flex` no le afecta y se comporta como un bloque. Cuando no
+   puede pintarlo, el <object> pasa a ser una caja normal con su contenido de
+   reserva —el aviso— dentro, y el flex lo centra en el panel.
+
+   `frameborder` no existe en <object>; el borde negro de 1px de producción no
+   se replica (ver el docblock del componente). */
+.mbn-pdf-viewer__frame {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 100%;
+	height: var(--mbn-pdf-viewer-height, 600px);
+	border: 0;
+	/* 8px literal, como en components/embed.css: tokens.css no tiene token para
+	   este radio. */
+	border-radius: 8px;
+	background: var(--mbn-surface-soft, #F9F9F9);
+}
+
+/* La reserva: `.mbn-notice` ocupa el 100% del ancho y aquí va centrado en el
+   panel, con aire alrededor. (0,2,0) para ganarle a `.mbn-notice` y a `.alert`
+   sin depender del orden de carga. */
+.mbn-pdf-viewer__frame > .mbn-notice {
+	width: auto;
+	max-width: 560px;
+	margin: 16px;
+}
+
+/* ============================================================
+ * El visor propio, con PDF.js (2026-10-08)
+ *
+ * `pdf-viewer.js` sustituye el <object> por esta caja donde el visor del
+ * navegador no sirve: Chrome en Android no tiene, y Safari en iOS no deja
+ * desplazarse por el PDF. Lleva también la clase `__frame`, así que hereda el
+ * alto, el radio y el fondo del panel —y, dentro del modal, el reparto del
+ * flex—; aquí solo se convierte en columna: la barra arriba y las páginas, que
+ * se desplazan, debajo.
+ * ============================================================ */
+
+.mbn-pdf-viewer__doc {
+	flex-direction: column;
+	align-items: stretch;
+	justify-content: flex-start;
+	overflow: hidden;
+}
+
+.mbn-pdf-viewer__bar {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 8px 12px;
+	padding: 8px 12px;
+	border-bottom: 1px solid var(--mbn-border-divider, #E6E6E6);
+	background: var(--mbn-surface-white, #FFFFFF);
+	font-family: var(--mbn-roboto-body-small-font-family, "Roboto", sans-serif);
+	font-size: calc(14px * var(--mbn-text-scale, 1));
+	line-height: 1.5;
+	color: var(--mbn-text-primary, #333333);
+}
+
+/* 32px: por encima de los 24 del mínimo de WCAG 2.5.8. */
+.mbn-pdf-viewer__zoom {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 32px;
+	height: 32px;
+	padding: 0;
+	border: 1px solid var(--mbn-border-default, #CCCCCC);
+	border-radius: 4px;
+	background: var(--mbn-surface-white, #FFFFFF);
+	color: var(--mbn-text-primary, #333333);
+	font-size: calc(20px * var(--mbn-text-scale, 1));
+	line-height: 1;
+	cursor: pointer;
+}
+
+.mbn-pdf-viewer__zoom:hover {
+	background: var(--mbn-surface-hover, #F2F2F2);
+}
+
+.mbn-pdf-viewer__zoom:focus-visible,
+.mbn-pdf-viewer__pages:focus-visible,
+.mbn-pdf-viewer__download:focus-visible {
+	outline: 3px solid var(--mbn-brand-blue, #0F69C4);
+	outline-offset: 2px;
+}
+
+/* En los extremos van con `aria-disabled`, no `disabled` (§8). */
+.mbn-pdf-viewer__zoom[aria-disabled="true"] {
+	opacity: 0.4;
+	cursor: default;
+}
+
+.mbn-pdf-viewer__scale {
+	min-width: 6.5em;
+	text-align: center;
+}
+
+.mbn-pdf-viewer__count {
+	margin-inline-start: auto;
+}
+
+.mbn-pdf-viewer__download {
+	color: var(--mbn-link-default, #1D70B8);
+	font-weight: 500;
+	text-decoration: underline;
+}
+
+/* La caja que se desplaza. `position: relative` la hace el `offsetParent` de
+   las páginas, que es lo que mide el contador. `overscroll-behavior` evita que
+   al llegar al final del documento se desplace la página de detrás. El
+   relleno de 16 tiene que coincidir con `RELLENO` del script. */
+.mbn-pdf-viewer__pages {
+	position: relative;
+	flex: 1 1 auto;
+	min-height: 0;
+	overflow: auto;
+	overscroll-behavior: contain;
+	-webkit-overflow-scrolling: touch;
+	padding: 16px;
+}
+
+.mbn-pdf-viewer__status {
+	margin: 0;
+	padding: 24px 0;
+	text-align: center;
+	color: var(--mbn-text-primary, #333333);
+}
+
+.mbn-pdf-viewer__pages > .mbn-notice {
+	width: auto;
+	max-width: 560px;
+	margin: 16px auto;
+}
+
+/* Bloque y no flex: con `margin-inline: auto` una página más ancha que la
+   caja —tras acercar— se alinea a la izquierda y se puede recorrer entera; con
+   `align-items: center` su mitad izquierda quedaría fuera de alcance. */
+.mbn-pdf-viewer__page {
+	--scale-round-x: 1px;
+	--scale-round-y: 1px;
+	position: relative;
+	overflow: hidden;
+	margin: 0 auto 16px;
+	background: #FFFFFF;
+	box-shadow: var(--mbn-shadow-elevation-2, 0 1px 3px rgba(0, 0, 0, 0.3));
+}
+
+.mbn-pdf-viewer__page:last-child {
+	margin-bottom: 0;
+}
+
+.mbn-pdf-viewer__canvas {
+	position: absolute;
+	inset: 0;
+	display: block;
+	width: 100%;
+	height: 100%;
+}
+
+/* La capa de texto de PDF.js: la hoja oficial (`web/pdf_viewer.css`,
+   `.textLayer`) pasada a CSS plano, sin lo que aquí no se usa —resaltados de
+   búsqueda y edición—. El texto es transparente: se ve el canvas y se
+   selecciona, y lo lee el lector de pantalla. Las variables
+   `--total-scale-factor` y `--font-height` las ponen el script y PDF.js. */
+.mbn-pdf-viewer__text {
+	--min-font-size: 1;
+	--text-scale-factor: calc(var(--total-scale-factor) * var(--min-font-size));
+	--min-font-size-inv: calc(1 / var(--min-font-size));
+	color-scheme: only light;
+	position: absolute;
+	inset: 0;
+	z-index: 0;
+	overflow: clip;
+	opacity: 1;
+	text-align: initial;
+	line-height: 1;
+	letter-spacing: normal;
+	word-spacing: normal;
+	-webkit-text-size-adjust: none;
+	text-size-adjust: none;
+	forced-color-adjust: none;
+	transform-origin: 0 0;
+	caret-color: CanvasText;
+}
+
+.mbn-pdf-viewer__text :is(span, br) {
+	position: absolute;
+	color: transparent;
+	white-space: pre;
+	cursor: text;
+	transform-origin: 0% 0%;
+	-webkit-user-select: text;
+	user-select: text;
+}
+
+.mbn-pdf-viewer__text > :not(.markedContent),
+.mbn-pdf-viewer__text .markedContent span:not(.markedContent) {
+	--font-height: 0;
+	--scale-x: 1;
+	--rotate: 0deg;
+	z-index: 1;
+	font-size: calc(var(--text-scale-factor) * var(--font-height));
+	transform: rotate(var(--rotate)) scaleX(var(--scale-x)) scale(var(--min-font-size-inv));
+}
+
+.mbn-pdf-viewer__text .markedContent {
+	display: contents;
+}
+
+.mbn-pdf-viewer__text span[role="img"] {
+	-webkit-user-select: none;
+	user-select: none;
+	cursor: default;
+}
+
+.mbn-pdf-viewer__text ::selection {
+	background: rgba(0, 0, 255, 0.25);
+	color: transparent;
+}
+
+.mbn-pdf-viewer__text br::selection {
+	background: transparent;
+}
+
+/* ---------- md ≥ 768px ---------- */
+
+@media (min-width: 768px) {
+	.mbn-pdf-viewer__title--h1 {
+		font-size: calc(32px * var(--mbn-text-scale, 1));
+	}
+}
+
+/* ---------- xl ≥ 1200px ---------- */
+
+@media (min-width: 1200px) {
+	.mbn-pdf-viewer__title--h1 {
+		font-size: var(--mbn-roboto-slab-large-font-size, 36px);
+	}
+}
+
+/* ============================================================
+ * El visor dentro de un modal (template-parts/components/partials/pdf-modal.php)
+ *
+ * Sin maqueta: es el `modal` de Bootstrap con las variables `--bs-modal-*`
+ * redefinidas (§7.3). Pantalla completa por debajo de `lg` y `modal-xl` a
+ * partir de ahí, en los dos casos a toda la altura de la ventana: el visor
+ * ocupa el cuerpo entero del modal en vez de sus 600px de siempre.
+ * ============================================================ */
+
+.mbn-pdf-modal {
+	--bs-modal-color: var(--mbn-text-primary, #333333);
+	--bs-modal-header-padding: 16px 24px;
+	--bs-modal-header-border-color: var(--mbn-border-divider, #E6E6E6);
+	--bs-modal-padding: 16px;
+}
+
+.mbn-pdf-modal .modal-content {
+	height: 100%;
+}
+
+.mbn-pdf-modal__heading {
+	display: flex;
+	flex-direction: column;
+	min-width: 0;
+}
+
+/* base.css: `h2 { font-weight: 500 !important; font-family: Roboto
+   !important }`. La Roboto Slab necesita !important para ganarle. */
+.mbn-pdf-modal__title {
+	margin: 0;
+	font-family: var(--mbn-roboto-slab-medium-font-family, "Roboto Slab", serif) !important;
+	font-weight: var(--mbn-roboto-slab-medium-font-weight, 500) !important;
+	font-size: calc(20px * var(--mbn-text-scale, 1));
+	line-height: 1.5;
+	color: var(--mbn-text-primary, #333333);
+}
+
+/* base.css: `main p { margin-bottom: 20px; color: #4a4a4a }`, sin !important:
+   la clase (0,1,0) le gana a `main p` (0,0,2). */
+.mbn-pdf-modal__meta {
+	margin: 0;
+	font-size: calc(14px * var(--mbn-text-scale, 1));
+	line-height: 1.5;
+	color: var(--mbn-text-primary, #333333);
+}
+
+/* ---------- El enlace «Descargar» (2026-10-07) ----------
+   La cabecera pasa a tener tres piezas. `.modal-header` es un flex con
+   `justify-content: space-between`, así que sin esto el enlace se quedaría
+   pegado al título: el encabezado se lleva el espacio sobrante y el enlace y el
+   aspa quedan juntos a la derecha, separados por el `gap`.
+
+   El `margin-left: auto` del `.btn-close` de Bootstrap se come parte de ese
+   gap; 24 deja los ~16px efectivos. */
+.mbn-pdf-modal .modal-header {
+	gap: 24px;
+}
+
+.mbn-pdf-modal__heading {
+	flex: 1 1 auto;
+}
+
+/* Es un enlace y se lee como tal: el azul `link/default` del design system y
+   subrayado (§6). No es un botón —no lleva a un estado nuevo, descarga— y por
+   eso tampoco entra en la lista de «botones por clase» de a11y.css, donde
+   seguirá siendo un enlace amarillo. */
+.mbn-pdf-modal__download {
+	flex: 0 0 auto;
+	align-self: center;
+	font-family: var(--mbn-roboto-body-small-font-family, "Roboto", sans-serif);
+	font-size: calc(16px * var(--mbn-text-scale, 1));
+	font-weight: 500;
+	line-height: 1.5;
+	color: var(--mbn-link-default, #1D70B8);
+	text-decoration: underline;
+}
+
+.mbn-pdf-modal__download:hover,
+.mbn-pdf-modal__download:focus-visible {
+	color: var(--mbn-brand-blue-dark, #00268D);
+}
+
+.mbn-pdf-modal__download:focus-visible {
+	outline: 3px solid var(--mbn-brand-blue, #0F69C4);
+	outline-offset: 2px;
+}
+
+/* El foco del theme es un outline de 3px, no el anillo de Bootstrap, que
+   `.btn-close:focus` pone con `box-shadow` y quitando el outline. */
+.mbn-pdf-modal .btn-close {
+	--bs-btn-close-focus-shadow: none;
+	flex: 0 0 auto;
+}
+
+.mbn-pdf-modal .btn-close:focus-visible {
+	outline: 3px solid var(--mbn-brand-blue, #0F69C4);
+	outline-offset: 2px;
+}
+
+/* El visor crece hasta llenar el cuerpo. Su alto de siempre llega inline como
+   `--mbn-pdf-viewer-height`; aquí se anula con `height: auto` y lo reparte el
+   flex. El mínimo evita un visor inservible en una ventana muy baja. */
+.mbn-pdf-modal__body {
+	display: flex;
+	flex-direction: column;
+	min-height: 0;
+}
+
+.mbn-pdf-modal .mbn-pdf-viewer {
+	flex: 1 1 auto;
+	min-height: 0;
+}
+
+.mbn-pdf-modal .mbn-pdf-viewer__frame {
+	flex: 1 1 auto;
+	height: auto;
+	min-height: 320px;
+}
+
+/* ---------- lg ≥ 992px ----------
+   El mismo tier en el que `modal-fullscreen-lg-down` deja de ser pantalla
+   completa: desde aquí el diálogo es una caja con margen, y se le da toda la
+   altura disponible. */
+
+@media (min-width: 992px) {
+	.mbn-pdf-modal .modal-dialog {
+		height: calc(100% - var(--bs-modal-margin) * 2);
+	}
+}

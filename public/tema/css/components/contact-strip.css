@@ -1,0 +1,141 @@
+/* ============================================================
+ * Componente global — Barra de contacto
+ * Maqueta: Figma 600:8350, la tira gris de «Preguntas Frecuentes» (359:9804).
+ * Contenedor #F9F9F9 con radio 8 y relleno 16px; dentro, los datos
+ * repartidos en la fila. Cada dato: recuadro blanco de 52 (radio 8, padding 8)
+ * con el icono de 36, y al lado el título en 16 bold, el enlace en 16 azul
+ * subrayado y la nota en 14 regular.
+ *
+ * **Las columnas miden todas lo mismo** (2026-09-30, pedido del equipo): la
+ * maqueta reparte los datos con `space-between` y cada bloque mide lo que su
+ * texto, pero con un cuarto dato —el correo— eso dejaba columnas de anchos
+ * dispares y la más estrecha partía la dirección de correo a mitad de palabra.
+ * Desde `xl` es una sola fila de columnas iguales, sea cual sea el número de
+ * datos; por debajo, dos columnas desde `sm` y una en móvil.
+ *
+ * No hay canvas de tablet ni de mobile para esta página. Ver el docblock de
+ * faq.css.
+ *
+ * Ojo con base.css (el Base Kit de Siigsa): `main p { font-weight: 400
+ * !important }` — por eso el título es un `<strong>` y no un `<p>`, así el peso
+ * lo pone el elemento y no hace falta ganarle a un !important.
+ * ============================================================ */
+
+.mbn-contact-strip {
+	width: 100%;
+	padding: 16px;
+	background-color: var(--mbn-surface-soft, #F9F9F9);
+	border-radius: 8px;
+}
+
+.mbn-contact-strip__list {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr);
+	gap: 16px 24px;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.mbn-contact-strip__item {
+	display: flex;
+	align-items: flex-start;
+	gap: 8px;
+	min-width: 0;
+}
+
+/* ---------- Recuadro del icono ---------- */
+
+.mbn-contact-strip__icon {
+	display: flex;
+	flex: 0 0 auto;
+	align-items: center;
+	justify-content: center;
+	width: 52px;
+	height: 52px;
+	padding: 8px;
+	background-color: var(--mbn-surface-white, #FFFFFF);
+	border-radius: 8px;
+}
+
+/* Los iconos son SVG y WordPress no conoce sus dimensiones intrínsecas, así que
+   el tamaño lo fija el CSS (§9). */
+.mbn-contact-strip__icon img {
+	display: block;
+	width: 36px;
+	height: 36px;
+}
+
+/* ---------- Texto ---------- */
+
+.mbn-contact-strip__body {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	min-width: 0;
+	font-family: var(--mbn-roboto-body-small-font-family, "Roboto", sans-serif);
+	font-size: var(--mbn-roboto-body-small-font-size, 16px);
+	line-height: 1.5;
+	color: var(--mbn-text-primary, #333333);
+	/* Los datos traen direcciones y números largos que no se pueden partir por
+	   ningún espacio; sin esto desbordan la caja en pantallas estrechas. */
+	overflow-wrap: anywhere;
+}
+
+.mbn-contact-strip__heading {
+	display: block;
+}
+
+.mbn-contact-strip__title {
+	font-weight: 700;
+}
+
+/* El complemento va en la misma línea que el título, sin negrita: en la maqueta
+   «…O'Higgins 720, Santiago de Chile» se lee como una sola dirección. El espacio
+   lo pone el HTML, no un margen: es parte del texto. */
+.mbn-contact-strip__detail {
+	font-weight: 400;
+}
+
+.mbn-contact-strip__link {
+	color: var(--mbn-link-default, #1D70B8);
+	text-decoration: underline;
+}
+
+/* Si un correo no cabe —escala de texto A+, columnas estrechas—, el template
+   deja un `<wbr>` tras la arroba: `overflow-wrap: anywhere` solo corta a mitad
+   de palabra cuando la línea no ofrece ninguna otra oportunidad, así que el
+   corte cae en «consultas@ / mbienes.cl» y no en «consultas@mbi / enes.cl». */
+
+.mbn-contact-strip__link:hover,
+.mbn-contact-strip__link:focus-visible {
+	color: var(--mbn-brand-blue-dark, #00268D);
+}
+
+/* Gob/Desktop/Body/Extra Small. */
+.mbn-contact-strip__note {
+	font-size: var(--mbn-roboto-body-xsmall-font-size, 14px);
+}
+
+/* ---------- Responsive (mobile-first, §7.1) ----------
+   El relleno se mantiene en 16px en todos los tamaños para dar espacio al horario.
+
+   La fila única empieza en `xl` y no en `lg`: con cuatro datos a 992px cada
+   columna deja ~150px de texto y el correo ya no cabe; a 1200, 184px. */
+
+@media (min-width: 576px) {
+	.mbn-contact-strip__list {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+}
+
+@media (min-width: 1200px) {
+	/* Una columna por dato, todas iguales, sin contar cuántos hay: cada `<li>`
+	   abre su propia pista y `minmax(0, 1fr)` las reparte a partes iguales sin
+	   que el contenido más largo ensanche la suya. */
+	.mbn-contact-strip__list {
+		grid-auto-flow: column;
+		grid-auto-columns: minmax(0, 1fr);
+		grid-template-columns: none;
+	}
+}

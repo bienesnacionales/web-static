@@ -1,0 +1,417 @@
+/* Footer — bloques footerDesktop / footerTablet / footerMobile.
+ *
+ * Bloque del contrato: header-footer-contract-v1.json → blocks.footerDesktop/Tablet/Mobile
+ * Maquetas Figma:
+ *   Desktop 1440 → 179:1154
+ *   Tablet   834 → 672:9294
+ *   Mobile   402 → 442:9429
+ *
+ * Decisión humana (openQuestions.resolvedAt 2026-08-25T05:01 — OPEN-Q-HF-002):
+ * horario canónico único replicado en los 3 viewports (se usa la redacción
+ * desktop, que es la más completa).
+ *
+ * DEC-MAP-002 RESUELTO 2026-08-27: el bloque de redes sociales está presente
+ * en los 3 viewports (nodo 179:1178 confirmado en Desktop).
+ *
+ * Visibilidad:
+ *   - desktop ≥1200px → .mbn-footer--desktop visible, --tablet y --mobile ocultos
+ *   - tablet  768-1199.98 → --tablet visible, resto oculto
+ *   - mobile  <768 → --mobile visible, resto oculto
+ *
+ * Tokens (assets/css/tokens.css):
+ *   --mbn-surface-footer            #01084D
+ *   --mbn-footer-padding-desktop    60px 171px 0
+ *   --mbn-footer-padding-responsive 60px 24px
+ *   --mbn-footer-row-desktop        1214px  (ancho real de la fila, ver tokens.css)
+ *   --mbn-footer-col-gap-desktop    48px
+ *   --mbn-footer-gap-responsive     32px
+ *   --mbn-footer-contact-gap        38px
+ *   --mbn-footer-contact-width      222px
+ *
+ * NOTA sobre el kit base (assets/css/base.css, "Base Kit Digital" de Siigsa):
+ * ese archivo declara `footer { background-color: #012C50 !important; padding:
+ * 40px 0 50px; }` sobre el selector de elemento. El `!important` gana a
+ * cualquier declaración normal, así que el fondo de marca #01084D y el padding
+ * de la maqueta se pierden si no se contrarrestan aquí. Es el único caso del
+ * bloque donde el theme usa `!important` (override final permitido por la
+ * convención del proyecto).
+ */
+
+.mbn-footer {
+	/* Override de base.css (kit Siigsa): `footer { background-color: #012C50 !important }`. */
+	background-color: var(--mbn-surface-footer, #01084D) !important;
+	color: #FFFFFF;
+	/* base.css aplica `footer { padding: 40px 0 50px }`; el padding real de cada
+	   viewport vive en .mbn-footer__container. */
+	padding: 0;
+	min-height: 0;
+}
+
+/* ---------- Desktop (≥1200px, maqueta 1440) ---------- */
+
+.mbn-footer--desktop {
+	display: none;
+}
+
+.mbn-footer--desktop .mbn-footer__container {
+	max-width: var(--mbn-width-frame-desktop, 1440px);
+	margin-inline: auto;
+	/* La maqueta declara 60px 171px 0; el inset horizontal efectivo lo fija el
+	   max-width de la fila (ver token --mbn-footer-row-desktop). Aquí sólo se
+	   conserva un colchón mínimo para viewports entre 1200 y 1262px. */
+	padding: 60px 24px 60px;
+}
+
+.mbn-footer--desktop .mbn-footer__row {
+	display: flex;
+	flex-wrap: nowrap;
+	gap: var(--mbn-footer-col-gap-desktop, 48px);
+	align-items: flex-start;
+	justify-content: center;
+	max-width: var(--mbn-footer-row-desktop, 1214px);
+	margin-inline: auto;
+}
+
+.mbn-footer--desktop .mbn-footer__col {
+	min-width: 0;
+}
+
+/* Anchos de la maqueta como flex-basis: las columnas de texto pueden encoger
+   entre 1200px y 1262px de viewport en vez de romper la fila en dos líneas. */
+.mbn-footer--desktop .mbn-footer__col--tramites { flex: 0 1 169px; }
+.mbn-footer--desktop .mbn-footer__col--ciudadania { flex: 0 1 247px; }
+.mbn-footer--desktop .mbn-footer__col--informacion { flex: 0 1 247px; }
+
+.mbn-footer--desktop .mbn-footer__col--logo {
+	flex: 0 0 137px;
+	/* h-full + justify-between de la maqueta: la franja se ancla al borde
+	   inferior del footer, que no tiene padding-bottom. */
+	align-self: stretch;
+	justify-content: space-between;
+	gap: 24px;
+}
+
+.mbn-footer--desktop .mbn-footer__col--contacto {
+	flex: 0 1 var(--mbn-footer-contact-width, 222px);
+}
+
+/* ---------- Tablet (768–1199.98px, maqueta 834) ---------- */
+
+.mbn-footer--tablet {
+	display: none;
+}
+
+.mbn-footer--tablet .mbn-footer__container {
+	max-width: var(--mbn-width-frame-tablet, 834px);
+	margin-inline: auto;
+	padding: var(--mbn-footer-padding-responsive, 60px 24px);
+}
+
+.mbn-footer--tablet .mbn-footer__grid {
+	display: grid;
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+	grid-template-rows: repeat(2, fit-content(100%));
+	gap: var(--mbn-footer-gap-responsive, 32px);
+	align-items: start;
+}
+
+.mbn-footer--tablet .mbn-footer__cell--logo {
+	grid-column: 1;
+	grid-row: 1;
+}
+
+.mbn-footer--tablet .mbn-footer__cell--tramites {
+	grid-column: 2;
+	grid-row: 1;
+}
+
+.mbn-footer--tablet .mbn-footer__cell--ciudadania {
+	grid-column: 3;
+	grid-row: 1;
+}
+
+.mbn-footer--tablet .mbn-footer__cell--informacion {
+	grid-column: 2;
+	grid-row: 2;
+}
+
+.mbn-footer--tablet .mbn-footer__cell--contacto {
+	grid-column: 3;
+	grid-row: 2;
+}
+
+/* ---------- Mobile (<768px, maqueta 402) ---------- */
+
+.mbn-footer--mobile {
+	display: none;
+}
+
+.mbn-footer--mobile .mbn-footer__container {
+	max-width: var(--mbn-width-frame-mobile, 402px);
+	margin-inline: auto;
+	padding: var(--mbn-footer-padding-responsive, 60px 24px);
+}
+
+.mbn-footer--mobile .mbn-footer__stack {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	gap: var(--mbn-footer-gap-responsive, 32px);
+}
+
+/* ---------- Compartido: logo ---------- */
+
+/* Tablet y Mobile: franja pegada bajo el logo (gap 0 en la maqueta).
+   Desktop redefine justify-content y align-self más arriba. */
+.mbn-footer__col--logo,
+.mbn-footer__cell--logo {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	width: 137px;
+	max-width: 100%;
+}
+
+/* El raster del logo (nodo 179:1156) viene con fondo negro opaco, igual que en
+   Figma, donde el layer se compone con blend mode "lighten" sobre el azul del
+   footer. El blend debe declararse aquí, sobre el <img>: dentro del SVG se
+   mezclaría contra transparente y dejaría un rectángulo negro. En alto
+   contraste (fondo #000) lighten es la identidad, así que el logo se conserva. */
+.mbn-footer__logo {
+	display: block;
+	width: 137px;
+	height: 126px;
+	max-width: 100%;
+	mix-blend-mode: lighten;
+}
+
+.mbn-footer__logo-franja {
+	display: block;
+	width: 110px;
+	height: 8px;
+	max-width: 100%;
+}
+
+/* La versión de alto contraste sólo se ve con html.mbn-contrast (a11y.css),
+   igual que el logo del header. */
+.mbn-footer__logo-franja.mbn-footer__logo-franja--contrast {
+	display: none;
+}
+
+/* ---------- Compartido: columnas de enlaces ---------- */
+
+/* Anchos de columna de la maqueta, compartidos por los 3 viewports: son los que
+   fijan dónde rompe el texto largo ("Solicitud de Información Pública / Ley de
+   Transparencia"). En Desktop los refuerza el flex-basis; en Tablet la celda de
+   grid (1fr ≈ 240px) puede ser más estrecha y manda ella. */
+.mbn-footer__col--tramites,
+.mbn-footer__cell--tramites {
+	max-width: 169px;
+}
+
+.mbn-footer__col--ciudadania,
+.mbn-footer__cell--ciudadania,
+.mbn-footer__col--informacion,
+.mbn-footer__cell--informacion {
+	max-width: 247px;
+}
+
+.mbn-footer__col-list {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}
+
+.mbn-footer__col-item {
+	padding: 0;
+}
+
+.mbn-footer__col-heading {
+	display: block;
+	font: 700 16px/1.5 "Roboto", system-ui, sans-serif;
+	/* El atajo `font` reinicia el tamaño: se reescribe escalado. */
+	font-size: calc(16px * var(--mbn-text-scale, 1));
+	color: #FFFFFF;
+}
+
+/* Gob / Desktop / Link / Body Small — Roboto Medium 16/1.5, subrayado.
+   El padding vertical reproduce el paso de ~40px entre enlaces de la maqueta
+   y de paso lleva el área de activación a 32px (WCAG 2.2 target size). */
+.mbn-footer__col-link {
+	display: block;
+	padding-block: 4px;
+	color: #FFFFFF;
+	font: 500 16px/1.5 "Roboto", system-ui, sans-serif;
+	/* El atajo `font` reinicia el tamaño: se reescribe escalado. */
+	font-size: calc(16px * var(--mbn-text-scale, 1));
+	text-decoration: underline;
+	text-decoration-thickness: 1px;
+	text-underline-offset: 2px;
+}
+
+.mbn-footer__col-link:hover,
+.mbn-footer__col-link:focus-visible {
+	/* base.css fija `footer a { color: #fff !important }`, así que el énfasis
+	   no puede apoyarse en el color: se engrosa el subrayado. */
+	text-decoration-thickness: 2px;
+}
+
+.mbn-footer__col-link:focus-visible {
+	outline: 3px solid var(--mbn-text-on-primary, #E7ECFF);
+	outline-offset: 2px;
+}
+
+/* ---------- Compartido: contacto + redes ---------- */
+
+.mbn-footer__col--contacto,
+.mbn-footer__cell--contacto {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	gap: var(--mbn-footer-contact-gap, 38px);
+	width: var(--mbn-footer-contact-width, 222px);
+	max-width: 100%;
+}
+
+.mbn-footer__contact {
+	margin: 0;
+	font-style: normal;
+	overflow-wrap: break-word;
+}
+
+/* Gob/Desktop/Body/Small — Roboto Regular 16/1.5.
+   La maqueta separa los 3 bloques con una línea en blanco (24px = 16 × 1.5). */
+.mbn-footer__contact-line {
+	margin: 0 0 24px;
+	color: #FFFFFF;
+	font: 400 16px/1.5 "Roboto", system-ui, sans-serif;
+	/* El atajo `font` reinicia el tamaño: se reescribe escalado. */
+	font-size: calc(16px * var(--mbn-text-scale, 1));
+}
+
+.mbn-footer__contact-line:last-child {
+	margin-bottom: 0;
+}
+
+.mbn-footer__contact-line strong {
+	font-weight: 700;
+}
+
+/* Los 3 bloques vienen de campos wysiwyg («Generales del sitio» → Footer), que
+   generan sus propios <p>. El ritmo entre bloques lo marca ya
+   .mbn-footer__contact-line, así que los párrafos internos no aportan margen
+   propio; dos párrafos dentro del mismo bloque se separan como los bloques. */
+.mbn-footer__contact-line p {
+	margin: 0;
+}
+
+.mbn-footer__contact-line p + p {
+	margin-top: 24px;
+}
+
+.mbn-footer__contact-line > :first-child {
+	margin-top: 0;
+}
+
+.mbn-footer__contact-line > :last-child {
+	margin-bottom: 0;
+}
+
+/* En la maqueta el teléfono y los correos NO van subrayados en reposo; el
+   subrayado aparece en hover/focus para no perder la señal de interacción.
+   Se incluye `.mbn-footer__contact-line a` porque los enlaces que el editor
+   escriba en el wysiwyg no llevan la clase del theme. */
+.mbn-footer__contact-line a,
+.mbn-footer__contact-link {
+	color: #FFFFFF;
+	text-decoration: none;
+}
+
+.mbn-footer__contact-line a:hover,
+.mbn-footer__contact-line a:focus-visible,
+.mbn-footer__contact-link:hover,
+.mbn-footer__contact-link:focus-visible {
+	text-decoration: underline;
+	text-decoration-thickness: 2px;
+	text-underline-offset: 2px;
+}
+
+.mbn-footer__contact-line a:focus-visible,
+.mbn-footer__contact-link:focus-visible {
+	outline: 3px solid var(--mbn-text-on-primary, #E7ECFF);
+	outline-offset: 2px;
+}
+
+.mbn-footer__social {
+	display: flex;
+	align-items: center;
+	gap: 16px;
+	margin: 0;
+}
+
+.mbn-footer__social-link {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 24px;
+	height: 24px;
+	color: #FFFFFF;
+	border-radius: 2px;
+}
+
+.mbn-footer__social-link:hover {
+	opacity: 0.8;
+}
+
+.mbn-footer__social-link:focus-visible {
+	outline: 3px solid var(--mbn-text-on-primary, #E7ECFF);
+	outline-offset: 4px;
+	opacity: 1;
+}
+
+.mbn-footer__social-link img {
+	display: block;
+	width: 24px;
+	height: 24px;
+}
+
+/* ---------- viewport switch ---------- */
+
+@media (min-width: 1200px) {
+	.mbn-footer--desktop {
+		display: block;
+	}
+	.mbn-footer--tablet,
+	.mbn-footer--mobile {
+		display: none;
+	}
+}
+
+@media (min-width: 768px) and (max-width: 1199.98px) {
+	.mbn-footer--tablet {
+		display: block;
+	}
+	.mbn-footer--desktop,
+	.mbn-footer--mobile {
+		display: none;
+	}
+}
+
+@media (max-width: 767.98px) {
+	.mbn-footer--mobile {
+		display: block;
+	}
+	.mbn-footer--desktop,
+	.mbn-footer--tablet {
+		display: none;
+	}
+}
+
+@media print {
+	.mbn-footer__social {
+		display: none;
+	}
+}

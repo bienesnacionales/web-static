@@ -1,38 +1,59 @@
 ---
 /**
- * Página de búsqueda. Cumple dos funciones: destino del enlace del Header si
- * la isla no llega a hidratarse, y URL compartible para buscar sin el modal.
+ * Resultados de la búsqueda del sitio (`/buscar/?s=…`).
+ *
+ * El marcado es el de la búsqueda del tema original; los resultados los pone
+ * Pagefind en el navegador, que es lo que puede hacer un sitio estático. Los
+ * formularios de búsqueda de la cabecera apuntan aquí.
  */
 import BaseLayout from '@/layouts/BaseLayout.astro';
-import Buscador from '@/components/Buscador.tsx';
 ---
 
 <BaseLayout
-  titulo="Buscar"
-  descripcion="Busque en las páginas, documentación y noticias del sitio del Ministerio de Bienes Nacionales."
+  titulo="Búsqueda – Ministerio de bienes nacionales"
+  clases="search search-results wp-embed-responsive wp-theme-mbn"
   sinIndexar
 >
-  <div class="mx-auto max-w-3xl px-4 py-16 sm:px-6">
-    <header class="mb-10">
-      <p class="eyebrow">Búsqueda</p>
-      <h1
-        class="mt-3 font-display text-4xl font-bold tracking-tight text-slate-900
-               sm:text-5xl dark:text-white"
-      >
-        Buscar en el sitio
-      </h1>
-      <p class="mt-5 text-lg text-slate-600 dark:text-slate-400">
-        La búsqueda cubre todas las páginas del portal. Desde cualquier página puede
-        abrirla también con <kbd
-          class="rounded border border-slate-300 px-1.5 py-0.5 text-sm dark:border-slate-700"
-          >Ctrl</kbd
-        > + <kbd
-          class="rounded border border-slate-300 px-1.5 py-0.5 text-sm dark:border-slate-700"
-          >K</kbd
-        >.
-      </p>
-    </header>
+  <main id="primary" class="site-main">
+    <div class="mbn-search">
+      <div class="mbn-container mbn-search__container">
+        <p class="mbn-search__count" data-busqueda-total hidden></p>
+        <div class="mbn-search__header">
+          <h1 class="mbn-search__title">Búsqueda</h1>
+          <p class="mbn-search__intro">
+            Ingresa tu búsqueda y encuentra lo que necesitas saber del Ministerio de Bienes Nacionales.
+          </p>
+          <form class="mbn-search__form" role="search" action="/buscar/" method="get" aria-label="Buscar en el sitio">
+            <label class="visually-hidden" for="mbn-search-field">Texto a buscar</label>
+            <div class="input-group flex-nowrap mbn-search__group">
+              <span class="input-group-text mbn-search__field-icon">
+                <img
+                  src="/tema/images/components/icon-search.svg"
+                  alt=""
+                  aria-hidden="true"
+                  width="20"
+                  height="20"
+                />
+              </span>
+              <input
+                id="mbn-search-field"
+                class="form-control mbn-search__input"
+                type="search"
+                name="s"
+                value=""
+                placeholder="Ingrese texto"
+                autocomplete="off"
+                required
+              />
+              <button class="btn mbn-search__button" type="submit">Buscar</button>
+            </div>
+          </form>
+          <p class="mbn-search__caption" data-busqueda-leyenda hidden></p>
+        </div>
+        <div data-busqueda-resultados aria-live="polite"></div>
+      </div>
+    </div>
+  </main>
 
-    <Buscador modo="pagina" client:load />
-  </div>
+  <script is:inline src="/js/busqueda-sitio.js"></script>
 </BaseLayout>

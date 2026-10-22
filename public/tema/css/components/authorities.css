@@ -1,0 +1,462 @@
+/* ============================================================
+ * Componente global — Autoridades (pestañas)
+ * Maqueta: Figma 292:3317, con los paneles 167:2068 (Ministerio),
+ * 284:2266 (Autoridades), 377:5807 (Seremis regionales) y
+ * 288:2586 (Divisiones).
+ *
+ * La botonera es «Tabs horizontales» del design system (284:1997), montada
+ * sobre el `nav-tabs` de Bootstrap: aquí solo se redefinen sus variables
+ * `--bs-nav-*` (§7.3). El acordeón de dos de las pestañas es el componente
+ * `accordion` en su variante `brand`, y su piel vive en `accordion.css`.
+ *
+ * Ojo con base.css (el Base Kit de Siigsa): `main p { font-weight: 400
+ * !important }`, la escala de h1-h6 con !important y `.nav { display: block }`
+ * bajo 767px. Donde hace falta !important para ganarle está anotado.
+ * ============================================================ */
+
+.mbn-authorities {
+	display: flex;
+	flex-direction: column;
+	/* El gap del frame de la maqueta entre migas, botonera y contenido. */
+	gap: 24px;
+	width: 100%;
+}
+
+/* base.css declara font-family y font-weight de h1-h6 con !important. */
+.mbn-authorities__title {
+	margin: 0;
+	font-family: var(--mbn-roboto-slab-large-font-family, "Roboto Slab", serif) !important;
+	font-weight: 500 !important;
+	font-size: calc(24px * var(--mbn-text-scale, 1));
+	line-height: 1.5;
+	color: var(--mbn-text-primary, #333333);
+}
+
+/* ---------- Botonera ----------
+   En la maqueta el bloque de pestañas mide 745px de los 1120 del contenido y
+   las cuatro se reparten ese ancho a partes iguales; la línea gris de 1px llega
+   solo hasta ahí, no hasta el borde del contenido. */
+
+.mbn-authorities__nav-wrap {
+	width: 100%;
+	max-width: 745px;
+	/* La fila se desplaza en horizontal cuando no cabe, en lugar de envolver:
+	   cuatro pestañas en dos filas parecen dos niveles de navegación. El scroll
+	   es el gesto nativo en táctil y el teclado llega a todas con las flechas
+	   que aporta Bootstrap. */
+	overflow-x: auto;
+	overscroll-behavior-x: contain;
+	-webkit-overflow-scrolling: touch;
+}
+
+/* ⚠️ `base.css` declara `.nav { display: block }` bajo 767px y
+   `nav .nav { display: block }` bajo 992px. Con la primera, las cuatro pestañas
+   se apilan en móvil como cuatro filas de ancho completo. `display: flex` hay
+   que declararlo explícitamente —Bootstrap lo trae, pero base.css lo pisa
+   dentro de su media query—, y el descendiente sube la especificidad a (0,2,0)
+   para ganarle también a `nav .nav` (0,1,1) si el bloque acabara dentro de un
+   `<nav>`. */
+.mbn-authorities .mbn-authorities__nav {
+	display: flex;
+	flex-direction: row;
+}
+
+.mbn-authorities__nav {
+	--bs-nav-tabs-border-width: 1px;
+	--bs-nav-tabs-border-color: var(--mbn-border-header, #B3B3B3);
+	--bs-nav-tabs-link-active-color: var(--mbn-brand-blue, #0F69C4);
+	--bs-nav-tabs-link-active-bg: transparent;
+	--bs-nav-tabs-link-active-border-color: transparent;
+	--bs-nav-tabs-link-hover-border-color: transparent;
+	--bs-nav-tabs-border-radius: 0;
+	--bs-nav-link-color: var(--mbn-text-strong, #373737);
+	--bs-nav-link-hover-color: var(--mbn-brand-blue, #0F69C4);
+	--bs-nav-link-padding-x: 8px;
+	--bs-nav-link-padding-y: 10px;
+	--bs-nav-link-font-size: var(--mbn-roboto-body-small-font-size, 16px);
+	flex-wrap: nowrap;
+	min-width: max-content;
+}
+
+.mbn-authorities__nav-item {
+	/* Las cuatro se reparten el ancho a partes iguales, como en la maqueta. */
+	flex: 1 1 0;
+	min-width: max-content;
+}
+
+.mbn-authorities__tab {
+	width: 100%;
+	font-family: var(--mbn-roboto-body-small-font-family, "Roboto", sans-serif);
+	font-weight: 400;
+	line-height: 1.5;
+	text-align: center;
+	text-transform: capitalize;
+	white-space: nowrap;
+	/* El subrayado del estado activo se dibuja aquí y no con el borde del
+	   `nav-tabs`: el de Bootstrap rodea la pestaña por tres lados. Mide 4px en
+	   la maqueta. */
+	border-bottom: 4px solid transparent;
+	transition: color 120ms ease-out, border-color 120ms ease-out;
+}
+
+.mbn-authorities__tab.active {
+	font-weight: 700;
+	border-bottom-color: var(--mbn-brand-blue, #0F69C4);
+}
+
+.mbn-authorities__tab:focus-visible {
+	outline: 3px solid var(--mbn-brand-blue, #0F69C4);
+	outline-offset: -3px;
+	box-shadow: none;
+}
+
+/* ---------- Panel ---------- */
+
+.mbn-authorities__panel {
+	display: flex;
+	flex-direction: column;
+	gap: 24px;
+}
+
+/* Un panel con tabindex es foco programático, no un control: sin esto el
+   navegador dibujaría su anillo por defecto al activarlo con el ratón. */
+.mbn-authorities__panel:focus {
+	outline: none;
+}
+
+.mbn-authorities__panel:focus-visible {
+	outline: 3px solid var(--mbn-brand-blue, #0F69C4);
+	outline-offset: 4px;
+}
+
+/* El encabezado de la pestaña es Heading/Slab/Large. base.css declara familia y
+   peso de h1-h6 con !important. */
+.mbn-authorities__panel-title {
+	margin: 0;
+	font-family: var(--mbn-roboto-slab-large-font-family, "Roboto Slab", serif) !important;
+	font-weight: var(--mbn-roboto-slab-large-font-weight, 500) !important;
+	font-size: calc(28px * var(--mbn-text-scale, 1));
+	line-height: 1.5;
+	color: var(--mbn-text-primary, #333333);
+}
+
+.mbn-authorities__intro > :first-child {
+	margin-top: 0;
+}
+
+.mbn-authorities__intro > :last-child {
+	margin-bottom: 0;
+}
+
+.mbn-authorities__intro p,
+.mbn-authorities__intro li {
+	font-family: var(--mbn-roboto-body-small-font-family, "Roboto", sans-serif);
+	font-size: var(--mbn-roboto-body-small-font-size, 16px);
+	line-height: 1.5;
+	color: var(--mbn-text-primary, #333333);
+}
+
+.mbn-authorities__intro p {
+	margin-bottom: 16px;
+}
+
+/* ---------- Bloque adjunto al panel ----------
+   Hoy solo lo usa el organigrama dentro de la pestaña «Ministerio». El panel ya
+   separa sus piezas 24px, y la maqueta pide 64 entre la ficha y la fila del
+   organigrama (Figma 359:10279, `gap: 64`): de ahí los 40 que faltan. */
+
+.mbn-authorities__extra {
+	margin-top: 40px;
+}
+
+/* ---------- Lista de fichas ---------- */
+
+.mbn-authorities__cards {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	display: flex;
+	flex-direction: column;
+	gap: 24px;
+}
+
+/* ---------- Ficha ----------
+   Rejilla de 3 columnas: la imagen ocupa la primera y el contenido las otras
+   dos (368 + 744 sobre el contenido de 1120). Apilada por debajo de `md`,
+   donde una imagen de un tercio dejaría el texto en una columna inservible. */
+
+.mbn-authorities__card {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr);
+	gap: 8px;
+	background: var(--mbn-surface-white, #FFFFFF);
+	border: 1px solid var(--mbn-border-default, #CCCCCC);
+	border-radius: 16px;
+	overflow: hidden;
+}
+
+.mbn-authorities__media {
+	min-width: 0;
+	background: var(--mbn-surface-hover, #F2F2F2);
+	/* Apilada, la imagen no puede quedarse con el alto natural del archivo. */
+	aspect-ratio: 3 / 2;
+}
+
+.mbn-authorities__image {
+	display: block;
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	object-position: center;
+}
+
+.mbn-authorities__body {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+	min-width: 0;
+	padding: 16px;
+}
+
+/* Con botón, la maqueta abre el relleno vertical a 36px y separa las piezas 32
+   en vez de 8 (Figma 359:5169). */
+.mbn-authorities__card--cta .mbn-authorities__body {
+	gap: 32px;
+	padding-block: 36px;
+}
+
+.mbn-authorities__headings {
+	display: flex;
+	flex-direction: column;
+	min-width: 0;
+}
+
+/* base.css: `main p { font-weight: 400 !important }`. El antetítulo va en 500,
+   así que necesita !important para ganarle. */
+.mbn-authorities__eyebrow {
+	margin: 0;
+	font-family: var(--mbn-roboto-sans-small-font-family, "Roboto", sans-serif);
+	font-weight: var(--mbn-roboto-sans-small-font-weight, 500) !important;
+	font-size: var(--mbn-roboto-sans-small-font-size, 19px);
+	line-height: 1.5;
+	color: var(--mbn-brand-blue, #0F69C4);
+}
+
+.mbn-authorities__name {
+	margin: 0;
+	font-family: var(--mbn-roboto-sans-medium-font-family, "Roboto", sans-serif) !important;
+	font-weight: var(--mbn-roboto-sans-medium-font-weight, 500) !important;
+	font-size: var(--mbn-roboto-sans-medium-font-size, 24px);
+	line-height: 1.5;
+	color: var(--mbn-text-primary, #333333);
+}
+
+/* ---------- Contenido de la ficha ---------- */
+
+.mbn-authorities__content > :first-child {
+	margin-top: 0;
+}
+
+.mbn-authorities__content > :last-child {
+	margin-bottom: 0;
+}
+
+.mbn-authorities__content p,
+.mbn-authorities__content li {
+	font-family: var(--mbn-roboto-body-small-font-family, "Roboto", sans-serif);
+	font-size: var(--mbn-roboto-body-small-font-size, 16px);
+	line-height: 1.5;
+	color: var(--mbn-text-primary, #333333);
+}
+
+.mbn-authorities__content p {
+	margin-bottom: 24px;
+}
+
+.mbn-authorities__content ul,
+.mbn-authorities__content ol {
+	margin: 0 0 24px;
+	padding-left: 24px;
+}
+
+.mbn-authorities__content a {
+	color: var(--mbn-action-primary, #0046A8);
+	text-decoration: underline;
+}
+
+.mbn-authorities__content a:hover,
+.mbn-authorities__content a:focus-visible {
+	color: var(--mbn-brand-blue-dark, #00268D);
+}
+
+.mbn-authorities__content img {
+	max-width: 100%;
+	height: auto;
+}
+
+/* ---------- Redes sociales ----------
+   Los SVG del catálogo son blancos (nacieron para el pie azul), así que se
+   tiñen con `mask-image`: un `<img>` no toma `currentColor` (§8). Propiedades
+   largas, no el atajo `mask`: un var() dentro del atajo no se resuelve de forma
+   fiable. */
+
+.mbn-authorities__social {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	display: flex;
+	align-items: center;
+	gap: 11px;
+}
+
+.mbn-authorities__social-link {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	color: var(--mbn-brand-blue-darken-1, #0051A8);
+	/* El icono mide 24px, el mínimo exacto de WCAG 2.5.8. El área activa se
+	   amplía con padding y se devuelve al layout con margen negativo, pero solo
+	   4px en horizontal: con más, dos iconos contiguos (24 + 11 de gap) se
+	   solaparían. Mismo cálculo que el componente `share`. */
+	padding: 6px 4px;
+	margin: -6px -4px;
+}
+
+.mbn-authorities__social-link:hover,
+.mbn-authorities__social-link:focus-visible {
+	color: var(--mbn-brand-blue-dark, #00268D);
+}
+
+.mbn-authorities__social-glyph {
+	display: block;
+	width: 24px;
+	height: 24px;
+	background-color: currentColor;
+	mask-image: var(--mbn-authorities-social-icon);
+	mask-repeat: no-repeat;
+	mask-position: center;
+	mask-size: contain;
+	-webkit-mask-image: var(--mbn-authorities-social-icon);
+	-webkit-mask-repeat: no-repeat;
+	-webkit-mask-position: center;
+	-webkit-mask-size: contain;
+}
+
+/* ---------- Botón ----------
+   `btn` de Bootstrap con las variables del design system (§7.3). En la maqueta
+   va alineado a la derecha del contenido. */
+
+.mbn-authorities__cta-wrap {
+	display: flex;
+	justify-content: flex-start;
+}
+
+.mbn-authorities__cta {
+	--bs-btn-bg: var(--mbn-surface-white, #FFFFFF);
+	--bs-btn-border-color: var(--mbn-action-primary, #0046A8);
+	--bs-btn-border-width: 2px;
+	--bs-btn-color: var(--mbn-brand-blue-dark, #00268D);
+	--bs-btn-hover-bg: var(--mbn-action-primary, #0046A8);
+	--bs-btn-hover-border-color: var(--mbn-action-primary, #0046A8);
+	--bs-btn-hover-color: var(--mbn-text-on-primary, #E7ECFF);
+	--bs-btn-active-bg: var(--mbn-brand-blue-dark, #00268D);
+	--bs-btn-active-border-color: var(--mbn-brand-blue-dark, #00268D);
+	--bs-btn-active-color: var(--mbn-text-on-primary, #E7ECFF);
+	--bs-btn-padding-x: 24px;
+	--bs-btn-padding-y: 12px;
+	--bs-btn-font-family: var(--mbn-roboto-body-button-large-font-family, "Roboto", sans-serif);
+	--bs-btn-font-size: var(--mbn-roboto-body-button-large-font-size, 19px);
+	--bs-btn-font-weight: 700;
+	--bs-btn-line-height: 1.5;
+	--bs-btn-border-radius: 24px;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 8px;
+	text-decoration: none;
+}
+
+.mbn-authorities__cta:focus-visible {
+	outline: 3px solid var(--mbn-brand-blue, #0F69C4);
+	outline-offset: 2px;
+	box-shadow: none;
+}
+
+/* El icono se tiñe con la máscara para que siga al texto en el estado hover,
+   donde el botón se invierte. */
+.mbn-authorities__cta-icon {
+	display: block;
+	flex: 0 0 auto;
+	width: 24px;
+	height: 24px;
+	background-color: currentColor;
+	mask-image: var(--mbn-authorities-cta-icon);
+	mask-repeat: no-repeat;
+	mask-position: center;
+	mask-size: contain;
+	-webkit-mask-image: var(--mbn-authorities-cta-icon);
+	-webkit-mask-repeat: no-repeat;
+	-webkit-mask-position: center;
+	-webkit-mask-size: contain;
+}
+
+/* ---------- md ≥ 768px ---------- */
+
+@media (min-width: 768px) {
+	.mbn-authorities__nav {
+		--bs-nav-link-padding-x: 16px;
+	}
+
+	.mbn-authorities__panel-title {
+		font-size: calc(32px * var(--mbn-text-scale, 1));
+	}
+
+	/* La rejilla de la maqueta: imagen en la primera columna, contenido en las
+	   otras dos. La imagen deja de tener proporción fija y estira a la altura
+	   de la ficha, como en el Figma. */
+	.mbn-authorities__card {
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+	}
+
+	.mbn-authorities__card--no-image {
+		grid-template-columns: minmax(0, 1fr);
+	}
+
+	.mbn-authorities__media {
+		grid-column: 1;
+		aspect-ratio: auto;
+	}
+
+	.mbn-authorities__body {
+		grid-column: 2 / span 2;
+	}
+
+	.mbn-authorities__card--no-image .mbn-authorities__body {
+		grid-column: 1;
+	}
+
+	.mbn-authorities__cta-wrap {
+		justify-content: flex-end;
+	}
+}
+
+/* ---------- xl ≥ 1200px (canvas 1440 del Figma) ---------- */
+
+@media (min-width: 1200px) {
+	.mbn-authorities__title {
+		font-size: var(--mbn-roboto-slab-medium-font-size, 24px);
+	}
+
+	.mbn-authorities__panel-title {
+		font-size: var(--mbn-roboto-slab-large-font-size, 36px);
+	}
+}
+
+/* ---------- Reducción de movimiento ---------- */
+
+@media (prefers-reduced-motion: reduce) {
+	.mbn-authorities__tab,
+	.mbn-authorities__panel.fade {
+		transition: none;
+	}
+}

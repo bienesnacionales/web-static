@@ -1,0 +1,85 @@
+/* ============================================================
+ * Componente global — Aviso destacado
+ * Maqueta: Figma 285:3680 («Alerta»), en el detalle de trámite 169:3365.
+ * Caja blanca con borde de 2px en #2196F3, radio 4, sombra elevation-3,
+ * padding 16 y un icono `info` de 36px separado del texto por 24.
+ *
+ * Es `.alert` de Bootstrap con sus variables `--bs-alert-*` redefinidas (§7.3).
+ * ============================================================ */
+
+.mbn-notice {
+	--bs-alert-bg: var(--mbn-surface-white, #FFFFFF);
+	--bs-alert-color: var(--mbn-text-strong, #373737);
+	--bs-alert-border-color: var(--mbn-state-info, #2196F3);
+	--bs-alert-border: 2px solid var(--bs-alert-border-color);
+	--bs-alert-border-radius: 4px;
+	--bs-alert-padding-x: 16px;
+	--bs-alert-padding-y: 16px;
+	--bs-alert-margin-bottom: 0;
+	display: flex;
+	align-items: flex-start;
+	gap: 24px;
+	width: 100%;
+	box-shadow: var(--mbn-shadow-elevation-3, 0 0.471px 1.414px rgba(0, 0, 0, 0.3), 0 1.886px 3.772px 1.414px rgba(0, 0, 0, 0.15));
+}
+
+.mbn-notice__icon {
+	flex: 0 0 auto;
+	display: block;
+	width: 36px;
+	height: 36px;
+}
+
+.mbn-notice__body {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+	min-width: 0;
+}
+
+/* base.css: `main p { font-weight: 400 !important }`, así que el peso 500 del
+   estilo Heading/Sans/Small necesita !important para imponerse. */
+.mbn-notice__title {
+	margin: 0;
+	font-family: var(--mbn-roboto-sans-small-font-family, "Roboto", sans-serif);
+	font-weight: var(--mbn-roboto-sans-small-font-weight, 500) !important;
+	font-size: var(--mbn-roboto-sans-small-font-size, 19px);
+	line-height: 1.5;
+	color: var(--mbn-text-strong, #373737);
+}
+
+.mbn-notice__content > :first-child {
+	margin-top: 0;
+}
+
+.mbn-notice__content > :last-child {
+	margin-bottom: 0;
+}
+
+.mbn-notice__content p,
+.mbn-notice__content li {
+	font-family: var(--mbn-roboto-body-small-font-family, "Roboto", sans-serif);
+	font-size: var(--mbn-roboto-body-small-font-size, 16px);
+	line-height: 1.5;
+	color: var(--mbn-text-strong, #373737);
+}
+
+.mbn-notice__content p {
+	margin-bottom: 16px;
+}
+
+.mbn-notice__content ul,
+.mbn-notice__content ol {
+	margin: 0 0 16px;
+	padding-left: 24px;
+}
+
+.mbn-notice__content a {
+	color: var(--mbn-action-primary, #0046A8);
+	text-decoration: underline;
+}
+
+.mbn-notice__content a:hover,
+.mbn-notice__content a:focus-visible {
+	color: var(--mbn-brand-blue-dark, #00268D);
+}

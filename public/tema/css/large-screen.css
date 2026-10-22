@@ -1,0 +1,66 @@
+/* amplía el documento completo, incluidos los diálogos y controles flotantes */
+:root {
+	--mbn-screen-scale: 1;
+	--mbn-viewport-width: 100vw;
+	--mbn-viewport-height: 100vh;
+}
+
+@supports (zoom: 1.1) {
+	body {
+		zoom: var(--mbn-screen-scale);
+	}
+
+	/* el plugin calcula coordenadas físicas; aquí se centra en el espacio ampliado */
+	html[data-mbn-large-screen] .pum-overlay.pum-theme-mbn .pum-container {
+		display: flex !important;
+		flex-direction: column;
+		position: fixed !important;
+		left: 50% !important;
+		top: 50% !important;
+		margin: 0 !important;
+		transform: translate(-50%, -50%) !important;
+		max-width: calc(var(--mbn-viewport-width) - 48px) !important;
+		max-height: calc(var(--mbn-viewport-height) - 48px) !important;
+		overflow-y: auto;
+	}
+
+	html[data-mbn-large-screen] .pum-overlay.pum-theme-mbn .pum-content {
+		order: 1;
+		flex: 0 0 auto;
+	}
+
+	html[data-mbn-large-screen] .pum-overlay.pum-theme-mbn .pum-close {
+		position: sticky !important;
+		order: 0;
+		align-self: flex-end;
+		flex: 0 0 auto;
+		z-index: 2;
+		background-color: var(--mbn-surface-white, #FFFFFF);
+		top: 12px !important;
+		right: 12px !important;
+		bottom: auto !important;
+		left: auto !important;
+		margin: -56px 0 28px !important;
+	}
+
+	html.admin-bar {
+		margin-top: calc(32px * var(--mbn-screen-scale)) !important;
+	}
+
+	@media (max-width: 782px) {
+		html.admin-bar {
+			margin-top: calc(46px * var(--mbn-screen-scale)) !important;
+		}
+	}
+}
+
+@media print {
+	:root {
+		--mbn-screen-scale: 1 !important;
+		--mbn-viewport-width: 100vw !important;
+		--mbn-viewport-height: 100vh !important;
+	}
+	body {
+		zoom: 1;
+	}
+}

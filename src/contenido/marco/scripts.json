@@ -1,0 +1,31 @@
+{
+  "chatbot": {
+    "endpoint": "/api/chatbot/",
+    "idleSeconds": 600,
+    "warningSeconds": 300,
+    "historyMode": "shared",
+    "messageLimit": 400,
+    "reporting": true,
+    "pageId": 6,
+    "responseTimeout": 38,
+    "answerFeedback": true,
+    "links": {
+      "faq": "/preguntas-frecuentes/",
+      "tramites": "/tramites/",
+      "participacion": "/ciudadania/participacion-ciudadana/"
+    },
+    "contactUrl": "/preguntas-frecuentes/#mbn-chat-contacto"
+  },
+  "pdfViewer": {
+    "base": "/tema/vendor/pdfjs/6.4.299/",
+    "text": {
+      "loading": "Cargando documento…",
+      "error": "No se pudo mostrar el documento.",
+      "zoomIn": "Acercar",
+      "zoomOut": "Alejar",
+      "zoom": "Zoom: %s",
+      "page": "Página %1$s de %2$s",
+      "download": "Descargar"
+    }
+  }
+}

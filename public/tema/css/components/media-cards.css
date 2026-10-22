@@ -1,0 +1,328 @@
+/* ============================================================
+ * Componente global — Tarjetas con imagen
+ * Maqueta: Figma 280:2663 (frame 1440x924; tarjeta destacada 401:6002).
+ *
+ * Patrón "destacado + lista": la primera tarjeta ocupa la columna
+ * izquierda a doble alto y muestra extracto; las demás se apilan a la
+ * derecha con imagen, título y botón.
+ * ============================================================ */
+
+.mbn-media-cards {
+	background: var(--mbn-surface-soft, #F9F9F9);
+	padding: var(--mbn-space-section, 36px) 24px;
+}
+
+.mbn-media-cards--surface-white {
+	background: var(--mbn-surface-white, #FFFFFF);
+}
+
+.mbn-media-cards__container {
+	max-width: var(--mbn-width-content, 1120px);
+	margin-inline: auto;
+}
+
+/* ---------- Encabezado ---------- */
+
+.mbn-media-cards__header {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: space-between;
+	gap: 16px;
+	margin-bottom: 24px;
+}
+
+/* base.css declara font-family y font-weight de h1-h6 con !important. */
+.mbn-media-cards__title {
+	margin: 0;
+	font-family: var(--mbn-roboto-slab-large-font-family, "Roboto Slab", serif) !important;
+	font-weight: 500 !important;
+	font-size: calc(28px * var(--mbn-text-scale, 1));
+	line-height: 1.5;
+	color: var(--mbn-text-primary, #333333);
+}
+
+.mbn-media-cards__all-link {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	padding: 8px 16px;
+	border-radius: 24px;
+	background: var(--mbn-action-primary, #0046A8);
+	color: var(--mbn-text-on-primary, #E7ECFF);
+	font-family: var(--mbn-roboto-body-small-font-family, "Roboto", sans-serif);
+	font-weight: 700;
+	font-size: calc(16px * var(--mbn-text-scale, 1));
+	line-height: 1.5;
+	text-decoration: none;
+	transition: background-color 120ms ease-out;
+}
+
+.mbn-media-cards__all-link:hover,
+.mbn-media-cards__all-link:focus-visible {
+	background: var(--mbn-brand-blue-dark, #00268D);
+	color: var(--mbn-text-on-primary, #E7ECFF);
+}
+
+.mbn-media-cards__all-link:focus-visible {
+	outline: 3px solid var(--mbn-brand-blue, #0F69C4);
+	outline-offset: 2px;
+}
+
+.mbn-media-cards__all-link-label--responsive {
+	display: none;
+}
+
+/* ---------- Rejilla ---------- */
+
+.mbn-media-cards__grid {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	display: grid;
+	gap: 24px;
+	grid-template-columns: 1fr;
+}
+
+.mbn-media-cards__item {
+	display: flex;
+}
+
+.mbn-media-cards__card {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+	width: 100%;
+	overflow: hidden;
+	background: var(--mbn-surface-white, #FFFFFF);
+	border: 1px solid var(--mbn-border-default, #CCCCCC);
+	border-radius: 16px;
+	transition: border-color 120ms ease-out, box-shadow 120ms ease-out;
+}
+
+/* El área clicable es toda la tarjeta (stretched-link), así que el realce de
+   hover y de foco va aquí y no solo en el botón. */
+.mbn-media-cards__card:hover,
+.mbn-media-cards__card:focus-within {
+	border-color: var(--mbn-action-primary, #0046A8);
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+}
+
+.mbn-media-cards__media {
+	flex: 0 0 auto;
+	overflow: hidden;
+}
+
+/* Las tres imágenes del Figma miden 319, 138 y 169 px de alto. Las dos
+   secundarias se uniforman: la diferencia entre ellas viene de que la columna
+   estira las tarjetas para cuadrar con la destacada, no del diseño. */
+.mbn-media-cards__image {
+	display: block;
+	width: 100%;
+	height: 180px;
+	object-fit: cover;
+}
+
+.mbn-media-cards__item--featured .mbn-media-cards__image {
+	height: 220px;
+}
+
+/* `flex: 1` para que el cuerpo ocupe el alto sobrante de la tarjeta: sin él,
+   el `margin-top: auto` del botón no tiene contra qué empujar y las tarjetas de
+   una misma fila dejan el CTA a distinta altura. */
+.mbn-media-cards__body {
+	display: flex;
+	flex: 1 1 auto;
+	flex-direction: column;
+	gap: 8px;
+	padding: 16px;
+}
+
+.mbn-media-cards__card-title {
+	margin: 0;
+	font-family: var(--mbn-roboto-body-small-font-family, "Roboto", sans-serif) !important;
+	font-weight: 500 !important;
+	font-size: calc(20px * var(--mbn-text-scale, 1));
+	line-height: 1.5;
+	color: var(--mbn-text-primary, #333333);
+}
+
+.mbn-media-cards__excerpt {
+	margin: 0;
+	font-family: var(--mbn-roboto-body-small-font-family, "Roboto", sans-serif);
+	font-weight: 400;
+	font-size: calc(16px * var(--mbn-text-scale, 1));
+	line-height: 1.5;
+	color: var(--mbn-text-primary, #333333);
+}
+
+.mbn-media-cards__cta-wrap {
+	display: flex;
+	justify-content: flex-end;
+	width: 100%;
+	margin-top: auto;
+	padding: 8px 16px;
+}
+
+.mbn-media-cards__cta {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	padding: 8px 16px;
+	border: 2px solid var(--mbn-action-primary, #0046A8);
+	border-radius: 24px;
+	background: var(--mbn-surface-white, #FFFFFF);
+	color: var(--mbn-brand-blue-dark, #00268D);
+	font-family: var(--mbn-roboto-body-small-font-family, "Roboto", sans-serif);
+	font-weight: 700;
+	font-size: calc(16px * var(--mbn-text-scale, 1));
+	line-height: 1.5;
+	text-align: center;
+	text-decoration: none;
+	transition: background-color 120ms ease-out, color 120ms ease-out;
+}
+
+.mbn-media-cards__cta:hover,
+.mbn-media-cards__cta:focus-visible {
+	background: var(--mbn-action-primary, #0046A8);
+	color: var(--mbn-text-on-primary, #E7ECFF);
+}
+
+.mbn-media-cards__cta:focus-visible {
+	outline: 3px solid var(--mbn-brand-blue, #0F69C4);
+	outline-offset: 2px;
+}
+
+/* ---------- md ≥ 768px ---------- */
+
+@media (min-width: 768px) {
+	.mbn-media-cards {
+		padding-inline: 40px;
+	}
+
+	.mbn-media-cards__grid {
+		grid-template-columns: repeat(2, 1fr);
+	}
+
+	/* La destacada ocupa la columna izquierda a doble alto; las siguientes se
+	   apilan a la derecha. Con más de tres tarjetas, las sobrantes fluyen en
+	   filas nuevas sin romper el patrón. */
+	.mbn-media-cards__item--featured {
+		grid-row: span 2;
+	}
+
+	.mbn-media-cards__title {
+		font-size: calc(32px * var(--mbn-text-scale, 1));
+	}
+
+	.mbn-media-cards__item--featured .mbn-media-cards__image {
+		height: 280px;
+	}
+}
+
+/* ---------- xl ≥ 1200px (canvas 1440 del Figma) ---------- */
+
+@media (min-width: 1200px) {
+	.mbn-media-cards {
+		padding-inline: 160px;
+	}
+
+	.mbn-media-cards__title {
+		font-size: calc(36px * var(--mbn-text-scale, 1));
+	}
+
+	.mbn-media-cards__card-title {
+		font-size: calc(24px * var(--mbn-text-scale, 1));
+	}
+
+	.mbn-media-cards__item--featured .mbn-media-cards__image {
+		height: 319px;
+	}
+}
+
+/* Por debajo de xl el enlace del encabezado usa su texto alternativo. */
+@media (max-width: 1199.98px) {
+	.mbn-media-cards__all-link-label--desktop {
+		display: none;
+	}
+
+	.mbn-media-cards__all-link-label--responsive {
+		display: inline;
+	}
+}
+
+/* ---------- Movimiento reducido ---------- */
+
+@media (prefers-reduced-motion: reduce) {
+	.mbn-media-cards__card,
+	.mbn-media-cards__all-link,
+	.mbn-media-cards__cta {
+		transition: none;
+	}
+}
+
+/* conserva completas las portadas de las cápsulas */
+.mbn-media-cards--original .mbn-media-cards__image {
+    height: auto;
+    object-fit: contain;
+    background: var(--mbn-surface-soft, #F9F9F9);
+}
+
+@media (min-width: 1200px) {
+    .mbn-media-cards--grid .mbn-media-cards__grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+
+/* portada: más espacio para el contenido de la noticia principal */
+.home .mbn-media-cards__item--featured .mbn-media-cards__card-title {
+    font-size: calc(22px * var(--mbn-text-scale, 1));
+}
+
+.home .mbn-media-cards__item--featured .mbn-media-cards__excerpt {
+    font-size: calc(17px * var(--mbn-text-scale, 1));
+}
+
+@media (min-width: 1200px) {
+    .home .mbn-media-cards__item--featured .mbn-media-cards__card-title {
+        font-size: calc(26px * var(--mbn-text-scale, 1));
+    }
+}
+
+/* conserva una lectura breve en la tarjeta cuando las noticias se apilan */
+@media (min-width: 768px) {
+    /* las dos tarjetas secundarias determinan las filas de la rejilla */
+    .home .mbn-media-cards__item--featured {
+        contain: size;
+        min-height: 0;
+    }
+
+    .home .mbn-media-cards__item--featured .mbn-media-cards__body {
+        min-height: 0;
+    }
+
+    .home .mbn-media-cards__item--featured .mbn-media-cards__card-title,
+    .home .mbn-media-cards__item--featured .mbn-media-cards__cta-wrap {
+        flex: 0 0 auto;
+    }
+
+    .home .mbn-media-cards__item--featured .mbn-media-cards__excerpt {
+        flex: 0 1 auto;
+        min-height: 0;
+        max-height: var(--mbn-home-excerpt-height, 1.5em);
+        overflow: hidden;
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: var(--mbn-home-excerpt-lines, 1);
+    }
+}
+
+@media (max-width: 767.98px) {
+    .home .mbn-media-cards__item--featured .mbn-media-cards__excerpt {
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 6;
+        overflow: hidden;
+    }
+}

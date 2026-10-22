@@ -1,0 +1,156 @@
+/* ============================================================
+ * Componente global — Listado de noticias
+ * Maqueta: Figma 369:7324 (columna de 368px del detalle de noticia:
+ * título Roboto Medium 24, tarjetas con imagen de 138px, cuerpo con
+ * padding 16 y gap 8, botón outline «Ver Noticia» alineado a la derecha).
+ *
+ * La tarjeta es la misma pieza visual que en media-cards.css. No se
+ * comparte hoja porque cada componente tiene la suya (convención §9) y
+ * porque los dos bloques pueden evolucionar por separado; si un día
+ * divergen de verdad, esa duplicación es lo que lo permite sin romper
+ * la portada.
+ * ============================================================ */
+
+.mbn-news-list {
+	display: flex;
+	flex-direction: column;
+	gap: 24px;
+}
+
+/* base.css declara font-family y font-weight de h1-h6 con !important. */
+.mbn-news-list__title {
+	margin: 0;
+	font-family: var(--mbn-roboto-sans-medium-font-family, "Roboto", sans-serif) !important;
+	font-weight: var(--mbn-roboto-sans-medium-font-weight, 500) !important;
+	font-size: calc(20px * var(--mbn-text-scale, 1));
+	line-height: 1.5;
+	color: var(--mbn-text-primary, #333333);
+}
+
+.mbn-news-list__grid {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	display: grid;
+	gap: 24px;
+	grid-template-columns: 1fr;
+}
+
+.mbn-news-list__item {
+	display: flex;
+}
+
+.mbn-news-list__card {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+	width: 100%;
+	overflow: hidden;
+	background: var(--mbn-surface-white, #FFFFFF);
+	border: 1px solid var(--mbn-border-default, #CCCCCC);
+	border-radius: var(--mbn-card-radius, 16px);
+	transition: border-color 120ms ease-out, box-shadow 120ms ease-out;
+}
+
+/* El área clicable es toda la tarjeta (stretched-link), así que el realce va
+   en la tarjeta y no solo en el botón. */
+.mbn-news-list__card:hover,
+.mbn-news-list__card:focus-within {
+	border-color: var(--mbn-action-primary, #0046A8);
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+}
+
+.mbn-news-list__media {
+	flex: 0 0 auto;
+	overflow: hidden;
+}
+
+.mbn-news-list__image {
+	display: block;
+	width: 100%;
+	height: 138px;
+	object-fit: cover;
+}
+
+.mbn-news-list__body {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+	padding: 16px;
+}
+
+.mbn-news-list__card-title {
+	margin: 0;
+	font-family: var(--mbn-roboto-sans-small-font-family, "Roboto", sans-serif) !important;
+	font-weight: var(--mbn-roboto-sans-small-font-weight, 500) !important;
+	font-size: calc(17px * var(--mbn-text-scale, 1));
+	line-height: 1.5;
+	color: var(--mbn-text-primary, #333333);
+}
+
+.mbn-news-list__cta-wrap {
+	display: flex;
+	justify-content: flex-end;
+	width: 100%;
+	margin-top: auto;
+	padding: 8px 16px;
+}
+
+.mbn-news-list__cta {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	padding: 8px 16px;
+	border: 2px solid var(--mbn-action-primary, #0046A8);
+	border-radius: 24px;
+	background: var(--mbn-surface-white, #FFFFFF);
+	color: var(--mbn-brand-blue-dark, #00268D);
+	font-family: var(--mbn-roboto-body-button-font-family, "Roboto", sans-serif);
+	font-weight: var(--mbn-roboto-body-button-font-weight, 700);
+	font-size: var(--mbn-roboto-body-button-font-size, 16px);
+	line-height: 1.5;
+	text-align: center;
+	text-decoration: none;
+	transition: background-color 120ms ease-out, color 120ms ease-out;
+}
+
+.mbn-news-list__cta:hover,
+.mbn-news-list__cta:focus-visible {
+	background: var(--mbn-action-primary, #0046A8);
+	color: var(--mbn-text-on-primary, #E7ECFF);
+}
+
+/* ---------- md ≥ 768px ---------- */
+
+@media (min-width: 768px) {
+	.mbn-news-list--cols-2 .mbn-news-list__grid,
+	.mbn-news-list--cols-3 .mbn-news-list__grid {
+		grid-template-columns: repeat(2, 1fr);
+	}
+}
+
+/* ---------- xl ≥ 1200px (canvas 1440 del Figma) ---------- */
+
+@media (min-width: 1200px) {
+	.mbn-news-list__title {
+		font-size: var(--mbn-roboto-sans-medium-font-size, 24px);
+	}
+
+	.mbn-news-list__card-title {
+		font-size: var(--mbn-roboto-sans-small-font-size, 19px);
+	}
+
+	.mbn-news-list--cols-3 .mbn-news-list__grid {
+		grid-template-columns: repeat(3, 1fr);
+	}
+}
+
+/* ---------- Movimiento reducido ---------- */
+
+@media (prefers-reduced-motion: reduce) {
+	.mbn-news-list__card,
+	.mbn-news-list__cta {
+		transition: none;
+	}
+}

@@ -165,6 +165,7 @@ Variables de entorno (todas opcionales):
 | --- | --- |
 | `SITIO_PUBLICO=true` | Sitio indexable por buscadores |
 | `PUBLICAR_BORRADORES=true` | El build incluye las páginas en borrador |
+| `MODO_MANTENCION=true` | Portada «Sitio en Mantención»; el resto de las URL redirige a ella |
 | `PUBLIC_SITE_URL` | URL canónica (por defecto `https://www.bienesnacionales.cl`) |
 | `PUBLIC_GA_ID` | Activa Google Analytics 4 y ajusta la CSP en consecuencia |
 

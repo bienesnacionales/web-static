@@ -1,39 +1,9 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro';
+import html from '@/contenido/marco/404.html?raw';
+import datos from '@/contenido/marco/404.json';
 ---
 
-<BaseLayout
-  titulo="Página no encontrada"
-  descripcion="La página solicitada no existe o fue trasladada."
-  sinIndexar
->
-  <div class="mx-auto flex max-w-2xl flex-col items-start px-4 py-28 sm:px-6">
-    <p class="eyebrow">Error 404</p>
-    <h1
-      class="mt-4 font-display text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl dark:text-white"
-    >
-      No encontramos esta página
-    </h1>
-    <p class="mt-6 text-lg text-slate-600 dark:text-slate-400">
-      Es posible que el contenido haya cambiado de dirección, o que el enlace esté
-      incompleto.
-    </p>
-
-    <div class="mt-10 flex flex-wrap gap-4">
-      <a
-        href="/"
-        class="rounded-2xl bg-comunidad-700 px-6 py-3 font-semibold text-white transition-colors hover:bg-comunidad-800"
-      >
-        Ir al inicio
-      </a>
-      <a
-        href="/documentacion"
-        class="rounded-2xl border border-slate-300 px-6 py-3 font-semibold text-slate-800
-               transition-colors hover:bg-white dark:border-slate-700 dark:text-slate-200
-               dark:hover:bg-slate-800"
-      >
-        Ver documentación
-      </a>
-    </div>
-  </div>
+<BaseLayout titulo={datos.titulo} clases={datos.clases} sinIndexar>
+  <Fragment set:html={html} />
 </BaseLayout>

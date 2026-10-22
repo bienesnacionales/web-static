@@ -1,0 +1,207 @@
+/* ============================================================
+ * Componente global — Galería en carrusel
+ * Maqueta: Figma 369:5169 y 369:5186 (imágenes de 728x485, 3:2, del
+ * detalle de noticia 364:4962).
+ *
+ * Las diapositivas son el marcado de `core/gallery`, así que este archivo
+ * pisa los estilos del bloque. Todos los selectores que lo hacen llevan
+ * `.mbn-gallery` delante a propósito: suben la especificidad a (0,4,x),
+ * por encima de la de core (0,3,2 como máximo), de modo que la cascada
+ * no depende de si WordPress imprime los estilos del bloque en el head
+ * o justo antes del bloque (`should_load_separate_core_block_assets`).
+ * ============================================================ */
+
+.mbn-gallery {
+	--mbn-gallery-aspect: 3 / 2;
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+}
+
+/* ---------- Viewport: la pista desplazable ---------- */
+
+.mbn-gallery__viewport {
+	overflow: hidden;
+	border-radius: var(--mbn-card-radius, 16px);
+	background: var(--mbn-surface-hover, #F2F2F2);
+}
+
+.mbn-gallery--carousel .mbn-gallery__viewport {
+	overflow-x: auto;
+	overflow-y: hidden;
+	scroll-snap-type: x mandatory;
+	overscroll-behavior-x: contain;
+	/* La barra de scroll se oculta porque el carrusel ya expone flechas,
+	   indicadores y contador; dejarla visible añade un elemento más que
+	   compite con ellos. El desplazamiento táctil y con teclado sigue
+	   funcionando igual. */
+	scrollbar-width: none;
+}
+
+.mbn-gallery__viewport::-webkit-scrollbar {
+	display: none;
+}
+
+.mbn-gallery__viewport:focus-visible {
+	outline: 3px solid var(--mbn-brand-blue, #0F69C4);
+	outline-offset: 3px;
+}
+
+/* ---------- Diapositivas (marcado de core/gallery) ---------- */
+
+.mbn-gallery .wp-block-gallery.has-nested-images {
+	display: flex;
+	flex-wrap: nowrap;
+	align-items: stretch;
+	gap: 0;
+	margin: 0;
+}
+
+.mbn-gallery .wp-block-gallery.has-nested-images > figure.wp-block-image {
+	flex: 0 0 100%;
+	width: 100%;
+	max-width: 100%;
+	margin: 0;
+	scroll-snap-align: center;
+	scroll-snap-stop: always;
+}
+
+.mbn-gallery .wp-block-gallery.has-nested-images > figure.wp-block-image > img,
+.mbn-gallery .wp-block-gallery.has-nested-images > figure.wp-block-image > a > img {
+	display: block;
+	width: 100%;
+	height: 100%;
+	aspect-ratio: var(--mbn-gallery-aspect);
+	object-fit: cover;
+}
+
+/* Con proporción «original» el alto lo decide cada imagen: la pista toma el de
+   la más alta y las demás quedan con banda. Es la única opción en la que las
+   diapositivas no miden todas igual, y está advertido en el campo. */
+.mbn-gallery--ratio-original .wp-block-gallery.has-nested-images > figure.wp-block-image > img {
+	height: auto;
+	aspect-ratio: auto;
+	object-fit: contain;
+}
+
+/* El botón de ampliar de la caja de luz nativa vive dentro de la figure y se
+   posiciona por JS de core; solo hay que asegurar que quede por encima. */
+.mbn-gallery .wp-lightbox-container button.lightbox-trigger {
+	z-index: 2;
+}
+
+/* ---------- Controles ---------- */
+
+.mbn-gallery__controls {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: center;
+	gap: 8px 16px;
+}
+
+.mbn-gallery__controls[hidden] {
+	display: none;
+}
+
+.mbn-gallery__indicators {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+
+/* El contador ocupa la fila completa por debajo de las flechas: es un texto
+   con `aria-live`, y meterlo en la misma línea lo dejaría descolgado a la
+   derecha en cuanto el número de indicadores creciera. */
+.mbn-gallery__status {
+	flex: 1 0 100%;
+	text-align: center;
+}
+
+.mbn-gallery__nav {
+	flex: 0 0 auto;
+	width: 40px;
+	height: 40px;
+	padding: 0;
+	border: 2px solid var(--mbn-action-primary, #0046A8);
+	border-radius: 50%;
+	background-color: var(--mbn-surface-white, #FFFFFF);
+	color: var(--mbn-action-primary, #0046A8);
+	cursor: pointer;
+	transition: background-color 120ms ease-out, color 120ms ease-out;
+}
+
+.mbn-gallery__nav::before {
+	content: "";
+	display: block;
+	width: 24px;
+	height: 24px;
+	margin: auto;
+	background-color: currentColor;
+	/* Propiedades largas, no el atajo `mask`: un var() dentro del atajo no se
+	   resuelve de forma fiable (ver AGENTS.md §18). */
+	mask-image: var(--mbn-gallery-chevron);
+	mask-repeat: no-repeat;
+	mask-position: center;
+	mask-size: 24px 24px;
+	-webkit-mask-image: var(--mbn-gallery-chevron);
+	-webkit-mask-repeat: no-repeat;
+	-webkit-mask-position: center;
+	-webkit-mask-size: 24px 24px;
+}
+
+.mbn-gallery__nav--prev::before {
+	transform: rotate(180deg);
+}
+
+.mbn-gallery__nav:hover {
+	background-color: var(--mbn-action-primary, #0046A8);
+	color: var(--mbn-text-on-primary, #E7ECFF);
+}
+
+/* El extremo de la pista no deshabilita el botón: un `disabled` que aparece
+   mientras el botón tiene el foco lo pierde y deja al teclado sin ancla.
+   `aria-disabled` lo anuncia y el JS lo convierte en no-op. */
+.mbn-gallery__nav[aria-disabled="true"] {
+	border-color: var(--mbn-border-default, #CCCCCC);
+	color: var(--mbn-border-default, #CCCCCC);
+	cursor: default;
+}
+
+.mbn-gallery__nav[aria-disabled="true"]:hover {
+	background-color: var(--mbn-surface-white, #FFFFFF);
+	color: var(--mbn-border-default, #CCCCCC);
+}
+
+.mbn-gallery__indicator {
+	width: 10px;
+	height: 10px;
+	padding: 0;
+	border: 1px solid var(--mbn-action-primary, #0046A8);
+	border-radius: 50%;
+	background-color: transparent;
+	cursor: pointer;
+	transition: background-color 120ms ease-out;
+}
+
+.mbn-gallery__indicator[aria-current="true"] {
+	background-color: var(--mbn-action-primary, #0046A8);
+}
+
+.mbn-gallery__status {
+	margin: 0;
+	font-family: var(--mbn-roboto-body-small-font-family, "Roboto", sans-serif);
+	font-size: calc(14px * var(--mbn-text-scale, 1));
+	line-height: 1.5;
+	color: var(--mbn-text-muted, #808080);
+}
+
+/* ---------- Movimiento reducido ---------- */
+
+@media (prefers-reduced-motion: reduce) {
+	.mbn-gallery__nav,
+	.mbn-gallery__indicator {
+		transition: none;
+	}
+}

@@ -1,0 +1,41 @@
+/* ============================================================
+ * Tipografías del theme — @font-face
+ *
+ * El theme no cargaba ninguna webfont: las familias del design system
+ * (Roboto Slab para los títulos, gobCL para el H1 del hero) solo se veían
+ * si el visitante las tenía instaladas. En la práctica los títulos de
+ * sección caían al fallback sans-serif y se perdía la serifa que pide la
+ * maqueta.
+ *
+ * Roboto Slab se sirve **desde el theme**, no desde un CDN, conforme a la
+ * regla de assets locales del proyecto (§7 de AGENTS.md). Es la versión
+ * variable (un solo archivo cubre de 100 a 900), tomada de Google Fonts:
+ * Roboto Slab está publicada bajo la licencia Apache 2.0, que permite
+ * alojarla y redistribuirla.
+ *
+ * Dos subconjuntos, los que necesita el castellano:
+ *   - latin      (34 KB) — el alfabeto básico y los signos de puntuación.
+ *   - latin-ext  (21 KB) — diacríticos ampliados; el navegador solo lo
+ *                          descarga si la página usa alguno de sus glifos.
+ *
+ * `font-display: swap` para que el texto sea legible desde el primer
+ * pintado y la fuente entre cuando esté disponible.
+ * ============================================================ */
+
+@font-face {
+	font-family: "Roboto Slab";
+	font-style: normal;
+	font-weight: 100 900;
+	font-display: swap;
+	src: url("../fonts/roboto-slab-latin.woff2") format("woff2");
+	unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+	font-family: "Roboto Slab";
+	font-style: normal;
+	font-weight: 100 900;
+	font-display: swap;
+	src: url("../fonts/roboto-slab-latin-ext.woff2") format("woff2");
+	unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}

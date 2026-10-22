@@ -1,0 +1,110 @@
+/* ============================================================
+ * Componente global — Enviar por mensaje directo
+ * Maqueta: Figma 369:7680 (fila 1120x36; etiqueta Roboto Medium 24 y
+ * íconos de 24px con gap 11, todo alineado a la derecha).
+ *
+ * Los íconos se tiñen con mask-image: los SVG del catálogo son blancos
+ * (nacieron para el footer azul oscuro) y aquí van en el azul de marca.
+ * ============================================================ */
+
+.mbn-share {
+	position: relative;
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: flex-end;
+	gap: 24px;
+}
+
+.mbn-share__label {
+	font-family: var(--mbn-roboto-sans-medium-font-family, "Roboto", sans-serif);
+	font-weight: var(--mbn-roboto-sans-medium-font-weight, 500);
+	font-size: calc(20px * var(--mbn-text-scale, 1));
+	line-height: 1.5;
+	color: var(--mbn-text-primary, #333333);
+}
+
+.mbn-share__list {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	display: flex;
+	align-items: center;
+	gap: 11px;
+}
+
+.mbn-share__item {
+	display: flex;
+}
+
+/* El ícono mide 24px, justo el mínimo que pide WCAG 2.5.8 (AA). El área activa
+   se amplía con padding —y el margen negativo lo devuelve al layout, para que
+   la fila siga midiendo lo que dice la maqueta—, pero solo 4px en horizontal:
+   con los 6px de las otras direcciones el objetivo pasaría a 36px sobre un paso
+   de 35 (24 de ícono + 11 de gap) y dos objetivos contiguos se solaparían, de
+   modo que un clic en el borde activaría la red vecina. */
+.mbn-share__link {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	padding: 6px 4px;
+	margin: -6px -4px;
+	border-radius: 4px;
+	color: var(--mbn-action-primary, #0046A8);
+	text-decoration: none;
+}
+
+.mbn-share__link:hover,
+.mbn-share__link:focus-visible {
+	color: var(--mbn-brand-blue-dark, #00268D);
+}
+
+.mbn-share__icon {
+	display: block;
+	width: 24px;
+	height: 24px;
+	background-color: currentColor;
+	/* Propiedades largas, no el atajo `mask`: un var() dentro del atajo no se
+	   resuelve de forma fiable (ver AGENTS.md §10). */
+	mask-image: var(--mbn-share-icon);
+	mask-repeat: no-repeat;
+	mask-position: center;
+	mask-size: contain;
+	-webkit-mask-image: var(--mbn-share-icon);
+	-webkit-mask-repeat: no-repeat;
+	-webkit-mask-position: center;
+	-webkit-mask-size: contain;
+}
+
+/* ---------- Aviso «Mensaje copiado…» ----------
+   Va en posición absoluta bajo la fila para no desplazar el título cuando
+   aparece. Vacía, la región no tiene caja visible pero sigue en el árbol de
+   accesibilidad (sin display:none): así el lector de pantalla la anuncia. */
+
+.mbn-share__notice {
+	position: absolute;
+	top: calc(100% + 8px);
+	right: 0;
+	z-index: 5;
+	max-width: min(100%, 360px);
+	font-family: var(--mbn-roboto-body-small-font-family, "Roboto", sans-serif);
+	font-size: calc(14px * var(--mbn-text-scale, 1));
+	line-height: 1.5;
+	text-align: right;
+	color: var(--mbn-text-on-primary, #E7ECFF);
+}
+
+.mbn-share__notice:not(:empty) {
+	padding: 8px 12px;
+	border-radius: 8px;
+	background: var(--mbn-brand-blue-dark, #00268D);
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* ---------- xl ≥ 1200px (canvas 1440 del Figma) ---------- */
+
+@media (min-width: 1200px) {
+	.mbn-share__label {
+		font-size: var(--mbn-roboto-sans-medium-font-size, 24px);
+	}
+}

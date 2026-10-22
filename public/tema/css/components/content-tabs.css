@@ -1,0 +1,549 @@
+/* ============================================================
+ * Componente global — Pestañas de contenido
+ * Maqueta: la página «Participación Ciudadana». Desktop 323:4716, 340:11861,
+ * 356:4635 y 356:4850; tablet 672:8100…672:8293; mobile 442:6464…442:6608.
+ *
+ * La botonera es «Tabs horizontales» del design system (284:1997), montada
+ * sobre el `nav-tabs` de Bootstrap: aquí solo se redefinen sus variables
+ * `--bs-nav-*` (§7.3). La tabla es `.table` + `.table-responsive`, y el
+ * acordeón de la pestaña «Cosoc» es el componente global `accordion` en su
+ * variante `default`, cuya piel vive en `accordion.css`.
+ *
+ * ⚠️ Esta hoja **repite la piel de la botonera de `authorities.css`** con sus
+ * propias clases. Está asumido y explicado en el docblock de
+ * `inc/components/content-tabs.php`: si aparece un tercer bloque de pestañas,
+ * ese es el momento de extraer una capa `.mbn-tabnav__*` y migrar los dos.
+ *
+ * Ojo con base.css (el Base Kit de Siigsa): `main p { font-weight: 400
+ * !important }`, la escala de h1-h6 con !important y `.nav { display: block }`
+ * bajo 767px. Donde hace falta !important para ganarle está anotado.
+ * ============================================================ */
+
+.mbn-content-tabs {
+	display: flex;
+	flex-direction: column;
+	gap: 24px;
+	width: 100%;
+}
+
+/* base.css declara font-family y font-weight de h1-h6 con !important. */
+.mbn-content-tabs__title {
+	margin: 0;
+	font-family: var(--mbn-roboto-slab-large-font-family, "Roboto Slab", serif) !important;
+	font-weight: var(--mbn-roboto-slab-large-font-weight, 500) !important;
+	font-size: calc(24px * var(--mbn-text-scale, 1));
+	line-height: 1.5;
+	color: var(--mbn-text-primary, #333333);
+}
+
+/* ---------- Botonera ----------
+   A diferencia de `authorities`, la fila ocupa el ancho completo del contenido
+   (1120 en la maqueta), no 745: las cuatro pestañas se reparten ese ancho y la
+   línea gris de 1px llega de extremo a extremo, por debajo también de las dos
+   flechas. */
+
+.mbn-content-tabs__nav-wrap {
+	display: flex;
+	/* `stretch` y no `center`: así el borde inferior de las pestañas queda a ras
+	   de la línea gris del contenedor, que es como lo dibuja la maqueta. */
+	align-items: stretch;
+	gap: 4px;
+	width: 100%;
+	/* La línea va aquí y no en el `nav-tabs` de Bootstrap para que cruce por
+	   debajo de las flechas. La de Bootstrap se anula más abajo. */
+	border-bottom: 1px solid var(--mbn-border-header, #B3B3B3);
+}
+
+.mbn-content-tabs__nav-viewport {
+	flex: 1 1 auto;
+	min-width: 0;
+	/* La fila se desplaza en horizontal cuando no cabe, en lugar de envolver:
+	   cuatro pestañas en dos filas parecen dos niveles de navegación. */
+	overflow-x: auto;
+	overscroll-behavior-x: contain;
+	-webkit-overflow-scrolling: touch;
+	scroll-behavior: smooth;
+}
+
+/* La barra de desplazamiento se esconde **solo cuando el script ha revelado
+   las flechas**: sin JavaScript son el único mando que queda para llegar a las
+   pestañas que no caben con un ratón sin rueda horizontal. */
+.mbn-content-tabs--js .mbn-content-tabs__nav-viewport {
+	scrollbar-width: none;
+}
+
+.mbn-content-tabs--js .mbn-content-tabs__nav-viewport::-webkit-scrollbar {
+	display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.mbn-content-tabs__nav-viewport {
+		scroll-behavior: auto;
+	}
+}
+
+/* ⚠️ `base.css` declara `.nav { display: block }` bajo 767px y
+   `nav .nav { display: block }` bajo 992px, y carga después de Bootstrap. Sin
+   volver a declarar `display: flex`, las pestañas se apilan en móvil como
+   filas de ancho completo. El descendiente sube la especificidad a (0,2,0)
+   para ganarle también a `nav .nav` (0,1,1). */
+.mbn-content-tabs .mbn-content-tabs__nav {
+	display: flex;
+	flex-direction: row;
+}
+
+.mbn-content-tabs__nav {
+	--bs-nav-tabs-border-width: 0;
+	--bs-nav-tabs-border-color: transparent;
+	--bs-nav-tabs-link-active-color: var(--mbn-brand-blue, #0F69C4);
+	--bs-nav-tabs-link-active-bg: transparent;
+	--bs-nav-tabs-link-active-border-color: transparent;
+	--bs-nav-tabs-link-hover-border-color: transparent;
+	--bs-nav-tabs-border-radius: 0;
+	--bs-nav-link-color: var(--mbn-text-strong, #373737);
+	--bs-nav-link-hover-color: var(--mbn-brand-blue, #0F69C4);
+	--bs-nav-link-padding-x: 8px;
+	--bs-nav-link-padding-y: 10px;
+	--bs-nav-link-font-size: calc(14px * var(--mbn-text-scale, 1));
+	flex-wrap: nowrap;
+	align-items: stretch;
+	width: 100%;
+}
+
+.mbn-content-tabs__nav-item {
+	display: flex;
+	/* Bajo `xl` todas parten del mismo ancho y crecen a la vez, de modo que la
+	   fila queda regular como en la maqueta en vez de ajustarse al largo de
+	   cada rótulo. Con los 145px de base caben dos en el canvas de 402. */
+	flex: 1 0 145px;
+	max-width: 240px;
+}
+
+.mbn-content-tabs__tab {
+	width: 100%;
+	font-family: var(--mbn-roboto-body-small-font-family, "Roboto", sans-serif);
+	font-weight: 400;
+	line-height: 1.5;
+	text-align: center;
+	/* El Figma aplica `capitalize` a la etiqueta, que en estos rótulos —frases
+	   completas en español— produciría «¿Qué Es La Participación Ciudadana?».
+	   Divergencia deliberada: el texto se pinta como lo escriba el editor. */
+	text-transform: none;
+	/* El subrayado del estado activo se dibuja aquí y no con el borde del
+	   `nav-tabs`: el de Bootstrap rodea la pestaña por tres lados. */
+	border-bottom: 4px solid transparent;
+	transition: color 120ms ease-out, border-color 120ms ease-out;
+}
+
+.mbn-content-tabs__tab.active {
+	font-weight: 700;
+	border-bottom-color: var(--mbn-brand-blue, #0F69C4);
+}
+
+.mbn-content-tabs__tab:focus-visible {
+	outline: 3px solid var(--mbn-brand-blue, #0F69C4);
+	outline-offset: -3px;
+	box-shadow: none;
+}
+
+/* ---------- Flechas de la botonera ----------
+   «Boton Icono» de 40x40 con el glifo de 24 (Figma 442:34288). Nacen con
+   `hidden` en el marcado y solo las revela el script cuando la fila desborda. */
+
+.mbn-content-tabs__scroller {
+	flex: 0 0 auto;
+	align-self: center;
+	width: 40px;
+	height: 40px;
+	padding: 8px;
+	background: none;
+	border: 0;
+	border-radius: 50%;
+	cursor: pointer;
+}
+
+.mbn-content-tabs__scroller::before {
+	content: "";
+	display: block;
+	width: 24px;
+	height: 24px;
+	/* `mask-image` y no `<img>`: la flecha cambia de color al llegar al extremo
+	   y un SVG servido como imagen no toma `currentColor` (§8). La URL llega
+	   inline desde el template y es absoluta: dentro de una custom property se
+	   resolvería contra la hoja que la consume. Propiedades largas, no el
+	   atajo `mask`: un var() dentro del atajo no se resuelve de forma fiable. */
+	background-color: var(--mbn-brand-blue, #0F69C4);
+	mask-repeat: no-repeat;
+	mask-position: center;
+	mask-size: 24px 24px;
+	-webkit-mask-repeat: no-repeat;
+	-webkit-mask-position: center;
+	-webkit-mask-size: 24px 24px;
+}
+
+.mbn-content-tabs__scroller--prev::before {
+	mask-image: var(--mbn-content-tabs-prev-icon);
+	-webkit-mask-image: var(--mbn-content-tabs-prev-icon);
+}
+
+.mbn-content-tabs__scroller--next::before {
+	mask-image: var(--mbn-content-tabs-next-icon);
+	-webkit-mask-image: var(--mbn-content-tabs-next-icon);
+}
+
+.mbn-content-tabs__scroller:hover {
+	background-color: var(--mbn-surface-hover, #F2F2F2);
+}
+
+.mbn-content-tabs__scroller:focus-visible {
+	outline: 3px solid var(--mbn-brand-blue, #0F69C4);
+	outline-offset: 2px;
+}
+
+/* En los extremos, `aria-disabled` y no `disabled`: un `disabled` que aparece
+   con el foco puesto lo pierde y deja al teclado sin ancla (§8). */
+.mbn-content-tabs__scroller[aria-disabled="true"] {
+	cursor: default;
+}
+
+.mbn-content-tabs__scroller[aria-disabled="true"]::before {
+	background-color: var(--mbn-text-muted, #808080);
+}
+
+.mbn-content-tabs__scroller[aria-disabled="true"]:hover {
+	background-color: transparent;
+}
+
+/* ---------- Panel ---------- */
+
+.mbn-content-tabs__panel {
+	display: flex;
+	flex-direction: column;
+}
+
+/* Un panel con tabindex es foco programático, no un control. */
+.mbn-content-tabs__panel:focus {
+	outline: none;
+}
+
+.mbn-content-tabs__panel:focus-visible {
+	outline: 3px solid var(--mbn-brand-blue, #0F69C4);
+	outline-offset: 4px;
+}
+
+.mbn-content-tabs__layout {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr);
+	gap: 24px;
+}
+
+.mbn-content-tabs__main {
+	display: flex;
+	flex-direction: column;
+	gap: 24px;
+	min-width: 0;
+}
+
+/* base.css declara familia y peso de h1-h6 con !important. El encabezado del
+   panel es Heading/Slab/Medium (24px). */
+.mbn-content-tabs__panel-title {
+	margin: 0;
+	font-family: var(--mbn-roboto-slab-medium-font-family, "Roboto Slab", serif) !important;
+	font-weight: var(--mbn-roboto-slab-medium-font-weight, 500) !important;
+	font-size: calc(20px * var(--mbn-text-scale, 1));
+	line-height: 1.5;
+	color: var(--mbn-text-primary, #333333);
+}
+
+/* ---------- Bloque de texto ---------- */
+
+.mbn-content-tabs__prose > :first-child {
+	margin-top: 0;
+}
+
+.mbn-content-tabs__prose > :last-child {
+	margin-bottom: 0;
+}
+
+.mbn-content-tabs__prose p,
+.mbn-content-tabs__prose li {
+	font-family: var(--mbn-roboto-body-small-font-family, "Roboto", sans-serif);
+	font-size: var(--mbn-roboto-body-small-font-size, 16px);
+	line-height: 1.5;
+	color: var(--mbn-text-primary, #333333);
+}
+
+.mbn-content-tabs__prose p {
+	margin-bottom: 24px;
+}
+
+.mbn-content-tabs__prose ul,
+.mbn-content-tabs__prose ol {
+	margin: 0 0 24px;
+	padding-left: 24px;
+}
+
+.mbn-content-tabs__prose li {
+	margin-bottom: 4px;
+}
+
+/* base.css declara familia y peso de h2-h6 con !important, así que los
+   subtítulos que el editor escriba conservan los del kit; aquí solo se ajustan
+   tamaño, color y ritmo vertical. */
+.mbn-content-tabs__prose h2,
+.mbn-content-tabs__prose h3,
+.mbn-content-tabs__prose h4 {
+	margin-top: 32px;
+	margin-bottom: 12px;
+	line-height: 1.5;
+	color: var(--mbn-text-primary, #333333);
+}
+
+.mbn-content-tabs__prose h2 {
+	font-size: calc(20px * var(--mbn-text-scale, 1));
+}
+
+.mbn-content-tabs__prose h3 {
+	font-size: calc(19px * var(--mbn-text-scale, 1));
+}
+
+.mbn-content-tabs__prose h4 {
+	font-size: calc(16px * var(--mbn-text-scale, 1));
+}
+
+/* `link/default` del design system, que es el azul de los enlaces de la
+   maqueta. NO es el `--mbn-action-primary` de los botones. */
+.mbn-content-tabs__prose a {
+	color: var(--mbn-link-default, #1D70B8);
+	text-decoration: underline;
+}
+
+.mbn-content-tabs__prose a:hover,
+.mbn-content-tabs__prose a:focus-visible {
+	color: var(--mbn-brand-blue-dark, #00268D);
+}
+
+.mbn-content-tabs__prose img {
+	max-width: 100%;
+	height: auto;
+}
+
+/* ---------- Bloque de tabla ----------
+   «Tablas» del design system (356:5200): cabecera azul con el texto en blanco y
+   filas blancas separadas por una línea de rgba(0,0,0,.26). */
+
+.mbn-content-tabs__table-wrap:focus-visible {
+	outline: 3px solid var(--mbn-brand-blue, #0F69C4);
+	outline-offset: 2px;
+}
+
+.mbn-content-tabs__table {
+	--bs-table-bg: var(--mbn-surface-white, #FFFFFF);
+	--bs-table-color: var(--mbn-text-strong, #373737);
+	--bs-table-border-color: var(--mbn-table-row-border, rgba(0, 0, 0, 0.26));
+	width: 100%;
+	margin-bottom: 0;
+	font-family: var(--mbn-roboto-body-small-font-family, "Roboto", sans-serif);
+	font-size: var(--mbn-roboto-body-small-font-size, 16px);
+	line-height: 1.5;
+	vertical-align: middle;
+}
+
+.mbn-content-tabs__table-caption {
+	caption-side: top;
+	padding: 0 0 12px;
+	font-family: var(--mbn-roboto-slab-medium-font-family, "Roboto Slab", serif);
+	font-weight: 500;
+	font-size: calc(19px * var(--mbn-text-scale, 1));
+	line-height: 1.5;
+	color: var(--mbn-text-black, #000000);
+}
+
+/* Bootstrap reparte el padding con `.table > :not(caption) > * > *` (0,1,2):
+   el descendiente propio (0,2,2) le gana sin !important.
+
+   *Divergencia deliberada:* la maqueta declara `16px 41px 16px 24px`, pero esos
+   41px salen de un Figma con anchos de columna fijos. Con `table-layout: auto`
+   —lo único que sirve cuando el número de columnas lo decide el editor— ese
+   relleno le roba sitio a las columnas cortas y parte valores que no deberían
+   partirse («61.402.000-8» en dos líneas). Con 24px a cada lado la separación
+   entre columnas sigue siendo de 48px, casi la misma que en el diseño. */
+.mbn-content-tabs__table > :not(caption) > * > * {
+	padding: 16px 24px;
+}
+
+.mbn-content-tabs__table thead th {
+	background-color: var(--mbn-brand-blue, #0F69C4);
+	color: var(--mbn-surface-white, #FFFFFF);
+	/* La cabecera del design system va en peso normal, no en negrita. */
+	font-weight: 400;
+	white-space: nowrap;
+	/* Sobre el azul, la línea inferior de Bootstrap se vería como un corte. */
+	border-bottom: 0;
+}
+
+/* Bootstrap separa `thead` de `tbody` con un borde de 2px en `currentcolor`
+   (`.table > :not(:first-child)`). La maqueta no lo lleva. */
+.mbn-content-tabs__table > :not(:first-child) {
+	border-top: 0;
+}
+
+.mbn-content-tabs__table tbody td {
+	color: var(--mbn-text-strong, #373737);
+}
+
+/* Celda de dato atómico —un RUT, un código, una fecha—: no se parte, y su
+   ancho mínimo obliga al reparto automático de la tabla a darle sitio. Quién
+   lo es lo decide el normalizador; ver su docblock. */
+.mbn-content-tabs__cell--atomic {
+	white-space: nowrap;
+}
+
+/* ---------- Columna lateral ----------
+   Recuadro gris con las «Cards Horizontales» (340:4649). */
+
+.mbn-content-tabs__aside {
+	display: flex;
+	flex-direction: column;
+	gap: 16px;
+	align-self: start;
+	padding: 24px;
+	background-color: var(--mbn-surface-panel, #F7F7F7);
+	border: 1px solid var(--mbn-border-panel, #EAEAEC);
+	border-radius: 4px;
+}
+
+/* Heading/Slab/Small (19px). base.css fuerza familia y peso de h1-h6. */
+.mbn-content-tabs__aside-title {
+	margin: 0;
+	font-family: var(--mbn-roboto-slab-medium-font-family, "Roboto Slab", serif) !important;
+	font-weight: 500 !important;
+	font-size: calc(19px * var(--mbn-text-scale, 1));
+	line-height: 1.5;
+	color: var(--mbn-text-black, #000000);
+}
+
+.mbn-content-tabs__links {
+	display: flex;
+	flex-direction: column;
+	gap: 16px;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.mbn-content-tabs__link-card {
+	display: flex;
+	gap: 16px;
+	align-items: center;
+	justify-content: space-between;
+	padding: 16px 24px;
+	background-color: var(--mbn-surface-white, #FFFFFF);
+	border: 1px solid var(--mbn-border-divider, #E6E6E6);
+	border-radius: 16px;
+	text-decoration: none;
+	transition: border-color 120ms ease-out, box-shadow 120ms ease-out;
+}
+
+.mbn-content-tabs__link-card:hover {
+	border-color: var(--mbn-brand-blue, #0F69C4);
+	box-shadow: var(--mbn-shadow-elevation-2);
+}
+
+.mbn-content-tabs__link-card:focus-visible {
+	outline: 3px solid var(--mbn-brand-blue, #0F69C4);
+	outline-offset: 2px;
+}
+
+.mbn-content-tabs__link-body {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+	min-width: 0;
+}
+
+.mbn-content-tabs__link-title {
+	font-family: var(--mbn-roboto-body-button-font-family, "Roboto", sans-serif);
+	font-weight: 700;
+	font-size: var(--mbn-roboto-body-small-font-size, 16px);
+	line-height: 1.5;
+	color: var(--mbn-text-strong, #373737);
+	overflow-wrap: anywhere;
+}
+
+.mbn-content-tabs__link-url {
+	font-family: var(--mbn-roboto-body-small-font-family, "Roboto", sans-serif);
+	font-weight: 400;
+	font-size: var(--mbn-roboto-body-small-font-size, 16px);
+	line-height: 1.5;
+	color: var(--mbn-link-default, #1D70B8);
+	overflow-wrap: anywhere;
+}
+
+.mbn-content-tabs__link-icon {
+	flex: 0 0 auto;
+	width: 24px;
+	height: 24px;
+}
+
+/* ---------- md ≥ 768px (canvas 834 del Figma) ---------- */
+
+@media (min-width: 768px) {
+	.mbn-content-tabs__panel-title {
+		font-size: calc(22px * var(--mbn-text-scale, 1));
+	}
+
+	.mbn-content-tabs__prose h2 {
+		font-size: calc(22px * var(--mbn-text-scale, 1));
+	}
+
+	.mbn-content-tabs__link-card {
+		padding: 16px 32px;
+	}
+}
+
+/* ---------- xl ≥ 1200px (canvas 1440 del Figma) ---------- */
+
+@media (min-width: 1200px) {
+	.mbn-content-tabs {
+		gap: 24px;
+	}
+
+	.mbn-content-tabs__nav {
+		--bs-nav-link-font-size: var(--mbn-roboto-body-small-font-size, 16px);
+	}
+
+	/* A partir de aquí las cuatro caben en una línea, así que se reparten el
+	   ancho a partes iguales y el rótulo deja de dividirse en dos renglones. */
+	.mbn-content-tabs__nav-item {
+		flex: 1 1 0;
+		min-width: max-content;
+		max-width: none;
+	}
+
+	/* A partir de `xl` la fila cabe entera, así que las flechas no llegan a
+	   revelarse: el script las muestra midiendo el desbordamiento real y no por
+	   breakpoint. *Divergencia deliberada:* el canvas de tablet del Figma sí las
+	   dibuja, pero allí las pestañas tienen ancho fijo; aquí caben cuatro en 834
+	   y esconder dos tras una flecha sería peor navegación. */
+
+	.mbn-content-tabs__tab {
+		white-space: nowrap;
+	}
+
+	.mbn-content-tabs__panel-title {
+		font-size: var(--mbn-roboto-slab-medium-font-size, 24px);
+	}
+
+	.mbn-content-tabs__prose h2 {
+		font-size: var(--mbn-roboto-slab-medium-font-size, 24px);
+	}
+
+	/* 696 + 24 + 400 = los 1120 del contenido. El ancho de la columna lateral
+	   es fijo en la maqueta, que es justo lo que el grid de Bootstrap no puede
+	   expresar (§7.2): sus columnas son porcentajes. Mismo criterio que el
+	   detalle de noticia con su aside de 368px. */
+	.mbn-content-tabs__layout--aside {
+		grid-template-columns: minmax(0, 1fr) 400px;
+	}
+}

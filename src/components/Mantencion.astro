@@ -1,0 +1,86 @@
+---
+/*
+  Portada de mantención. `src/pages/index.astro` la sirve en lugar de la
+  portada real cuando se construye con `MODO_MANTENCION=true`.
+
+  No usa BaseLayout a propósito: sin cabecera, pie ni menú, que llevarían a
+  secciones que se presentan como en mantención.
+
+  Fondo blanco: el logo trae su propio bloque blanco.
+*/
+import logoMinisterio from '@/assets/marca/bienes-nacionales.svg?url';
+import { politicaCsp } from '@/lib/seguridad';
+import { SITIO_PUBLICO } from '@/lib/publicacion';
+---
+
+<!doctype html>
+<html lang="es-CL">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta http-equiv="content-security-policy" content={politicaCsp()} />
+
+    <title>Sitio en Mantención — Ministerio de Bienes Nacionales</title>
+    <meta name="description" content="Sitio en mantención. Pronta nueva web." />
+    {/*
+      Indexable en el sitio público, igual que BaseLayout: esta portada
+      reemplaza a la de www.bienesnacionales.cl, y con `noindex` el Ministerio
+      saldría de los buscadores mientras dure la mantención.
+    */}
+    {!SITIO_PUBLICO && <meta name="robots" content="noindex, nofollow" />}
+    <link rel="icon" href="/tema/images/favicon.ico" sizes="16x16 32x32" type="image/x-icon" />
+    {/*
+      `is:inline`: sin él Astro agrupa esta hoja con las de la página que
+      importa el componente, y `index.astro` lo importa siempre para poder
+      elegir; estas reglas de `body`, `main`, `h1` y `p` se colarían en la
+      portada normal aunque la mantención no se muestre.
+    */}
+    <style is:inline>
+      body {
+        display: grid;
+        place-items: center;
+        min-height: 100dvh;
+        margin: 0;
+        padding: 3rem 1rem;
+        background: #fff;
+        font-family: Roboto, ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+        text-align: center;
+      }
+      main {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+      h1 {
+        margin: 2.5rem 0 0;
+        color: #143458;
+        font-size: 1.875rem;
+        font-weight: 700;
+        letter-spacing: -0.025em;
+      }
+      p {
+        margin: 0.75rem 0 0;
+        color: #475569;
+        font-size: 1.125rem;
+      }
+      @media (min-width: 640px) {
+        h1 { font-size: 2.25rem; }
+        p { font-size: 1.25rem; }
+      }
+    </style>
+  </head>
+
+  <body>
+    <main>
+      <img
+        src={logoMinisterio}
+        alt="Ministerio de Bienes Nacionales, Gobierno de Chile"
+        width="200"
+        height="181"
+        fetchpriority="high"
+      />
+      <h1>Sitio en Mantención</h1>
+      <p>Pronta nueva Web</p>
+    </main>
+  </body>
+</html>

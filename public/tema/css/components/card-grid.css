@@ -1,0 +1,335 @@
+/* ============================================================
+ * Componente global — Rejilla de tarjetas
+ *
+ * Dos maquetas, un solo componente:
+ *   - Acceso rápido a trámites — Figma 280:2712 (2 columnas, gap 24, fondo
+ *     gris, con ícono, botón outline, tarjeta de 304px).
+ *   - Destacados               — Figma 179:1116 (3 columnas, gap 16, fondo
+ *     blanco, sin ícono, botón sólido, tarjeta de 220px).
+ *
+ * Todo lo que comparten (padding 24, gap 8, tipografías, botonera alineada a
+ * la derecha) vive en las reglas base; lo que las separa, en modificadores.
+ * ============================================================ */
+
+.mbn-card-grid {
+	background: var(--mbn-surface-soft, #F9F9F9);
+	padding: var(--mbn-space-section, 36px) 24px;
+}
+
+.mbn-card-grid--surface-white {
+	background: var(--mbn-surface-white, #FFFFFF);
+}
+
+.mbn-card-grid__container {
+	max-width: var(--mbn-width-content, 1120px);
+	margin-inline: auto;
+}
+
+/* ---------- Encabezado ---------- */
+
+.mbn-card-grid__header {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: space-between;
+	gap: 16px;
+	margin-bottom: 24px;
+}
+
+/* base.css declara font-family y font-weight de h1-h6 con !important, así que
+   la tipografía de título de sección solo se puede imponer con !important. */
+.mbn-card-grid__title {
+	margin: 0;
+	font-family: var(--mbn-roboto-slab-large-font-family, "Roboto Slab", serif) !important;
+	font-weight: 500 !important;
+	font-size: calc(28px * var(--mbn-text-scale, 1));
+	line-height: 1.5;
+	color: var(--mbn-text-primary, #333333);
+}
+
+.mbn-card-grid__all-link {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	padding: 8px 16px;
+	border-radius: 24px;
+	background: var(--mbn-action-primary, #0046A8);
+	color: var(--mbn-text-on-primary, #E7ECFF);
+	font-family: var(--mbn-roboto-body-small-font-family, "Roboto", sans-serif);
+	font-weight: 700;
+	font-size: calc(16px * var(--mbn-text-scale, 1));
+	line-height: 1.5;
+	text-decoration: none;
+	transition: background-color 120ms ease-out;
+}
+
+.mbn-card-grid__all-link:hover,
+.mbn-card-grid__all-link:focus-visible {
+	background: var(--mbn-brand-blue-dark, #00268D);
+	color: var(--mbn-text-on-primary, #E7ECFF);
+}
+
+.mbn-card-grid__all-link:focus-visible {
+	outline: 3px solid var(--mbn-brand-blue, #0F69C4);
+	outline-offset: 2px;
+}
+
+/* ---------- Rejilla ---------- */
+
+.mbn-card-grid__grid {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	display: grid;
+	gap: 16px;
+	grid-template-columns: 1fr;
+}
+
+.mbn-card-grid__card {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	gap: 8px;
+	/* El Figma fija el alto de la tarjeta (304px en Acceso rápido, 220px en
+	   Destacados). Aquí es una altura MÍNIMA y llega por custom property: con
+	   una altura fija, un título o una descripción más largos que los medidos
+	   quedarían recortados por el overflow. */
+	min-height: var(--mbn-card-grid-card-min-height, 0);
+	padding: 24px;
+	background: var(--mbn-surface-white, #FFFFFF);
+	border: 1px solid var(--mbn-border-default, #CCCCCC);
+	border-radius: 16px;
+	position: relative;
+	transition: border-color 160ms ease-out, box-shadow 160ms ease-out;
+}
+
+/* ---------- Hover — Figma 600:8079 (Acceso rápido) y 600:8189 (Destacados) --------- */
+
+/* El degradado va en un pseudo-elemento y no en `background-image` de la
+   tarjeta: los degradados no son interpolables, así que animar su opacidad es
+   la única forma de que la transición no sea un salto seco.
+   Se pinta antes que los hijos en el orden del DOM y todos ellos llevan
+   `position: relative`, de modo que quedan por encima sin necesidad de z-index. */
+.mbn-card-grid__card::before {
+	content: "";
+	position: absolute;
+	inset: 0;
+	border-radius: inherit;
+	background-image: var(--mbn-card-hover-gradient, linear-gradient(to left, #0F69C4 0%, #0046A8 100%));
+	opacity: 0;
+	transition: opacity 160ms ease-out;
+	pointer-events: none;
+}
+
+.mbn-card-grid__card > * {
+	position: relative;
+}
+
+/* `:focus-within` acompaña al hover para que quien navegue con teclado reciba
+   el mismo realce al llegar al botón de la tarjeta. */
+.mbn-card-grid__card:hover,
+.mbn-card-grid__card:focus-within {
+	border-color: var(--mbn-action-primary, #0046A8);
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.10);
+}
+
+.mbn-card-grid__card:hover::before,
+.mbn-card-grid__card:focus-within::before {
+	opacity: 1;
+}
+
+.mbn-card-grid__card:hover .mbn-card-grid__card-title,
+.mbn-card-grid__card:focus-within .mbn-card-grid__card-title,
+.mbn-card-grid__card:hover .mbn-card-grid__card-body,
+.mbn-card-grid__card:focus-within .mbn-card-grid__card-body {
+	color: var(--mbn-text-on-brand-soft, rgba(255, 255, 255, 0.95));
+}
+
+/* Sobre el degradado, las dos variantes de botón convergen en el mismo blanco:
+   la sólida se invierte y la de contorno se queda como está. */
+.mbn-card-grid__card:hover .mbn-card-grid__cta,
+.mbn-card-grid__card:focus-within .mbn-card-grid__cta {
+	background: var(--mbn-surface-white, #FFFFFF);
+	border-color: var(--mbn-action-primary, #0046A8);
+	color: var(--mbn-brand-blue-dark, #00268D);
+}
+
+/* El hover propio del botón no puede volverlo azul cuando la tarjeta ya lo es:
+   desaparecería sobre el degradado. Se realza con un tinte claro. */
+.mbn-card-grid__card:hover .mbn-card-grid__cta:hover,
+.mbn-card-grid__card:hover .mbn-card-grid__cta:focus-visible,
+.mbn-card-grid__card:focus-within .mbn-card-grid__cta:focus-visible {
+	background: var(--mbn-text-on-primary, #E7ECFF);
+	color: var(--mbn-brand-blue-dark, #00268D);
+}
+
+.mbn-card-grid__card:hover .mbn-card-grid__cta:focus-visible,
+.mbn-card-grid__card:focus-within .mbn-card-grid__cta:focus-visible {
+	outline-color: var(--mbn-surface-white, #FFFFFF);
+}
+
+.mbn-card-grid__tile {
+	flex: 0 0 auto;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	padding: 8px;
+	background: var(--mbn-surface-hover, #F2F2F2);
+	border-radius: 8px;
+}
+
+.mbn-card-grid__icon {
+	display: block;
+	width: 36px;
+	height: 36px;
+}
+
+.mbn-card-grid__card-title {
+	margin: 0;
+	transition: color 160ms ease-out;
+	font-family: var(--mbn-roboto-body-small-font-family, "Roboto", sans-serif) !important;
+	font-weight: 500 !important;
+	font-size: calc(20px * var(--mbn-text-scale, 1));
+	line-height: 1.5;
+	color: var(--mbn-text-primary, #333333);
+}
+
+.mbn-card-grid__card-body {
+	margin: 0;
+	transition: color 160ms ease-out;
+	font-family: var(--mbn-roboto-body-small-font-family, "Roboto", sans-serif);
+	font-weight: 400;
+	font-size: calc(16px * var(--mbn-text-scale, 1));
+	line-height: 1.5;
+	color: var(--mbn-text-primary, #333333);
+}
+
+/* La botonera se ancla al fondo de la tarjeta. En el Figma queda justo después
+   del texto y a distinta altura en cada tarjeta, pero esa irregularidad viene
+   de un párrafo vacío en el archivo, no del diseño. */
+.mbn-card-grid__cta-wrap {
+	display: flex;
+	justify-content: flex-end;
+	width: 100%;
+	margin-top: auto;
+	padding-block: 4px;
+}
+
+.mbn-card-grid__cta {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	padding: 8px 16px;
+	border: 2px solid var(--mbn-action-primary, #0046A8);
+	border-radius: 24px;
+	background: var(--mbn-surface-white, #FFFFFF);
+	color: var(--mbn-brand-blue-dark, #00268D);
+	font-family: var(--mbn-roboto-body-small-font-family, "Roboto", sans-serif);
+	font-weight: 700;
+	font-size: calc(16px * var(--mbn-text-scale, 1));
+	line-height: 1.5;
+	text-align: center;
+	text-decoration: none;
+	transition: background-color 120ms ease-out, color 120ms ease-out;
+}
+
+.mbn-card-grid__cta:hover,
+.mbn-card-grid__cta:focus-visible {
+	background: var(--mbn-action-primary, #0046A8);
+	color: var(--mbn-text-on-primary, #E7ECFF);
+}
+
+.mbn-card-grid__cta:focus-visible {
+	outline: 3px solid var(--mbn-brand-blue, #0F69C4);
+	outline-offset: 2px;
+}
+
+/* Variante sólida del botón (Destacados). La base es la de contorno. */
+.mbn-card-grid__cta--solid {
+	border-color: var(--mbn-action-primary, #0046A8);
+	background: var(--mbn-action-primary, #0046A8);
+	color: var(--mbn-text-on-primary, #E7ECFF);
+}
+
+.mbn-card-grid__cta--solid:hover,
+.mbn-card-grid__cta--solid:focus-visible {
+	border-color: var(--mbn-brand-blue-dark, #00268D);
+	background: var(--mbn-brand-blue-dark, #00268D);
+	color: var(--mbn-text-on-primary, #E7ECFF);
+}
+
+/* El texto alternativo del botón solo existe por debajo de xl. Se alternan con
+   display para que el que queda oculto no forme parte del nombre accesible del
+   enlace (WCAG 2.5.3). */
+.mbn-card-grid__cta-label--responsive {
+	display: none;
+}
+
+/* ---------- md ≥ 768px ---------- */
+
+@media (min-width: 768px) {
+	.mbn-card-grid {
+		padding-inline: 40px;
+	}
+
+	.mbn-card-grid__grid--cols-2 {
+		grid-template-columns: repeat(2, 1fr);
+		gap: 24px;
+	}
+
+	.mbn-card-grid__grid--cols-3 {
+		grid-template-columns: repeat(2, 1fr);
+	}
+
+	.mbn-card-grid__title {
+		font-size: calc(32px * var(--mbn-text-scale, 1));
+	}
+}
+
+/* ---------- xl ≥ 1200px (canvas 1440 del Figma) ---------- */
+
+@media (min-width: 1200px) {
+	.mbn-card-grid {
+		padding-inline: 160px;
+	}
+
+	.mbn-card-grid__title {
+		font-size: calc(36px * var(--mbn-text-scale, 1));
+	}
+
+	.mbn-card-grid__card-title {
+		font-size: calc(24px * var(--mbn-text-scale, 1));
+	}
+
+	/* La tercera columna solo aparece en el canvas de 1440: por debajo, tres
+	   tarjetas de 24px de título quedan demasiado estrechas. */
+	.mbn-card-grid__grid--cols-3 {
+		grid-template-columns: repeat(3, 1fr);
+	}
+}
+
+/* Por debajo de xl el botón muestra su texto alternativo, cuando el editor lo
+   ha definido. El template marca el texto de escritorio con --desktop
+   únicamente en ese caso, así que aquí basta con intercambiarlos. */
+@media (max-width: 1199.98px) {
+	.mbn-card-grid__cta-label--desktop {
+		display: none;
+	}
+
+	.mbn-card-grid__cta-label--responsive {
+		display: inline;
+	}
+}
+
+/* ---------- Movimiento reducido ---------- */
+
+@media (prefers-reduced-motion: reduce) {
+	.mbn-card-grid__all-link,
+	.mbn-card-grid__cta,
+	.mbn-card-grid__card,
+	.mbn-card-grid__card::before,
+	.mbn-card-grid__card-title,
+	.mbn-card-grid__card-body {
+		transition: none;
+	}
+}

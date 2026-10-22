@@ -1,9 +1,9 @@
 {
-  "name": "comunidades-agricolas-web",
+  "name": "bienesnacionales-web",
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "Sitio web de las Comunidades Agrícolas de Chile — Astro + Tailwind + React",
+  "description": "Sitio web del Ministerio de Bienes Nacionales — Astro",
   "engines": {
     "node": ">=20.11"
   },
@@ -16,26 +16,12 @@
     "astro": "astro"
   },
   "dependencies": {
-    "@astrojs/react": "^4.2.0",
     "@astrojs/sitemap": "^3.2.1",
-    "@fontsource-variable/inter": "^5.3.0",
-    "@fontsource-variable/plus-jakarta-sans": "^5.3.0",
-    "@fontsource/opendyslexic": "^5.3.0",
-    "astro": "^5.2.0",
-    "embla-carousel-react": "^8.6.0",
-    "lucide": "^1.31.0",
-    "lucide-react": "^0.469.0",
-    "morphicons": "^1.7.0",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "astro": "^5.2.0"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.4",
-    "@tailwindcss/vite": "^4.0.0",
-    "@types/react": "^19.0.0",
-    "@types/react-dom": "^19.0.0",
     "pagefind": "^1.3.0",
-    "tailwindcss": "^4.0.0",
     "typescript": "^5.7.3"
   }
 }

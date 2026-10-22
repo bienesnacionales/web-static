@@ -1,0 +1,298 @@
+/* ============================================================
+ * Componente global — Enlaces con ícono
+ * Maqueta: Figma 179:1128 (frame 1440x488; ítem 341x72, gap 48/24).
+ *
+ * Ícono de 72px a la izquierda y, a la derecha, la franja bicolor sobre
+ * dos líneas de texto. Toda la pieza es el enlace.
+ *
+ * Por debajo de `md` la rejilla pasa a ser un carrusel: la misma lista
+ * convertida en pista desplazable con scroll-snap. El desplazamiento es
+ * nativo —dedo, rueda y teclado funcionan sin JS—; el script solo añade
+ * las flechas y el contador.
+ *
+ * El orden pintado es siempre el del repeater —izquierda a derecha, arriba
+ * abajo—: aquí no se usa `order` de CSS. Reordenar visualmente rompería la
+ * correspondencia con el DOM, y con ella el recorrido por teclado y el
+ * contador del carrusel, que sí siguen el DOM.
+ * ============================================================ */
+
+.mbn-icon-links {
+	padding: var(--mbn-space-section, 36px) 24px;
+}
+
+.mbn-icon-links--surface-page {
+	background: var(--mbn-surface-page, rgba(255, 255, 255, 0.95));
+}
+
+.mbn-icon-links--surface-soft {
+	background: var(--mbn-surface-soft, #F9F9F9);
+}
+
+.mbn-icon-links--surface-white {
+	background: var(--mbn-surface-white, #FFFFFF);
+}
+
+.mbn-icon-links__container {
+	max-width: var(--mbn-width-content, 1120px);
+	margin-inline: auto;
+}
+
+.mbn-icon-links__grid {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	display: grid;
+	gap: 24px;
+	grid-template-columns: 1fr;
+}
+
+.mbn-icon-links__item {
+	display: flex;
+}
+
+.mbn-icon-links__link {
+	display: flex;
+	align-items: flex-start;
+	gap: 8px;
+	width: 100%;
+	padding: 4px;
+	border-radius: 8px;
+	text-decoration: none;
+	transition: background-color 120ms ease-out;
+}
+
+.mbn-icon-links__link:hover {
+	background: var(--mbn-surface-hover, #F2F2F2);
+}
+
+.mbn-icon-links__link:focus-visible {
+	outline: 3px solid var(--mbn-brand-blue, #0F69C4);
+	outline-offset: 2px;
+}
+
+/* El ícono se tiñe con mask-image en lugar de servirse como <img>: en esta
+   sección va en gris y los mismos nombres del catálogo se usan en azul en otras
+   secciones. Con la máscara, el color lo decide el CSS y no hay que duplicar el
+   asset. Requiere que el ícono sea una silueta (SVG), no una fotografía. */
+.mbn-icon-links__icon {
+	flex: 0 0 auto;
+	width: 56px;
+	height: 56px;
+	background-color: var(--mbn-icon-links-icon-color, #B3B3B3);
+	/* Propiedades largas y no el atajo `mask`: un var() dentro del shorthand no
+	   se resuelve en todos los motores y el ícono desaparece sin previo aviso. */
+	-webkit-mask-image: var(--mbn-icon-links-icon);
+	-webkit-mask-repeat: no-repeat;
+	-webkit-mask-position: center;
+	-webkit-mask-size: contain;
+	mask-image: var(--mbn-icon-links-icon);
+	mask-repeat: no-repeat;
+	mask-position: center;
+	mask-size: contain;
+}
+
+.mbn-icon-links__body {
+	display: flex;
+	flex: 1 1 auto;
+	flex-direction: column;
+	gap: 16px;
+	min-width: 0;
+}
+
+/* La franja se estira al ancho del bloque de texto: el SVG del catálogo lleva
+   preserveAspectRatio="none" y mantiene la proporción 37/63 de color. */
+.mbn-icon-links__franja {
+	display: block;
+	width: 100%;
+	height: 8px;
+	background-image: url("../../images/components/franja.svg");
+	background-repeat: no-repeat;
+	background-size: 100% 100%;
+}
+
+.mbn-icon-links__text {
+	display: flex;
+	flex-direction: column;
+	font-family: var(--mbn-roboto-body-small-font-family, "Roboto", sans-serif);
+	font-size: calc(16px * var(--mbn-text-scale, 1));
+	line-height: 1.5;
+	color: var(--mbn-brand-blue, #0F69C4);
+	overflow-wrap: break-word;
+}
+
+.mbn-icon-links__leading {
+	font-weight: 400;
+}
+
+.mbn-icon-links__emphasized {
+	font-weight: 700;
+}
+
+/* ---------- Carrusel (solo por debajo de md) ---------- */
+
+/* La pista y los controles solo existen mientras la sección es un carrusel.
+   A partir de `md` todo esto se desactiva y vuelve la rejilla, así que las
+   reglas viven dentro de la media query de máximo ancho de más abajo. */
+
+.mbn-icon-links__controls {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 16px;
+	margin-top: 16px;
+}
+
+.mbn-icon-links__nav {
+	position: relative;
+	flex: 0 0 auto;
+	width: 40px;
+	height: 40px;
+	padding: 0;
+	border: 2px solid var(--mbn-action-primary, #0046A8);
+	border-radius: 50%;
+	background: var(--mbn-surface-white, #FFFFFF);
+	cursor: pointer;
+	transition: background-color 120ms ease-out, border-color 120ms ease-out, opacity 120ms ease-out;
+}
+
+/* La flecha se dibuja con dos bordes girados: evita añadir un asset más para
+   un glifo que el CSS resuelve con tres declaraciones. */
+.mbn-icon-links__nav::before {
+	content: "";
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	width: 9px;
+	height: 9px;
+	border-top: 2px solid var(--mbn-brand-blue-dark, #00268D);
+	border-right: 2px solid var(--mbn-brand-blue-dark, #00268D);
+}
+
+.mbn-icon-links__nav--next::before {
+	transform: translate(-65%, -50%) rotate(45deg);
+}
+
+.mbn-icon-links__nav--prev::before {
+	transform: translate(-35%, -50%) rotate(-135deg);
+}
+
+.mbn-icon-links__nav:hover:not(:disabled) {
+	background: var(--mbn-action-primary, #0046A8);
+}
+
+.mbn-icon-links__nav:hover:not(:disabled)::before {
+	border-color: var(--mbn-surface-white, #FFFFFF);
+}
+
+.mbn-icon-links__nav:focus-visible {
+	outline: 3px solid var(--mbn-brand-blue, #0F69C4);
+	outline-offset: 2px;
+}
+
+/* En los extremos el botón se deshabilita en vez de ocultarse: si desapareciera,
+   los controles se reordenarían y el contador saltaría de sitio. */
+.mbn-icon-links__nav:disabled {
+	border-color: var(--mbn-border-default, #CCCCCC);
+	opacity: 0.5;
+	cursor: default;
+}
+
+.mbn-icon-links__nav:disabled::before {
+	border-color: var(--mbn-text-muted, #808080);
+}
+
+.mbn-icon-links__status {
+	margin: 0;
+	min-width: 4ch;
+	font-family: var(--mbn-roboto-body-small-font-family, "Roboto", sans-serif);
+	font-size: calc(16px * var(--mbn-text-scale, 1));
+	line-height: 1.5;
+	color: var(--mbn-text-primary, #333333);
+	text-align: center;
+	font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 767.98px) {
+	.mbn-icon-links__grid {
+		display: flex;
+		flex-wrap: nowrap;
+		gap: 16px;
+		overflow-x: auto;
+		overflow-y: hidden;
+		scroll-snap-type: x mandatory;
+		overscroll-behavior-x: contain;
+		/* La barra de scroll se oculta porque los controles ya indican la
+		   posición; el desplazamiento táctil y por teclado no se ve afectado. */
+		scrollbar-width: none;
+		/* Aire para que el foco de un enlace no quede pegado al borde. */
+		padding: 4px;
+		margin: -4px;
+	}
+
+	.mbn-icon-links__grid::-webkit-scrollbar {
+		display: none;
+	}
+
+	.mbn-icon-links__grid:focus-visible {
+		outline: 3px solid var(--mbn-brand-blue, #0F69C4);
+		outline-offset: 3px;
+	}
+
+	/* 86% deja asomar el siguiente enlace: es lo que avisa de que la lista
+	   continúa, sin necesidad de un indicador extra. */
+	.mbn-icon-links__item {
+		flex: 0 0 86%;
+		scroll-snap-align: center;
+		scroll-snap-stop: always;
+	}
+}
+
+/* ---------- md ≥ 768px ---------- */
+
+@media (min-width: 768px) {
+	/* Fuera del carrusel los controles no pintan nada, ni siquiera revelados. */
+	.mbn-icon-links__controls {
+		display: none;
+	}
+
+	.mbn-icon-links {
+		padding-inline: 40px;
+	}
+
+	.mbn-icon-links__grid {
+		grid-template-columns: repeat(2, 1fr);
+		column-gap: 48px;
+	}
+}
+
+/* ---------- xl ≥ 1200px (canvas 1440 del Figma) ---------- */
+
+@media (min-width: 1200px) {
+	.mbn-icon-links {
+		padding-inline: 160px;
+	}
+
+	.mbn-icon-links__grid--cols-3 {
+		grid-template-columns: repeat(3, 1fr);
+	}
+
+	.mbn-icon-links__icon {
+		width: 72px;
+		height: 72px;
+	}
+}
+
+/* ---------- Movimiento reducido ---------- */
+
+@media (prefers-reduced-motion: reduce) {
+	.mbn-icon-links__link,
+	.mbn-icon-links__nav {
+		transition: none;
+	}
+
+	/* El JS ya evita el desplazamiento animado; esto cubre además el que
+	   provoca el navegador al llevar el foco a un enlace fuera de vista. */
+	.mbn-icon-links__grid {
+		scroll-behavior: auto;
+	}
+}

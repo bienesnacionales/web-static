@@ -1,0 +1,421 @@
+/* ============================================================
+ * Componente global — Buscador de noticias
+ * Maqueta: Figma 369:8112 (frame 1440x2303; contenido 1120).
+ *
+ * Ritmo vertical del archivo: el del resto del sitio (tokens
+ * --mbn-space-*): 24px de aire arriba, 24 entre bloques (migas →
+ * encabezado → buscador → filtros → rejilla), 24 dentro de la rejilla
+ * y antes de la paginación, y 36 abajo. El Figma separa los bloques
+ * con 36 y cierra con 62; se homologó con las plantillas (2026-09-29).
+ *
+ * Las piezas del design system de gob.cl que se replican aquí:
+ *   Buscador   93:338    campo + botón unidos, radio 4
+ *   Chips      94:1393   14px bold, radio 4, relleno o borde
+ *   Paginación 101:1216  «Mostrando X - Y de Z» + flechas y números
+ *
+ * La TARJETA no se estiliza aquí: es la de `media-cards`
+ * (.mbn-media-cards__card*), que se consume desde el parcial compartido
+ * `template-parts/components/partials/media-card.php`. Lo único que este
+ * bloque ajusta son las dos medidas en las que la maqueta del listado
+ * difiere de la de la portada (ver más abajo).
+ * ============================================================ */
+
+.mbn-news-search {
+	background: var(--mbn-surface-white, #FFFFFF);
+	padding: var(--mbn-space-page-top, 24px) 24px var(--mbn-space-section, 36px);
+}
+
+.mbn-news-search--surface-soft {
+	background: var(--mbn-surface-soft, #F9F9F9);
+}
+
+.mbn-news-search__container {
+	display: flex;
+	flex-direction: column;
+	gap: var(--mbn-space-stack, 24px);
+	max-width: var(--mbn-width-content, 1120px);
+	margin-inline: auto;
+}
+
+/* Las migas traen su propio padding vertical de 12px: el gap del contenedor
+   ya las separa del título, y sumar margen las despegaría de más. */
+.mbn-news-search__container > .mbn-breadcrumbs {
+	margin: 0;
+}
+
+/* ---------- Encabezado (Figma 369:8114) ---------- */
+
+.mbn-news-search__header {
+	display: flex;
+	flex-direction: column;
+	gap: 16px;
+}
+
+/* base.css declara font-family y font-weight de h1-h6 con !important. */
+.mbn-news-search__title {
+	margin: 0;
+	font-family: var(--mbn-roboto-slab-large-font-family, "Roboto Slab", serif) !important;
+	font-weight: 500 !important;
+	font-size: calc(28px * var(--mbn-text-scale, 1));
+	line-height: 1.5;
+	color: var(--mbn-text-black, #000000);
+}
+
+.mbn-news-search__intro {
+	margin: 0;
+	font-family: var(--mbn-roboto-body-small-font-family, "Roboto", sans-serif);
+	font-weight: 400;
+	font-size: calc(17px * var(--mbn-text-scale, 1));
+	line-height: 1.5;
+	color: var(--mbn-text-black, #000000);
+}
+
+/* ---------- Etiquetas de los dos controles ---------- */
+
+/* «Buscador» y «Filtros de categoría» comparten estilo en el archivo: el
+   mismo Body/Small • Bold sobre el control que encabezan. */
+.mbn-news-search__label {
+	display: block;
+	margin: 0 0 8px;
+	font-family: var(--mbn-roboto-body-button-font-family, "Roboto", sans-serif);
+	font-weight: 700;
+	font-size: calc(16px * var(--mbn-text-scale, 1));
+	line-height: 1.5;
+	color: var(--mbn-text-primary, #333333);
+}
+
+/* ---------- Buscador (Figma 93:338) ---------- */
+
+.mbn-news-search__form {
+	margin: 0;
+}
+
+.mbn-news-search__field {
+	display: flex;
+	align-items: stretch;
+	width: 100%;
+}
+
+.mbn-news-search__input {
+	flex: 1 1 auto;
+	min-width: 0;
+	/* 7px y no 8: el trazo del archivo va por dentro de la caja, así que el
+	   borde de 1px sale del padding y el campo mide los 40px de la maqueta. */
+	padding: 7px 12px;
+	border: 1px solid var(--mbn-text-primary, #333333);
+	/* El borde derecho lo cierra el botón: en la maqueta son una sola pieza. */
+	border-right: 0;
+	border-radius: 4px 0 0 4px;
+	background: var(--mbn-surface-white, #FFFFFF);
+	font-family: var(--mbn-roboto-body-small-font-family, "Roboto", sans-serif);
+	font-weight: 400;
+	font-size: calc(16px * var(--mbn-text-scale, 1));
+	line-height: 1.5;
+	color: var(--mbn-text-primary, #333333);
+}
+
+.mbn-news-search__input::placeholder {
+	color: var(--mbn-text-muted, #808080);
+	opacity: 1;
+}
+
+.mbn-news-search__input:focus-visible {
+	outline: 3px solid var(--mbn-brand-blue, #0F69C4);
+	outline-offset: -1px;
+}
+
+.mbn-news-search__submit {
+	flex: 0 0 auto;
+	padding: 7px 16px;
+	border: 1px solid var(--mbn-action-primary, #0046A8);
+	border-radius: 0 4px 4px 0;
+	background: var(--mbn-action-primary, #0046A8);
+	color: var(--mbn-text-on-primary, #E7ECFF);
+	font-family: var(--mbn-roboto-body-button-font-family, "Roboto", sans-serif);
+	font-weight: 700;
+	font-size: calc(16px * var(--mbn-text-scale, 1));
+	line-height: 1.5;
+	cursor: pointer;
+	transition: background-color 120ms ease-out;
+}
+
+.mbn-news-search__submit:hover,
+.mbn-news-search__submit:focus-visible {
+	background: var(--mbn-brand-blue-dark, #00268D);
+	border-color: var(--mbn-brand-blue-dark, #00268D);
+	color: var(--mbn-text-on-primary, #E7ECFF);
+}
+
+.mbn-news-search__submit:focus-visible {
+	outline: 3px solid var(--mbn-brand-blue, #0F69C4);
+	outline-offset: 2px;
+}
+
+/* ---------- Filtros por categoría (Figma 94:1393) ---------- */
+
+.mbn-news-search__chips {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	display: flex;
+	flex-wrap: wrap;
+	gap: 12px;
+}
+
+.mbn-news-search__chip {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	/* 3px + 1px de borde = los 4px de padding del archivo, con el chip en los
+	   29px de alto exactos. El chip activo conserva el borde —del color de su
+	   propio relleno— para no cambiar de tamaño al seleccionarse. */
+	padding: 3px 7px;
+	border: 1px solid var(--mbn-brand-blue-dark, #00268D);
+	border-radius: 4px;
+	background: var(--mbn-surface-white, #FFFFFF);
+	color: var(--mbn-brand-blue-dark, #00268D);
+	font-family: var(--mbn-roboto-body-button-font-family, "Roboto", sans-serif);
+	font-weight: 700;
+	font-size: calc(14px * var(--mbn-text-scale, 1));
+	line-height: 1.5;
+	text-decoration: none;
+	transition: background-color 120ms ease-out, color 120ms ease-out;
+}
+
+.mbn-news-search__chip:hover {
+	background: var(--mbn-surface-hover, #F2F2F2);
+	color: var(--mbn-brand-blue-dark, #00268D);
+}
+
+.mbn-news-search__chip:focus-visible {
+	outline: 3px solid var(--mbn-brand-blue, #0F69C4);
+	outline-offset: 2px;
+}
+
+/* El chip activo va relleno, como en el archivo. El color no es la única
+   señal: el borde también cambia y el enlace lleva aria-current. */
+.mbn-news-search__chip--current {
+	border-color: var(--mbn-action-primary, #0046A8);
+	background: var(--mbn-action-primary, #0046A8);
+	color: var(--mbn-text-on-primary, #E7ECFF);
+}
+
+.mbn-news-search__chip--current:hover {
+	background: var(--mbn-brand-blue-dark, #00268D);
+	border-color: var(--mbn-brand-blue-dark, #00268D);
+	color: var(--mbn-text-on-primary, #E7ECFF);
+}
+
+/* ---------- Resultados ---------- */
+
+.mbn-news-search__results {
+	display: flex;
+	flex-direction: column;
+	gap: 24px;
+	scroll-margin-top: 16px;
+}
+
+/* Recibe el foco al paginar. No se dibuja outline alrededor de toda la
+   rejilla: el contenedor no está en el recorrido del tabulador, el foco solo
+   llega aquí de forma programática. */
+.mbn-news-search__results:focus {
+	outline: none;
+}
+
+.mbn-news-search--loading .mbn-news-search__results {
+	opacity: 0.55;
+	transition: opacity 120ms ease-out;
+}
+
+.mbn-news-search__empty {
+	margin: 0;
+	padding: 32px 24px;
+	border: 1px dashed var(--mbn-border-default, #CCCCCC);
+	border-radius: 16px;
+	background: var(--mbn-surface-white, #FFFFFF);
+	font-family: var(--mbn-roboto-body-small-font-family, "Roboto", sans-serif);
+	font-size: calc(16px * var(--mbn-text-scale, 1));
+	line-height: 1.5;
+	color: var(--mbn-text-primary, #333333);
+	text-align: center;
+}
+
+.mbn-news-search__grid {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	display: grid;
+	gap: 24px;
+	grid-template-columns: 1fr;
+}
+
+.mbn-news-search__item {
+	display: flex;
+}
+
+/* Las dos medidas en que la tarjeta del listado difiere de la de la portada:
+   en el archivo del buscador la fotografía mide 138px (no 180) y el titular
+   usa Heading/Sans/Small — 19px — en vez de 20/24px. Se ajustan aquí, dentro
+   del bloque, para no tocar `media-cards`. */
+.mbn-news-search .mbn-media-cards__image {
+	height: 138px;
+}
+
+.mbn-news-search .mbn-media-cards__card-title {
+	font-size: var(--mbn-roboto-sans-small-font-size, 19px);
+}
+
+/* ---------- Paginación (Figma 101:1216) ---------- */
+
+.mbn-news-search__pagination {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: flex-end;
+	justify-content: flex-end;
+	gap: 8px;
+}
+
+.mbn-news-search__showing {
+	margin: 0;
+	font-family: var(--mbn-roboto-body-small-font-family, "Roboto", sans-serif);
+	font-weight: 400;
+	font-size: calc(14px * var(--mbn-text-scale, 1));
+	line-height: 1.5;
+	color: var(--mbn-text-primary, #333333);
+	text-align: right;
+}
+
+.mbn-news-search__showing strong {
+	font-weight: 700;
+}
+
+.mbn-news-search__pages {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 8px;
+}
+
+.mbn-news-search__page {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	min-width: 24px;
+	height: 24px;
+	padding: 0 2px;
+	background: transparent;
+	color: var(--mbn-brand-blue-dark, #00268D);
+	font-family: var(--mbn-roboto-body-small-font-family, "Roboto", sans-serif);
+	font-weight: 400;
+	font-size: calc(16px * var(--mbn-text-scale, 1));
+	line-height: 1;
+	text-decoration: none;
+}
+
+/* Los números que no son la página actual llevan una línea inferior, no un
+   subrayado de texto: en el archivo es una barra a lo ancho de la caja de
+   24px, y `text-decoration` la ceñiría a los dígitos. */
+.mbn-news-search__page--page {
+	box-shadow: inset 0 -1px 0 0 var(--mbn-brand-blue-dark, #00268D);
+}
+
+a.mbn-news-search__page:hover {
+	color: var(--mbn-action-primary, #0046A8);
+	box-shadow: inset 0 -2px 0 0 var(--mbn-action-primary, #0046A8);
+}
+
+a.mbn-news-search__page:focus-visible {
+	outline: 3px solid var(--mbn-brand-blue, #0F69C4);
+	outline-offset: 2px;
+}
+
+.mbn-news-search__page--current {
+	border-radius: 2px;
+	background: var(--mbn-action-primary, #0046A8);
+	color: var(--mbn-text-on-primary, #E7ECFF);
+	box-shadow: none;
+}
+
+.mbn-news-search__page--dots {
+	color: var(--mbn-text-muted, #808080);
+	box-shadow: none;
+}
+
+/* Las flechas son el export del archivo y traen su propia caja gris; el
+   estado inactivo se marca bajando la opacidad, no repintando el SVG. */
+.mbn-news-search__page--prev,
+.mbn-news-search__page--next {
+	min-width: 24px;
+	padding: 0;
+	box-shadow: none;
+	border-radius: 4px;
+}
+
+.mbn-news-search__page--prev img,
+.mbn-news-search__page--next img {
+	display: block;
+	width: 24px;
+	height: 24px;
+}
+
+.mbn-news-search__page--disabled {
+	opacity: 0.4;
+	box-shadow: none;
+}
+
+/* ---------- md ≥ 768px ---------- */
+
+@media (min-width: 768px) {
+	.mbn-news-search {
+		padding-inline: 40px;
+	}
+
+	.mbn-news-search__title {
+		font-size: calc(32px * var(--mbn-text-scale, 1));
+	}
+
+	.mbn-news-search__intro {
+		font-size: var(--mbn-roboto-sans-small-font-size, 19px);
+	}
+
+	.mbn-news-search__grid {
+		grid-template-columns: repeat(2, 1fr);
+	}
+
+	/* El buscador no llega a ocupar los 1120 del canvas en tablet, pero sí
+	   toda la columna disponible: es una sola pieza y partirla no ayuda. */
+	.mbn-news-search__submit {
+		padding-inline: 24px;
+	}
+}
+
+/* ---------- xl ≥ 1200px (canvas 1440 del Figma) ---------- */
+
+@media (min-width: 1200px) {
+	.mbn-news-search {
+		padding-inline: 160px;
+	}
+
+	.mbn-news-search__title {
+		font-size: var(--mbn-roboto-slab-large-font-size, 36px);
+	}
+
+	/* La tercera columna solo desde xl, mismo criterio que `card-grid` y
+	   `news-list`: por debajo, tres tarjetas dejan el titular en cinco líneas. */
+	.mbn-news-search__grid--cols-3 {
+		grid-template-columns: repeat(3, 1fr);
+	}
+}
+
+/* ---------- Movimiento reducido ---------- */
+
+@media (prefers-reduced-motion: reduce) {
+	.mbn-news-search__chip,
+	.mbn-news-search__submit,
+	.mbn-news-search--loading .mbn-news-search__results {
+		transition: none;
+	}
+}

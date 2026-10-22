@@ -1,0 +1,806 @@
+/* Accesibilidad — alto contraste y escala de texto.
+ *
+ * Estado, siempre en <html> (lo escribe el arranque inline de inc/a11y.php y lo
+ * mantiene header-nav.js, §6):
+ *
+ *   html.mbn-contrast            → modo de alto contraste.
+ *   html[data-mbn-text-step]     → nivel de escala: -2, -1, 0, 1 ó 2.
+ *   --mbn-text-scale             → el factor que corresponde al nivel, como
+ *                                  estilo en línea del propio <html>.
+ *
+ * ESCALA DE TEXTO
+ * Un nivel equivale a **2 puntos** sobre el cuerpo de 16px, y hay dos niveles en
+ * cada sentido: 12 / 14 / 16 / 18 / 20px, o sea factores 0.75 / 0.875 / 1 /
+ * 1.125 / 1.25. El factor es proporcional, así que un titular de 36px sube a
+ * 40.5 y 45, y no 2px a secas: escalar todo por igual es lo que conserva la
+ * jerarquía tipográfica.
+ *
+ * El factor no se aplica desde aquí: **cada tamaño en px del theme está escrito
+ * como `calc(Npx * var(--mbn-text-scale, 1))`**, en tokens.css y en cada hoja.
+ * Es la única forma de que la escala llegue al sitio entero: el theme dimensiona
+ * en px (por calco del Figma) y tocar sólo `html { font-size }` movía apenas los
+ * pocos `rem` de base.css. Con el factor en 1 el valor calculado es idéntico al
+ * literal, así que el sitio sin escala renderiza exactamente igual que antes.
+ *
+ * `html { font-size }` se mantiene para los `rem` de base.css (el kit Siigsa) y
+ * va en **porcentaje**, no en px: así respeta el tamaño base que la persona
+ * tenga configurado en su navegador en vez de pisarlo con 16px.
+ *
+ * ALTO CONTRASTE
+ * Texto blanco sobre negro, enlaces amarillos subrayados (#FCFF3C) que pasan a
+ * cian (#29EDFF) en hover y foco, y bordes amarillos. Dos capas:
+ *   1. Las reglas por bloque del shell (topbar, header, dropdown, offcanvas,
+ *      footer), que calzan con el marcado de cada uno.
+ *   2. El barrido del contenido (`main`), más abajo: el contenido lo arman 21
+ *      componentes del Contenido flexible y las plantillas de página, así que
+ *      enumerarlos uno a uno no escala — y cualquier componente nuevo nacería
+ *      sin contraste.
+ *
+ * La paleta es la del modo de contraste de base.css (kit Siigsa): #FCFF3C y
+ * #29EDFF. Esas reglas cuelgan de `.a11y-contrast`, una clase que el theme no
+ * pone, así que **no se aplican**: este archivo es el que las lleva al marcado
+ * del theme. La clase no se activa a propósito —su `.toolbar .toolbar-btn:hover`
+ * dejaba el botón de contraste pulsado negro sobre negro—. Los selectores del
+ * kit que pueden aparecer en contenido del editor (`.boton-*`, `.card`, `table`)
+ * los cubre el barrido.
+ *
+ * El logo principal no cambia: conserva su fondo blanco, sus colores y su
+ * tamaño (ver la regla del logo).
+ *
+ * Implementación por overrides descendentes; el `!important` del barrido es
+ * deliberado (a11y.css es la última capa de la cascada, §6) y hace falta para
+ * ganar a las reglas de elemento con `!important` de base.css.
+ */
+
+:root {
+	--mbn-text-scale: 1;
+}
+
+/* ============================================================
+ * Escala de texto
+ * ============================================================ */
+
+html {
+	font-size: calc(100% * var(--mbn-text-scale, 1));
+}
+
+/* base.css vuelve a declarar h1–h6 en px bajo 767px, y un px literal no escala.
+   Se reescriben con el factor. Especificidad (0,0,2) contra la (0,0,1) del kit,
+   y a11y.css carga después. */
+@media (max-width: 767px) {
+	html h1 {
+		font-size: calc(40px * var(--mbn-text-scale, 1));
+		line-height: calc(60px * var(--mbn-text-scale, 1));
+	}
+
+	html h2 {
+		font-size: calc(32px * var(--mbn-text-scale, 1));
+		line-height: calc(48px * var(--mbn-text-scale, 1));
+	}
+
+	html h3 {
+		font-size: calc(24px * var(--mbn-text-scale, 1));
+		line-height: calc(32px * var(--mbn-text-scale, 1));
+	}
+
+	html h4 {
+		font-size: calc(20px * var(--mbn-text-scale, 1));
+		line-height: calc(30px * var(--mbn-text-scale, 1));
+	}
+
+	html h5 {
+		font-size: calc(18px * var(--mbn-text-scale, 1));
+		line-height: calc(27px * var(--mbn-text-scale, 1));
+	}
+
+	html h6 {
+		font-size: calc(16px * var(--mbn-text-scale, 1));
+		line-height: calc(18px * var(--mbn-text-scale, 1));
+	}
+}
+
+/* ============================================================
+ * Modo alto contraste — shell
+ * ============================================================ */
+
+html.mbn-contrast,
+html.mbn-contrast body {
+	background: #000000;
+	color: #FFFFFF;
+}
+
+html.mbn-contrast body {
+	font-family: var(--wp--preset--font-family--roboto, "Roboto", system-ui, sans-serif);
+}
+
+html.mbn-contrast a,
+html.mbn-contrast .mbn-footer__contact-link,
+html.mbn-contrast .mbn-footer__contact-line a,
+html.mbn-contrast .mbn-footer__col-link,
+html.mbn-contrast .mbn-topbar__panel-link {
+	color: #FCFF3C;
+	text-decoration: underline;
+	text-underline-offset: 3px;
+}
+
+/* Hover y foco de los enlaces en cian (#29EDFF), la segunda tinta del modo de
+   contraste del kit Siigsa: el amarillo marca «esto es un enlace» y el cian
+   «estás sobre él». Incluye los ítems del menú, que son enlaces aunque vayan
+   en blanco, y los dos que son <button> con pinta de enlace. */
+html.mbn-contrast a:is(:hover, :focus-visible),
+html.mbn-contrast .mbn-header__nav-link:is(:hover, :focus-visible),
+html.mbn-contrast .mbn-header__nav-button:is(:hover, :focus-visible),
+html.mbn-contrast .mbn-topbar__panel-link:is(:hover, :focus-visible) {
+	color: #29EDFF;
+}
+
+html.mbn-contrast :focus-visible {
+	outline: 3px solid #FCFF3C;
+	outline-offset: 3px;
+}
+
+html.mbn-contrast .skip-link {
+	background: #FCFF3C;
+	color: #000000;
+	border: 2px solid #FFFFFF;
+}
+
+/* ----- TopBar ----- */
+html.mbn-contrast .mbn-topbar {
+	background: #000000;
+	color: #FFFFFF;
+	border-bottom: 2px solid #FCFF3C;
+}
+
+html.mbn-contrast .mbn-topbar__panel {
+	border-top: 1px solid #FCFF3C;
+}
+
+/* ----- Header (desktop + mobile) ----- */
+html.mbn-contrast .mbn-header {
+	background: #000000;
+	color: #FFFFFF;
+	border-bottom: 1px solid #FCFF3C;
+}
+
+html.mbn-contrast .mbn-header__divider {
+	background: #FCFF3C;
+	height: 1px;
+}
+
+html.mbn-contrast .mbn-header__logo {
+	color: #FFFFFF;
+}
+
+html.mbn-contrast .mbn-header--desktop {
+	border-bottom: 1px solid #FCFF3C;
+}
+
+html.mbn-contrast .mbn-header__nav-link,
+html.mbn-contrast .mbn-header__nav-button,
+html.mbn-contrast .mbn-offcanvas__nav-link,
+html.mbn-contrast .mbn-offcanvas__nav-toggle {
+	color: #FFFFFF;
+}
+
+/* Los iconos del menú (la casa de «Inicio», los chevrons, la hamburguesa y el
+   aspa del offcanvas) son SVG negros en un
+   <img>: sobre el fondo negro desaparecían. Se invierten; el logo no, que va
+   aparte y conserva sus colores. */
+html.mbn-contrast .mbn-header__nav-link img,
+html.mbn-contrast .mbn-header__nav-button img,
+html.mbn-contrast .mbn-offcanvas__nav-link img,
+html.mbn-contrast .mbn-offcanvas__nav-toggle img,
+html.mbn-contrast .mbn-header__menu-trigger img,
+html.mbn-contrast .mbn-offcanvas__close img {
+	filter: invert(1);
+}
+
+html.mbn-contrast .mbn-header__nav-link:focus-visible,
+html.mbn-contrast .mbn-header__nav-button:focus-visible {
+	outline-color: #FCFF3C;
+}
+
+html.mbn-contrast .mbn-header__nav-link--ministerio,
+html.mbn-contrast .mbn-offcanvas__nav-link--ministerio {
+	border-color: #FCFF3C;
+	color: #FCFF3C;
+}
+
+/* Botonera accesibilidad */
+html.mbn-contrast .mbn-header__a11y-button,
+html.mbn-contrast .mbn-offcanvas__a11y-button {
+	color: #FFFFFF;
+	background: #000000;
+	border: 1px solid #FCFF3C;
+}
+
+html.mbn-contrast .mbn-header__a11y-button img,
+html.mbn-contrast .mbn-offcanvas__a11y-button img {
+	filter: invert(1);
+}
+
+html.mbn-contrast .mbn-header__a11y-button[aria-pressed="true"],
+html.mbn-contrast .mbn-offcanvas__a11y-button[aria-pressed="true"] {
+	background: #FCFF3C;
+	color: #000000;
+	border-color: #FCFF3C;
+}
+
+/* Hover de la botonera según el kit (`.a11y-contrast .toolbar .toolbar-btn:hover`):
+   fondo negro y borde amarillo. Sin esto ganaba el #F2F2F2 de header.css y el
+   icono, invertido a blanco, desaparecía. El botón pulsado conserva su amarillo:
+   su icono es negro y sobre negro se perdería. */
+html.mbn-contrast .mbn-header__a11y-button.mbn-header__a11y-button:hover:not([aria-pressed="true"]),
+html.mbn-contrast .mbn-offcanvas__a11y-button.mbn-offcanvas__a11y-button:hover:not([aria-pressed="true"]) {
+	background: #000000;
+	border-color: #FCFF3C;
+}
+
+/* Sobre el amarillo el icono debe quedar negro: anula el invert de header.css. */
+html.mbn-contrast .mbn-header__a11y-button[aria-pressed="true"] img,
+html.mbn-contrast .mbn-offcanvas__a11y-button[aria-pressed="true"] img {
+	filter: none;
+}
+
+html.mbn-contrast .mbn-header__a11y-button:focus-visible,
+html.mbn-contrast .mbn-offcanvas__a11y-button:focus-visible {
+	outline-color: #FCFF3C;
+}
+
+/* Tope de la escala: `aria-disabled` y no `disabled` (§8), así que el estado
+   apagado se pinta también por el atributo. */
+html.mbn-contrast .mbn-header__a11y-button:disabled,
+html.mbn-contrast .mbn-offcanvas__a11y-button:disabled,
+html.mbn-contrast .mbn-header__a11y-button[aria-disabled="true"],
+html.mbn-contrast .mbn-offcanvas__a11y-button[aria-disabled="true"] {
+	opacity: 0.6;
+	color: #FFFFFF;
+	background: transparent;
+	border-color: #FCFF3C;
+}
+
+/* Logo principal: en alto contraste se cambia por su versión con el nombre del
+   Ministerio en blanco (`logo-header-mbn-with-franja-contrast.svg`), como
+   midesof.gob.cl con su `img.contrast`. Los templates imprimen los dos; el
+   oculto va con `display: none` y no se anuncia. Ni filtro ni fondo. Es la
+   versión monocroma oficial: la franja institucional también va en blanco
+   —tramo azul en contorno, rojo relleno—, y la del footer la calca (más abajo).
+   Desktop y móvil. */
+html.mbn-contrast .mbn-header__logo-img--normal {
+	display: none;
+}
+
+html.mbn-contrast .mbn-header__logo-img--contrast {
+	display: block;
+}
+
+html.mbn-contrast .mbn-header__logo,
+html.mbn-contrast .mbn-header__logo:is(:hover, :focus-visible) {
+	text-decoration: none;
+}
+
+/* ----- Buscador del header -----
+   El campo es un `.form-control` de Bootstrap dentro de un `.input-group`, no
+   una clase del theme: hay que ir a por las de Bootstrap. */
+html.mbn-contrast .mbn-header__search {
+	background-color: #000000;
+	border-color: #FCFF3C;
+}
+
+html.mbn-contrast .mbn-header__search:focus-within {
+	border-color: #FCFF3C;
+	box-shadow: 0 0 0 3px #FCFF3C;
+}
+
+html.mbn-contrast .mbn-header .form-control,
+html.mbn-contrast .mbn-header .input-group-text,
+html.mbn-contrast .mbn-offcanvas .form-control,
+html.mbn-contrast .mbn-offcanvas .input-group-text {
+	background-color: #000000;
+	color: #FFFFFF;
+	border-color: #FCFF3C;
+}
+
+/* Los dos buscadores (header desktop y offcanvas) llevan la utilidad
+   `border-dark` de Bootstrap, que declara su color con `!important`: la regla
+   de arriba perdía y el contorno quedaba #212529 sobre negro, invisible. Hasta
+   el 2026-10-07 le pasaba al del desktop sin que nadie lo viera. */
+html.mbn-contrast :is(.mbn-header, .mbn-offcanvas) :is(.form-control, .input-group-text).border-dark {
+	border-color: #FCFF3C !important;
+}
+
+html.mbn-contrast .mbn-header .form-control::placeholder,
+html.mbn-contrast .mbn-offcanvas .form-control::placeholder {
+	color: #FFFFFF;
+	opacity: 1;
+}
+
+html.mbn-contrast .mbn-header .input-group-text img,
+html.mbn-contrast .mbn-offcanvas .input-group-text img {
+	filter: invert(1);
+}
+
+/* ----- Dropdowns ----- */
+html.mbn-contrast .mbn-dropdown {
+	background: #000000;
+	border-color: #FCFF3C;
+}
+
+html.mbn-contrast .mbn-dropdown__list {
+	background: #FCFF3C;
+}
+
+html.mbn-contrast .mbn-dropdown__option {
+	background: #000000;
+	color: #FFFFFF;
+	border-bottom-color: #FCFF3C;
+}
+
+html.mbn-contrast .mbn-dropdown__option:hover,
+html.mbn-contrast .mbn-dropdown__option:focus-visible {
+	background: #1a1a00;
+	color: #29EDFF;
+	box-shadow: inset 0 0 0 2px #FCFF3C;
+}
+
+/* ----- Offcanvas ----- */
+html.mbn-contrast .offcanvas.mbn-offcanvas {
+	background: #000000;
+	color: #FFFFFF;
+	border-left: 2px solid #FCFF3C;
+}
+
+html.mbn-contrast .mbn-offcanvas__header {
+	border-bottom-color: #FCFF3C;
+}
+
+html.mbn-contrast .mbn-offcanvas__title {
+	color: #FFFFFF;
+}
+
+html.mbn-contrast .mbn-offcanvas__nav-link,
+html.mbn-contrast .mbn-offcanvas__nav-toggle {
+	color: #FFFFFF;
+}
+
+html.mbn-contrast .mbn-offcanvas__nav-link:hover,
+html.mbn-contrast .mbn-offcanvas__nav-toggle:hover {
+	color: #29EDFF;
+}
+
+html.mbn-contrast .mbn-offcanvas__submenu {
+	background: #1a1a00;
+}
+
+html.mbn-contrast .mbn-offcanvas__submenu-link {
+	color: #FFFFFF;
+	border-bottom-color: #FCFF3C;
+}
+
+html.mbn-contrast .mbn-offcanvas__submenu-link:hover,
+html.mbn-contrast .mbn-offcanvas__submenu-link:focus-visible {
+	background: #000000;
+	color: #29EDFF;
+}
+
+html.mbn-contrast .offcanvas-backdrop.mbn-offcanvas-backdrop {
+	background-color: rgba(0, 0, 0, 0.85);
+}
+
+/* ----- Footer -----
+ * base.css (kit Siigsa) declara `footer { background-color: #012C50 !important }`
+ * y `footer a { color: #fff !important }`, y footer.css contrarresta el fondo
+ * con su propio !important. El modo de alto contraste tiene que ganar a ambos,
+ * de ahi los !important de este bloque (a11y.css es la capa de override final).
+ */
+html.mbn-contrast .mbn-footer {
+	background-color: #000000 !important;
+	color: #FFFFFF;
+	border-top: 2px solid #FCFF3C;
+}
+
+html.mbn-contrast .mbn-footer__col-heading,
+html.mbn-contrast .mbn-footer__contact-line {
+	color: #FFFFFF;
+}
+
+html.mbn-contrast .mbn-footer__col-link,
+html.mbn-contrast .mbn-footer__contact-line a,
+html.mbn-contrast .mbn-footer__contact-link {
+	color: #FCFF3C !important;
+	text-decoration: underline;
+}
+
+html.mbn-contrast .mbn-footer__col-link:is(:hover, :focus-visible),
+html.mbn-contrast .mbn-footer__contact-line a:is(:hover, :focus-visible),
+html.mbn-contrast .mbn-footer__contact-link:is(:hover, :focus-visible) {
+	color: #29EDFF !important;
+}
+
+/* El logo se compone con mix-blend-mode: lighten; sobre negro lighten es la
+   identidad, asi que el raster se mantiene legible sin ajustes extra. */
+/* Franja institucional del footer: en alto contraste se cambia por su versión
+   en blanco (`footer-decorative-franja-contrast.svg`), la misma que lleva el
+   logo oficial de contraste del header. Mismo mecanismo: los tres shells
+   imprimen las dos y aquí se muestra una. (0,2,1) gana al display de footer.css. */
+html.mbn-contrast .mbn-footer__logo-franja--normal {
+	display: none;
+}
+
+html.mbn-contrast .mbn-footer__logo-franja--contrast {
+	display: block;
+}
+
+html.mbn-contrast .mbn-footer__social-link {
+	color: #FFFFFF;
+	border: 1px solid transparent;
+}
+
+html.mbn-contrast .mbn-footer__social-link:hover,
+html.mbn-contrast .mbn-footer__social-link:focus-visible {
+	background: #1a1a00;
+	color: #29EDFF;
+}
+
+/* ----- mbn-contrast sobre header-nav.js activaciones aria-pressed ----- */
+html.mbn-contrast .mbn-header__nav-button[aria-expanded="true"],
+html.mbn-contrast .mbn-offcanvas__nav-toggle[aria-expanded="true"] {
+	color: #FCFF3C;
+}
+
+html.mbn-contrast .mbn-offcanvas__a11y {
+	border-top-color: #FCFF3C;
+}
+
+/* ============================================================
+ * Modo alto contraste — barrido del contenido
+ *
+ * Ámbito: `main`, los diálogos de Bootstrap (`.modal`) y los popups de Popup
+ * Maker (`.pum-overlay`), que cuelgan del <body> y no de `main`. El shell
+ * queda fuera: ya tiene sus reglas arriba, calzadas con su marcado.
+ *
+ * Añadir un ámbito a `:is()` no cambia la especificidad mientras sea una clase:
+ * `:is()` toma la de su argumento más específico, que ya era `.modal`.
+ * ============================================================ */
+
+html.mbn-contrast #page,
+html.mbn-contrast main {
+	background-color: #000000 !important;
+	color: #FFFFFF !important;
+}
+
+/*
+ * Superficies y texto. La lista de elementos es deliberada: **están los de
+ * bloque y no los `<span>`**, porque varios iconos del theme se pintan con
+ * `mask-image` sobre un `<span>` y ahí el `background-color` ES el color del
+ * icono — pintarlo de negro lo borraría. Los pseudo-elementos quedan fuera por
+ * el mismo motivo (`::before`/`::after` con máscara en accordion, content-tabs,
+ * faq, gallery y org-chart), y de paso conservan los degradados decorativos.
+ *
+ * `background-image: none` quita fotografías y franjas de fondo: un texto blanco
+ * sobre una imagen no tiene contraste garantizado. Las imágenes de contenido
+ * (`<img>`) no se tocan.
+ *
+ * `:where()` no suma especificidad, así que las reglas de más abajo —enlaces,
+ * botones, campos— ganan sin necesidad de subir la apuesta.
+ */
+html.mbn-contrast :is(main, .modal, .pum-overlay) :where(div, section, article, aside, nav,
+header, footer, ul, ol, li, dl, dt, dd, p, h1, h2, h3, h4, h5, h6, hr, table,
+thead, tbody, tfoot, tr, th, td, caption, form, fieldset, legend, label, figure,
+figcaption, blockquote, details, summary, dialog, address, time, small, strong,
+em, b, i, cite, abbr, code, pre, span) {
+	background-color: #000000 !important;
+	background-image: none !important;
+	color: #FFFFFF !important;
+	border-color: #FCFF3C !important;
+	box-shadow: none !important;
+}
+
+/* Enlaces: amarillo subrayado, y también el texto que envuelvan. */
+html.mbn-contrast :is(main, .modal, .pum-overlay) a,
+html.mbn-contrast :is(main, .modal, .pum-overlay) a :where(h1, h2, h3, h4, h5, h6, p, span,
+strong, em, b, small, time, div, li) {
+	color: #FCFF3C !important;
+	background-color: transparent !important;
+}
+
+html.mbn-contrast :is(main, .modal, .pum-overlay) a {
+	text-decoration: underline !important;
+	text-underline-offset: 3px;
+}
+
+html.mbn-contrast :is(main, .modal, .pum-overlay) a:is(:hover, :focus-visible),
+html.mbn-contrast :is(main, .modal, .pum-overlay) a:is(:hover, :focus-visible) :where(h1, h2, h3, h4, h5, h6, p,
+span, strong, em, b, small, time, div, li) {
+	color: #29EDFF !important;
+}
+
+/* Campos de formulario. Van antes que los botones porque `input[type=submit]`
+   entra en las dos listas y tiene que mandar la de botones. */
+html.mbn-contrast :is(main, .modal, .pum-overlay) :is(input, select, textarea) {
+	background-color: #000000 !important;
+	color: #FFFFFF !important;
+	border: 1px solid #FCFF3C !important;
+}
+
+html.mbn-contrast :is(main, .modal, .pum-overlay) ::placeholder {
+	color: #FFFFFF !important;
+	opacity: 1;
+}
+
+/* Botones: los de Bootstrap, los del theme (`__button`, `__cta`) y los del kit
+   Siigsa (`boton-*`), que pueden aparecer en contenido escrito desde el editor. */
+html.mbn-contrast :is(main, .modal, .pum-overlay) :is(button, .btn, :is(a, button)[class*="boton-"],
+:is(a, button)[class*="__button"], :is(a, button)[class*="__cta"], input[type="submit"], input[type="button"],
+input[type="reset"]) {
+	background-color: #000000 !important;
+	background-image: none !important;
+	color: #FCFF3C !important;
+	border: 1px solid #FCFF3C !important;
+}
+
+html.mbn-contrast :is(main, .modal, .pum-overlay) :is(button, .btn, :is(a, button)[class*="boton-"],
+:is(a, button)[class*="__button"], :is(a, button)[class*="__cta"], input[type="submit"], input[type="button"],
+input[type="reset"]):is(:hover, :focus-visible) {
+	background-color: #FCFF3C !important;
+	color: #000000 !important;
+}
+
+/* Las tarjetas no cambian de color al pasar el ratón: como en midesof.gob.cl,
+   en alto contraste la superficie es negra y fija, y lo único que responde es
+   el texto de los enlaces (cian) y los botones. El degradado azul del hover de
+   `card-grid` y `direct-access` va en un `::before`, que el barrido deja fuera
+   por construcción; aquí se apaga. Va también la sombra, que sobre negro no se
+   ve pero delataba el cambio de estado en el borde. */
+html.mbn-contrast :is(main, .modal, .pum-overlay) :is(.mbn-card-grid__card, .mbn-direct-access__card)::before {
+	opacity: 0 !important;
+	background-image: none !important;
+}
+
+html.mbn-contrast :is(main, .modal, .pum-overlay) :is(.mbn-card-grid__card, .mbn-direct-access__card,
+.mbn-media-cards__card, .mbn-news-list__card, .mbn-content-tabs__link-card,
+.mbn-org-chart__node):is(:hover, :focus-within, :focus-visible) {
+	box-shadow: none !important;
+}
+
+/* Las tarjetas que son ellas mismas un <a> quedan fuera del barrido —que sólo
+   pinta elementos de bloque—, así que su borde era el gris del theme y en hover
+   el azul. Se fija en amarillo en todos los estados, como el de las demás. */
+html.mbn-contrast :is(main, .modal, .pum-overlay) :is(.mbn-direct-access__card, .mbn-content-tabs__link-card,
+a.mbn-org-chart__node, .mbn-icon-links__link) {
+	border-color: #FCFF3C !important;
+}
+
+/* Un botón —también un <a> con pinta de botón— se lee por su caja, no por el
+   subrayado, que es la seña de los enlaces de texto. */
+html.mbn-contrast :is(main, .modal, .pum-overlay) :is(button, .btn, :is(a, button)[class*="boton-"],
+:is(a, button)[class*="__button"], :is(a, button)[class*="__cta"]) {
+	text-decoration: none !important;
+}
+
+/* Dentro de un botón —también de un <a> con pinta de botón— el texto sigue al
+   botón y no a la regla de enlaces: sin esto, el rótulo de un CTA quedaba
+   amarillo (o cian, en hover) sobre el fondo amarillo del botón en hover. Va
+   detrás de la regla de enlaces del contenido, con su misma especificidad. */
+html.mbn-contrast :is(main, .modal, .pum-overlay) :is(button, .btn, :is(a, button)[class*="boton-"],
+:is(a, button)[class*="__button"], :is(a, button)[class*="__cta"], input[type="submit"], input[type="button"],
+input[type="reset"]) :where(h1, h2, h3, h4, h5, h6, p, span, strong, em, b, small,
+time, div, li) {
+	color: inherit !important;
+}
+
+/* Y tampoco lleva el fondo negro que el barrido da a los <span> y a los bloques:
+   sobre el amarillo del hover dejaba una caja negra detrás del rótulo (el botón
+   «Plan Estratégico Institucional» de «Ministerio»). Se exceptúan los iconos
+   con máscara, cuyo `background-color` es el propio icono. */
+html.mbn-contrast :is(main, .modal, .pum-overlay) :is(button, .btn, :is(a, button)[class*="boton-"],
+:is(a, button)[class*="__button"], :is(a, button)[class*="__cta"], input[type="submit"], input[type="button"],
+input[type="reset"]) :where(h1, h2, h3, h4, h5, h6, p, span, strong, em, b, small,
+time, div, li):not(.mbn-authorities__cta-icon, .mbn-authorities__social-glyph, .mbn-breadcrumbs__separator,
+.mbn-external-modal__icon, .mbn-icon-links__icon, .mbn-org-chart__chevron,
+.mbn-org-chart__person-icon, .mbn-share__icon, .mbn-survey__close-icon) {
+	background-color: transparent !important;
+}
+
+/* Controles con pinta de tarjeta o de pestaña —las barras del acordeón, las
+   pestañas y la cabecera plegable de una unidad del organigrama— son <button>
+   y entran en la lista de botones, pero no se rellenan de amarillo: como en
+   midesof.gob.cl (`.accordion-item button`, `.nav-tabs .nav-link`), quedan en
+   negro y sólo su texto pasa a cian. Rellenada, la cabecera del organigrama
+   dejaba el avatar y el nombre como parches negros sobre el amarillo.
+
+   Clases repetidas para ganar al hover de la lista de botones, (0,4,2). */
+html.mbn-contrast :is(main, .modal, .pum-overlay) :is(.accordion-button.accordion-button, .nav-link.nav-link,
+.mbn-org-chart__node.mbn-org-chart__node):is(:hover, :focus-visible) {
+	background-color: #000000 !important;
+	color: #29EDFF !important;
+}
+
+/* Los iconos teñidos con `mask-image` toman el color del texto, de modo que
+   siguen al botón cuando se invierte en hover. Es la lista completa de máscaras
+   del theme (§8): si se añade otra, va aquí. */
+html.mbn-contrast :is(main, .modal, .pum-overlay) :is(.mbn-authorities__cta-icon,
+.mbn-authorities__social-glyph, .mbn-breadcrumbs__separator,
+.mbn-external-modal__icon, .mbn-icon-links__icon, .mbn-org-chart__chevron,
+.mbn-org-chart__person-icon, .mbn-search__more-icon, .mbn-share__icon, .mbn-survey__close-icon),
+html.mbn-contrast :is(main, .modal, .pum-overlay) :is(.mbn-accordion--brand .accordion-button,
+.mbn-tramite .mbn-accordion .accordion-button,
+.mbn-content-tabs__scroller, .mbn-faq__scroller, .mbn-gallery__nav,
+.mbn-org-chart__authority-icon, .mbn-survey__done-icon)::after,
+html.mbn-contrast :is(main, .modal, .pum-overlay) :is(.mbn-accordion--brand .accordion-button,
+.mbn-content-tabs__scroller, .mbn-faq__scroller, .mbn-gallery__nav,
+.mbn-org-chart__authority-icon)::before {
+	background-color: currentColor !important;
+}
+
+/* Resultados de búsqueda: la página actual de la paginación es un <span> y el
+   barrido la deja negra como las demás. Se rellena de amarillo para que se lea
+   cuál es sin depender sólo de la negrita. */
+html.mbn-contrast main .mbn-search__page .page-numbers.current {
+	background-color: #FCFF3C !important;
+	color: #000000 !important;
+}
+
+/* El campo comparte caja con la lupa: el barrido de campos le pone el borde en
+   los cuatro lados y el texto quedaba pegado a una línea amarilla. */
+html.mbn-contrast main .mbn-search__input.mbn-search__input {
+	border-left: 0 !important;
+}
+
+/* Los SVG del catálogo son siluetas, negras o de color: sobre fondo negro
+   desaparecen o cambian de tinte. Se llevan a blanco puro —`brightness(0)` las
+   deja negras y `invert(1)` blancas—, por el `src`, para no tocar las
+   fotografías. Con `invert(1)` a secas el azul #0F5AC4 de los iconos de sección
+   salía naranja.
+
+   Las dos flechas de la galería no son siluetas: traen su caja gris con la
+   flecha dentro, y en blanco puro serían un cuadrado liso. Ésas sólo se
+   invierten. */
+html.mbn-contrast :is(main, .modal, .pum-overlay) img[src*=".svg"] {
+	filter: brightness(0) invert(1);
+}
+
+html.mbn-contrast :is(main, .modal, .pum-overlay) img[src*="icon-chevron-left"],
+html.mbn-contrast :is(main, .modal, .pum-overlay) img[src*="icon-chevron-right"] {
+	filter: invert(1);
+}
+
+/* Diálogos de Bootstrap (encuesta, aviso de salida, visor de PDF). El barrido
+   pinta de negro todo `div` dentro de `.modal`, también `.modal-dialog`, que es
+   sólo el contenedor de posición: en un diálogo centrado mide la altura entera
+   de la ventana, y salía como una columna negra opaca que tapaba la página y en
+   la que la caja del diálogo se perdía. El contenedor queda transparente y la
+   caja (`.modal-content`) recupera un borde amarillo que la recorta sobre el
+   telón. */
+html.mbn-contrast .modal .modal-dialog {
+	background-color: transparent !important;
+	border: 0 !important;
+}
+
+html.mbn-contrast .modal .modal-content {
+	background-color: #000000 !important;
+	border: 1px solid #FCFF3C !important;
+}
+
+/* La franja institucional del diálogo de la encuesta conserva sus colores, como
+   la del footer: son dos <span> y el barrido los dejaba en negro. */
+html.mbn-contrast .modal .mbn-survey__flag-blue {
+	background-color: var(--mbn-brand-blue, #0F69C4) !important;
+}
+
+html.mbn-contrast .modal .mbn-survey__flag-red {
+	background-color: var(--mbn-survey-flag-red, #FF2930) !important;
+}
+
+/* Popups de Popup Maker (§16). Entran en el barrido por `.pum-overlay`, que es
+   el telón: el barrido pinta a sus descendientes y no a él, así que conserva
+   el negro translúcido de la plantilla. La caja (`.pum-container`) gana el
+   borde amarillo de `.modal-content` —el barrido sólo cambia el color de un
+   borde, y la plantilla «MBN» no tiene— y la franja institucional recupera
+   sus colores: el barrido le quita el `background-image`, que es donde va
+   (popup-maker.css). */
+html.mbn-contrast .pum-overlay .pum-container {
+	border: 1px solid #FCFF3C !important;
+}
+
+html.mbn-contrast .pum-overlay.pum-theme-mbn .pum-container {
+	background-image: var(--mbn-popup-flag) !important;
+}
+
+/* Bootstrap pinta el aspa de cierre con un SVG negro incrustado en el CSS —una
+   imagen de FONDO, no un <img>—, así que `.btn-close` necesita dos reglas.
+   La primera deshace lo que le hace la lista de botones de arriba, donde
+   `.btn-close` entra por ser un `button`: allí pierde el `background-image`
+   (con él, el aspa) y gana un fondo negro opaco que el filtro de la segunda
+   regla convertía en un cuadro blanco vacío. Con el fondo transparente, el
+   filtro sólo invierte el aspa.
+
+   La clase va repetida a propósito: la lista de botones incluye
+   `input[type="submit"]`, así que su especificidad es (0,3,2) y una
+   `.btn-close` a secas —(0,3,1)— perdía aunque vaya después. */
+html.mbn-contrast :is(main, .modal, .pum-overlay) .btn-close.btn-close {
+	background-color: transparent !important;
+	background-image: var(--bs-btn-close-bg) !important;
+	/* Sin borde: el filtro de abajo también lo invierte, y el amarillo de la
+	   lista de botones salía como un recuadro gris alrededor del aspa. */
+	border-color: transparent !important;
+}
+
+html.mbn-contrast :is(main, .modal, .pum-overlay) .btn-close {
+	filter: invert(1) grayscale(100%) brightness(200%);
+}
+
+/* El visor de PDF con PDF.js (components/pdf-viewer.css). La capa de texto
+   es un `div` lleno de `span` que va ENCIMA del canvas, transparente a
+   propósito: el barrido le pondría fondo negro y texto blanco y taparía la
+   página entera. El documento se deja como es —igual que una `<img>`—. */
+html.mbn-contrast :is(main, .modal, .pum-overlay) .mbn-pdf-viewer__text,
+html.mbn-contrast :is(main, .modal, .pum-overlay) .mbn-pdf-viewer__text * {
+	background-color: transparent !important;
+	color: transparent !important;
+	border-color: transparent !important;
+}
+
+/* ============================================================
+ * Encuesta de satisfacción
+ *
+ * El diálogo entra por `.modal` en el barrido de arriba, pero tres piezas
+ * suyas necesitan regla propia y el botón flotante, todas: vive fuera de
+ * `main` —es `fixed` sobre el documento— así que el barrido no lo alcanza.
+ * ============================================================ */
+
+/* Botón flotante: el mismo trato que un botón del contenido. */
+html.mbn-contrast .mbn-survey-launcher {
+	background-color: #000000 !important;
+	color: #FCFF3C !important;
+	border: 1px solid #FCFF3C !important;
+}
+
+html.mbn-contrast .mbn-survey-launcher:is(:hover, :focus-visible) {
+	background-color: #FCFF3C !important;
+	color: #000000 !important;
+}
+
+/* El enunciado recibe el foco por script para que se anuncie, y `survey.css` le
+   quita el anillo por eso mismo; en contraste hay que repetirlo, porque
+   `html.mbn-contrast :focus-visible` tiene más especificidad que la regla de
+   allí y devolvía un recuadro amarillo alrededor del texto. */
+html.mbn-contrast .mbn-survey__question:focus-visible {
+	outline: none;
+}
+
+/* La estrella del botón es una máscara: su `background-color` ES su color. */
+html.mbn-contrast .mbn-survey-launcher__icon {
+	background-color: currentColor !important;
+}
+
+/* Las estrellas de la escala también son máscaras, y entran en la lista de
+   botones del barrido, que las dejaría negras sobre negro y con un recuadro
+   amarillo cada una. El valor elegido se sigue distinguiendo por la silueta
+   —contorno contra relleno— y además por el color.
+
+   La clase va repetida por el mismo motivo que en `.btn-close.btn-close`: la
+   lista de botones incluye `input[type="submit"]` y su especificidad es (0,3,2),
+   así que una `.mbn-survey__star` a secas —(0,3,1)— perdía y las estrellas sin
+   elegir se volvían negras sobre negro. */
+html.mbn-contrast :is(main, .modal, .pum-overlay) .mbn-survey__star.mbn-survey__star {
+	background-color: #FFFFFF !important;
+	border: 0 !important;
+}
+
+html.mbn-contrast :is(main, .modal, .pum-overlay) .mbn-survey__star.mbn-survey__star:is(.is-filled, .is-preview) {
+	background-color: #FCFF3C !important;
+}
+
+/* El indicador de pasos se dibuja con pseudo-elementos, que el barrido no
+   toca a propósito: aquí sí, porque su azul sobre negro no contrasta. */
+html.mbn-contrast :is(main, .modal, .pum-overlay) .mbn-survey__step-dot::before {
+	border-color: #FCFF3C !important;
+	background-color: #000000 !important;
+}
+
+html.mbn-contrast :is(main, .modal, .pum-overlay) .mbn-survey__step-dot:is(.is-done, .is-current)::before,
+html.mbn-contrast :is(main, .modal, .pum-overlay) .mbn-survey__step-dot::after {
+	background-color: #FCFF3C !important;
+}

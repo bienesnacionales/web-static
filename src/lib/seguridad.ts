@@ -63,26 +63,36 @@ export function politicaCsp(gaId?: string): string {
       "'self'",
       "'unsafe-inline'",
       "'wasm-unsafe-eval'",
+      // Las noticias con publicaciones de Instagram incrustadas cargan su script.
+      'https://www.instagram.com',
       ...(conGa ? [GA_SCRIPT] : []),
     ],
 
-    // Astro deja `<style>` en el HTML: sin `'unsafe-inline'` el sitio sale
-    // sin estilos.
+    // El tema y el contenido llevan `style=""` y `<style>`: sin
+    // `'unsafe-inline'` el sitio sale sin estilos.
     'style-src': ["'self'", "'unsafe-inline'"],
 
-    'img-src': ["'self'", 'data:', ...(conGa ? [GA_SCRIPT, ...GA_CONEXION] : [])],
+    // Las noticias citan imágenes de otros sitios del Gobierno y de las redes
+    // que incrustan. Una imagen no ejecuta código: abrir `https:` aquí no
+    // abre la puerta que cierra `script-src`.
+    'img-src': ["'self'", 'data:', 'https:'],
 
-    /*
-      Fuentes autoalojadas con `@fontsource`: cero peticiones a un CDN.
-      `data:` no sobra: Vite incrusta en base64 los recursos por debajo de su
-      umbral de inline, y un subconjunto de fuente puede caer dentro del CSS
-      como `src:url(data:font/woff2;...)`. Sin este permiso el navegador lo
-      bloquea y el texto se pinta con la fuente de reserva, sin error visible.
-    */
+    // Videos y mapas incrustados en el contenido.
+    'frame-src': [
+      "'self'",
+      'https://www.youtube.com',
+      'https://youtube.com',
+      'https://www.youtube-nocookie.com',
+      'https://*.arcgis.com',
+      'https://www.bienesnacionales.cl',
+      'https://www.instagram.com',
+    ],
+
+    'media-src': ["'self'"],
+
     'font-src': ["'self'", 'data:'],
 
-    // Pagefind pide su índice al mismo origen. El sitio no hace ninguna otra
-    // petición en tiempo de ejecución.
+    // Pagefind pide su índice al mismo origen, y los listados sus datos.
     'connect-src': ["'self'", ...(conGa ? GA_CONEXION : [])],
 
     'object-src': ["'none'"],
@@ -91,9 +101,9 @@ export function politicaCsp(gaId?: string): string {
     // rutas relativas de la página de golpe.
     'base-uri': ["'self'"],
 
-    // El sitio no tiene formularios propios: el de contacto es un enlace al
-    // del Ministerio. Cualquier envío desde estas páginas es un ataque.
-    'form-action': ["'none'"],
+    // Los únicos formularios son los de búsqueda (GET al propio sitio) y la
+    // encuesta y el chatbot, que envían por `fetch`.
+    'form-action': ["'self'"],
   };
 
   return Object.entries(directivas)

@@ -1,0 +1,44 @@
+/* ============================================================
+ * Componente — Aplicación embebida (template-parts/components/embed.php)
+ *
+ * Sin maqueta de Figma: la página que lo estrena («Estado de consulta de la
+ * Solicitud de Atención Ciudadana») no tiene canvas en el archivo, verificado
+ * recorriendo las cinco páginas del documento. El andamiaje sale del sistema de
+ * diseño: radio 8 y `--mbn-surface-soft`, los mismos del resto de paneles.
+ *
+ * El ancho es el del contenedor y el alto lo fija el editor, que llega como
+ * `--mbn-embed-height` en el atributo `style` del iframe (patrón de
+ * `card-grid`). El fallback de 800px es el `height="800px"` de producción, de
+ * modo que un marcado sin la custom property —una caché vieja, por ejemplo— se
+ * vea igual.
+ *
+ * **La piel del panel va en el marco, no en `.mbn-embed`.** En mantenimiento el
+ * contenedor lleva dentro el componente `notice`, que trae su propio fondo,
+ * borde y radio 4: con la piel en el contenedor se veían dos radios distintos
+ * en las esquinas. Poniéndola en el `<iframe>` el contenedor queda como envoltorio
+ * neutro y cada estado se ve solo con lo suyo.
+ *
+ * **El fondo del marco es deliberado.** La app SIAC manda
+ * `X-Frame-Options: SAMEORIGIN`, así que hasta que eso se relaje en su servidor
+ * el marco no pinta nada (ver el docblock de `inc/components/embed.php`). Con
+ * fondo, esa región se lee como un panel del sitio todavía sin cargar; sin él
+ * serían 800px de blanco indistinguibles de la página y parecería que falta
+ * contenido.
+ *
+ * No hay reglas de `base.css` en juego: el Base Kit no tiene selectores de
+ * elemento para `iframe`.
+ * ============================================================ */
+
+.mbn-embed__frame {
+	display: block;
+	width: 100%;
+	height: var(--mbn-embed-height, 800px);
+	/* `frameborder="0"` es HTML4 y ya no hace nada: el borde se quita aquí. */
+	border: 0;
+	/* 8px literal: `tokens.css` no tiene token para este radio —solo
+	   `--mbn-card-radius` (16) y `--mbn-radius-pill`—, así que se escribe como
+	   ya lo hace `components/contact-strip.css`. El radio recorta también el
+	   documento que pinta el iframe: no hace falta `overflow` en el padre. */
+	border-radius: 8px;
+	background: var(--mbn-surface-soft, #F9F9F9);
+}

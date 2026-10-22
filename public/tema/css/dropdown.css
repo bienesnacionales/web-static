@@ -1,0 +1,146 @@
+/* Dropdowns Desktop — bloques dropdowns.* del contrato.
+ *
+ * Bloque del contrato: header-footer-contract-v1.json → blocks.dropdowns.sharedTokens
+ * Estilos comunes a los 4 dropdowns (Trámites, Ciudadanía, Información
+ * Territorial, Ayuda).
+ *
+ * Tokens:
+ *   --mbn-surface-page         #FFFFFF / rgba(255,255,255,0.95)
+ *   --mbn-border-default       #CCCCCC
+ *   --mbn-surface-hover        #F2F2F2
+ *   --mbn-shadow-elevation-2   box-shadow elevation-2
+ *   --mbn-text-primary         #333333
+ *   --mbn-dropdown-option-height 48px
+ *   --mbn-dropdown-gap         1px
+ *   --mbn-dropdown-radius      0 0 4 4
+ *
+ * Estado abierto/cerrado controlado por [hidden] + JS en header-nav.js.
+ * Ancho por dropdown: 256px (default) o 241px (Información Territorial) — el
+ * template emite style="--mbn-dropdown-width: <px>" en cada panel. Ese es el
+ * ancho de partida: una opción puede ocupar DOS líneas, nunca tres. Si con ese
+ * ancho alguna llega a tres, header-nav.js ensancha el panel al abrirlo hasta el
+ * mínimo en que todas caben en dos (width en línea). Si al crecer se saliera de
+ * la ventana, lo alinea por la derecha del botón con .mbn-dropdown--end.
+ */
+
+.mbn-dropdown {
+	position: absolute;
+	/* El panel no lleva border-top: cuelga del border-bottom del header, así que
+	 * hay que salvar el padding vertical de la fila de menú (.py-2 = 8px). */
+	top: calc(100% + var(--mbn-dropdown-offset, 8px));
+	left: 0;
+	min-width: var(--mbn-dropdown-width, 256px);
+	width: var(--mbn-dropdown-width, 256px);
+	max-width: calc(var(--mbn-viewport-width, 100vw) - 32px);
+	background: rgba(255, 255, 255, 0.95);
+	border: 1px solid var(--mbn-border-default, #CCCCCC);
+	border-top: 0;
+	border-radius: var(--mbn-dropdown-radius, 0 0 4px 4px);
+	box-shadow: var(--mbn-shadow-elevation-2, 0 0.47px 0.94px rgba(0,0,0,0.3), 0 0.94px 2.83px rgba(0,0,0,0.15));
+	z-index: 1030;
+	padding: 0;
+	margin: 0;
+}
+
+/* Panel que desbordaría la ventana por la derecha: se ancla al borde derecho
+ * del botón en vez de al izquierdo. Lo pone header-nav.js al abrir. */
+.mbn-dropdown.mbn-dropdown--end {
+	left: auto;
+	right: 0;
+}
+
+/* Transición de apertura y repliegue.
+ *
+ * El atributo [hidden] sigue siendo la fuente de verdad: lo conmuta
+ * header-nav.js y es lo que leen las tecnologías asistivas. Como display no es
+ * animable, se neutraliza su display:none y el ocultamiento real lo hace
+ * visibility, que igualmente saca el panel del árbol de accesibilidad y del
+ * orden de tabulación; pointer-events evita que el panel cerrado intercepte
+ * clics mientras sigue ocupando su caja absoluta.
+ */
+.mbn-dropdown {
+	opacity: 1;
+	visibility: visible;
+	transform: translateY(0);
+	transform-origin: top center;
+	transition:
+		opacity 160ms ease-out,
+		transform 160ms ease-out,
+		visibility 0s;
+}
+
+.mbn-dropdown[hidden] {
+	display: block !important;
+	opacity: 0;
+	visibility: hidden;
+	transform: translateY(-4px);
+	pointer-events: none;
+	transition:
+		opacity 120ms ease-in,
+		transform 120ms ease-in,
+		visibility 0s linear 120ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.mbn-dropdown,
+	.mbn-dropdown[hidden] {
+		transform: none;
+		transition: none;
+	}
+}
+
+.mbn-dropdown__list {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	display: flex;
+	flex-direction: column;
+}
+
+.mbn-dropdown__item {
+	margin: 0;
+	padding: 0;
+}
+
+.mbn-dropdown__option {
+	display: flex;
+	align-items: center;
+	/* Mínimo, no alto fijo: dos líneas de 24px caben justas en 48, y sin el JS
+	 * que ensancha el panel una tercera línea haría crecer la opción en vez de
+	 * desbordar sobre la siguiente. */
+	min-height: var(--mbn-dropdown-option-height, 48px);
+	/* Derecha a 13px, simétrica a la izquierda: al ensanchar el panel hasta el
+	 * mínimo que da dos líneas, la opción larga llega al borde y los 4px del
+	 * Figma la dejaban pegada. */
+	padding: 0 13px;
+	background: var(--mbn-surface-white, #FFFFFF);
+	color: var(--mbn-text-primary, #333333);
+	text-decoration: none;
+	font: 400 16px/1.5 "Roboto", system-ui, sans-serif;
+	/* El atajo `font` reinicia el tamaño: se reescribe escalado. */
+	font-size: calc(16px * var(--mbn-text-scale, 1));
+	border-bottom: 1px solid var(--mbn-border-default, #CCCCCC);
+	transition: background 120ms ease-out;
+}
+
+.mbn-dropdown__option:hover,
+.mbn-dropdown__option:focus-visible {
+	background: var(--mbn-surface-hover, #F2F2F2);
+	outline: none;
+}
+
+.mbn-dropdown__option:focus-visible {
+	box-shadow: inset 0 0 0 2px var(--mbn-brand-blue, #0F69C4);
+}
+
+.mbn-dropdown__option--multiline {
+	min-height: 48px;
+	align-items: center;
+	line-height: 1.5;
+}
+
+/* El nav-button de un dropdown queda como anchor de posicionamiento relativo. */
+.mbn-header__nav-item:has(.mbn-dropdown),
+.mbn-header__nav-button {
+	position: relative;
+}

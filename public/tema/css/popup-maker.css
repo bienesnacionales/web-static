@@ -1,0 +1,58 @@
+/**
+ * Popup Maker — lo que la plantilla «MBN» no puede expresar desde el admin.
+ *
+ * La plantilla (popup_theme 55296, slug `mbn`) se configura en Popup Maker →
+ * Plantillas de popup: telón, caja, radio, sombra, colores del texto y botón de
+ * cierre salen de allí, y el plugin los escribe en su propio CSS
+ * (`uploads/pum/pum-site-styles.css`). Esta hoja añade SOLO lo que su editor
+ * no tiene (§16):
+ *
+ *   - La franja institucional de 8px del borde superior, azul y roja. El editor
+ *     ofrece un borde igual en los cuatro lados y una sola sombra.
+ *   - El relleno superior que reserva la fila del botón de cierre (el plugin
+ *     tiene un único relleno para los cuatro lados) y el inferior de 28px.
+ *   - El hover y el foco del botón de cierre: el plugin no tiene estados.
+ *   - La escala de texto de la botonera de accesibilidad en el contenido: el
+ *     reinicio del plugin fija `font-size: medium`, que no la sigue.
+ *
+ * Maqueta: Figma `1365:6714` («Modal / Cuenta Pública 2026»), 640px de ancho.
+ *
+ * Los selectores llevan `.pum-overlay.pum-theme-mbn` a propósito: el reinicio
+ * del plugin (`.pum-container { background: none }`) y su CSS generado
+ * (`.pum-theme-mbn .pum-container`) van en una hoja cuyo orden respecto a esta
+ * no está garantizado, así que se gana por especificidad, (0,3,0), no por orden.
+ *
+ * @package mbn
+ */
+
+.pum-overlay.pum-theme-mbn .pum-container {
+	/* 284 de 640 en el Figma. La custom property la reutiliza a11y.css para
+	   devolver la franja en alto contraste, donde el barrido la quita. */
+	--mbn-popup-flag: linear-gradient(90deg,
+		var(--mbn-brand-blue, #0F69C4) 0 44.375%,
+		var(--mbn-survey-flag-red, #FF2930) 44.375% 100%);
+
+	/* Franja (8) + relleno del cuerpo (16) + fila del cierre (28) + separación (16).
+	   Sin esto el botón de cierre, que el plugin posiciona en absoluto, pisaría la
+	   esquina de la imagen. */
+	padding-top: 68px;
+	padding-bottom: 28px;
+
+	/* En el fondo y no en un pseudo-elemento: así la recorta el mismo radio de
+	   la caja, sin `overflow: hidden`, que cortaría el contenido desplazable. */
+	background-image: var(--mbn-popup-flag);
+	background-repeat: no-repeat;
+	background-position: top left;
+	background-size: 100% 8px;
+}
+
+.pum-overlay.pum-theme-mbn .pum-content {
+	font-size: calc(16px * var(--mbn-text-scale, 1));
+}
+
+/* El mismo estado que el cierre de la encuesta (survey.css), que sale del
+   mismo componente de Figma. La «×» va en #4D4D4D desde el admin: el #99A1AF
+   de la maqueta mide 2,6:1 sobre blanco y no llega al 3:1 de WCAG 1.4.11. */
+.pum-overlay.pum-theme-mbn .pum-content + .pum-close:is(:hover, :focus-visible) {
+	background-color: var(--mbn-surface-hover, #F2F2F2);
+}

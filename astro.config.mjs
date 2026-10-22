@@ -3,9 +3,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { defineConfig } from 'astro/config';
-import react from '@astrojs/react';
 import sitemap from '@astrojs/sitemap';
-import tailwindcss from '@tailwindcss/vite';
 
 /**
  * Sirve el índice de Pagefind durante `astro dev`.
@@ -85,21 +83,24 @@ function avisoDeIndexacion() {
 /**
  * Sitio en mantención: toda URL lleva a la portada.
  *
- * Mientras esté en `true`, al terminar el build cada página HTML salvo la
- * portada se reemplaza por una redirección a `/`. Incluye `404.html`, que es
+ * Se activa construyendo con `MODO_MANTENCION=true`. Entonces la portada es la
+ * de mantención (`src/pages/index.astro` lee la misma variable) y, al
+ * terminar el build, cada página HTML salvo la portada se reemplaza por una
+ * redirección a `/`. Incluye `404.html`, que es
  * lo que el hosting sirve para las URL que no existen, así que también ésas
- * terminan en la portada. Los documentos de `public/documentos` se quitan del
- * build: un PDF no puede redirigir, y dejarlo sería dejar el contenido
- * accesible por enlace directo.
+ * terminan en la portada. Los archivos del contenido (`uploads`: imágenes, PDF,
+ * planillas) y los índices de `datos` se quitan del build: un archivo no puede
+ * redirigir, y dejarlo sería dejar el contenido accesible por enlace directo.
  *
  * Se hace aquí y no con reglas del servidor porque el sitio puede alojarse en
  * cualquier hosting de archivos: así funciona en todos sin configurar nada.
- * `astro dev` no se ve afectado, para que el sitio se pueda seguir trabajando.
+ * Las redirecciones no corren en `astro dev`: con la variable puesta sólo
+ * cambia la portada, y el resto del sitio se puede seguir trabajando.
  *
- * Para salir de mantención: `false` aquí y devolverle a
- * `src/pages/_index.astro` su nombre en lugar de la portada provisional.
+ * Se lee aquí y no se importa de `src/lib/publicacion.ts`, igual que
+ * `SITIO_PUBLICO`: la configuración se carga antes que el código del sitio.
  */
-const EN_MANTENCION = true;
+const MODO_MANTENCION = process.env.MODO_MANTENCION === 'true';
 
 /*
   `location.replace` además del `refresh`: no deja la URL vieja en el
@@ -122,7 +123,7 @@ const REDIRECCION_A_PORTADA = `<!doctype html>
 `;
 
 /**
- * Aplica `EN_MANTENCION` sobre el build terminado.
+ * Aplica `MODO_MANTENCION` sobre el build terminado.
  *
  * @returns {import('astro').AstroIntegration}
  */
@@ -131,10 +132,12 @@ function modoMantencion() {
     name: 'modo-mantencion',
     hooks: {
       'astro:build:done': ({ dir, logger }) => {
-        if (!EN_MANTENCION) return;
+        if (!MODO_MANTENCION) return;
         const raiz = fileURLToPath(dir);
 
-        fs.rmSync(path.join(raiz, 'documentos'), { recursive: true, force: true });
+        for (const carpeta of ['uploads', 'datos', 'documentos']) {
+          fs.rmSync(path.join(raiz, carpeta), { recursive: true, force: true });
+        }
 
         const paginas = fs
           .readdirSync(raiz, { recursive: true, encoding: 'utf8' })
@@ -145,7 +148,7 @@ function modoMantencion() {
 
         logger.warn(
           `Sitio EN MANTENCIÓN: ${paginas.length} páginas redirigen a la portada. ` +
-            'Para salir, EN_MANTENCION = false en astro.config.mjs.',
+            'Para salir, construya sin MODO_MANTENCION=true.',
         );
       },
     },
@@ -158,14 +161,14 @@ export default defineConfig({
   // SSG puro: sin servidor en producción.
   output: 'static',
 
-  integrations: [react(), sitemap(), avisoDeIndexacion(), modoMantencion()],
+  integrations: [sitemap(), avisoDeIndexacion(), modoMantencion()],
 
   build: {
     format: 'directory',
   },
 
   vite: {
-    plugins: [tailwindcss(), indicePagefindEnDesarrollo()],
+    plugins: [indicePagefindEnDesarrollo()],
     server: {
       host: true,
       port: 4321,

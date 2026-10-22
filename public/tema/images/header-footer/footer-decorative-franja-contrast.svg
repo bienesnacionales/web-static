@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="110" height="8" viewBox="0 0 110 8" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+  <title>footer-decorative-franja-contrast</title>
+  <!-- Versión de alto contraste de footer-decorative-franja-93-512.svg. Calca la
+       franja del logo oficial de contraste del header
+       (logo-header-mbn-with-franja-contrast.svg): todo en blanco, el tramo azul
+       como contorno de 1px y el rojo relleno, con el mismo corte (41 de 110). -->
+  <path fill="#FFFFFF" fill-rule="evenodd" d="M0 0H41V8H0ZM1 1V7H40V1Z"/>
+  <rect x="41" y="0" width="69" height="8" fill="#FFFFFF"/>
+</svg>

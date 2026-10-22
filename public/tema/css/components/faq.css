@@ -1,0 +1,418 @@
+/* ============================================================
+ * Componente global — Preguntas frecuentes
+ * Maqueta: Figma 359:9804. La fila de la botonera con su botón es 731:6271,
+ * la columna de categorías 359:10220 y los paneles plegables 359:10015…10263.
+ *
+ * Las dos botoneras son «Tabs horizontales» y «Tabs verticales» del design
+ * system (284:1997), montadas sobre el `nav-tabs` de Bootstrap: aquí solo se
+ * redefinen sus variables `--bs-nav-*` (§7.3). El acordeón de cada categoría es
+ * el componente global `accordion` en su variante `brand`, cuya piel vive en
+ * `accordion.css`; lo único que se le ajusta desde aquí es el azul de la barra
+ * abierta (ver más abajo).
+ *
+ * ⚠️ Esta hoja **repite la piel de la botonera horizontal** de `authorities.css`
+ * y `content-tabs.css`. Es el tercer bloque de pestañas del theme, que es el
+ * punto en que `content-tabs.php` decía que tocaba extraer una capa común
+ * `.mbn-tabnav__*`; la extracción NO se hace aquí porque tocaría dos
+ * componentes ya desplegados y verificados por un motivo ajeno a ellos (§7.4),
+ * y porque esta botonera diverge en lo que más pesa: la línea gris llega solo
+ * hasta donde acaban las pestañas, no al ancho completo. Queda anotado en
+ * AGENTS.md como deuda con nombre.
+ *
+ * **No hay canvas de tablet ni de mobile de esta página** (se verificó en las
+ * páginas «Interfaces tablet» e «Interfaces Mobile» del archivo: solo existe el
+ * frame de 1440). El comportamiento responsive es una decisión propia,
+ * documentada en cada bloque.
+ *
+ * Ojo con base.css (el Base Kit de Siigsa): `.nav { display: block }` bajo
+ * 767px y `nav .nav` bajo 992px apilan cualquier `.nav` de Bootstrap, y la
+ * escala de h1-h6 va con !important. Donde hace falta ganarles está anotado.
+ * ============================================================ */
+
+.mbn-faq {
+	display: flex;
+	flex-direction: column;
+	gap: 24px;
+	width: 100%;
+	/* El Figma pinta la barra abierta del acordeón en `primario/base` #0F69C4,
+	   mientras que la misma variante `brand` en «Ministerio» (288:2586) usa
+	   `primario/darken-1` #0051A8. Es una inconsistencia del archivo entre dos
+	   instancias del mismo componente base, no dos estados distintos: se
+	   respeta cada maqueta con esta custom property, cuyo valor por defecto
+	   —el de «Ministerio»— vive en accordion.css. */
+	--mbn-accordion-brand-bg: var(--mbn-brand-blue, #0F69C4);
+}
+
+/* base.css declara font-family y font-weight de h1-h6 con !important. */
+.mbn-faq__title {
+	margin: 0;
+	font-family: var(--mbn-roboto-slab-medium-font-family, "Roboto Slab", serif) !important;
+	font-weight: var(--mbn-roboto-slab-medium-font-weight, 500) !important;
+	font-size: calc(24px * var(--mbn-text-scale, 1));
+	line-height: 1.5;
+	color: var(--mbn-text-primary, #333333);
+}
+
+/* ---------- Fila de la botonera y su botón ---------- */
+
+.mbn-faq__bar {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 24px;
+	width: 100%;
+}
+
+/* A diferencia de `content-tabs`, la fila NO ocupa el ancho del contenido: en
+   la maqueta mide 367 de los 1120 —lo que ocupan sus dos pestañas— y la línea
+   gris de 1px acaba ahí, no debajo del botón. `flex: 0 1 auto` es justo eso:
+   crece solo lo que pidan las pestañas y se encoge cuando no quepan. */
+.mbn-faq__nav-wrap {
+	display: flex;
+	/* `stretch` para que el borde inferior de las pestañas quede a ras de la
+	   línea gris del contenedor. */
+	align-items: stretch;
+	flex: 0 1 auto;
+	gap: 4px;
+	min-width: 0;
+	border-bottom: 1px solid var(--mbn-border-header, #B3B3B3);
+}
+
+.mbn-faq__nav-viewport,
+.mbn-faq__side-viewport {
+	flex: 1 1 auto;
+	min-width: 0;
+	/* La fila se desplaza en horizontal cuando no cabe, en lugar de envolver:
+	   pestañas en dos filas parecen dos niveles de navegación. */
+	overflow-x: auto;
+	overscroll-behavior-x: contain;
+	-webkit-overflow-scrolling: touch;
+	scroll-behavior: smooth;
+}
+
+/* La barra de desplazamiento se esconde **solo cuando el script ha revelado
+   las flechas**: sin JavaScript son el único mando que queda para llegar a las
+   pestañas que no caben con un ratón sin rueda horizontal. */
+.mbn-faq--js .mbn-faq__nav-viewport,
+.mbn-faq__side--js .mbn-faq__side-viewport {
+	scrollbar-width: none;
+}
+
+.mbn-faq--js .mbn-faq__nav-viewport::-webkit-scrollbar,
+.mbn-faq__side--js .mbn-faq__side-viewport::-webkit-scrollbar {
+	display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.mbn-faq__nav-viewport,
+	.mbn-faq__side-viewport {
+		scroll-behavior: auto;
+	}
+}
+
+/* ⚠️ `base.css` declara `.nav { display: block }` bajo 767px y `nav .nav` bajo
+   992px, y carga después de Bootstrap. Sin volver a declarar `display: flex`,
+   las pestañas se apilan como filas de ancho completo. El descendiente sube la
+   especificidad a (0,2,0) para ganarle también a `nav .nav` (0,1,1). */
+.mbn-faq .mbn-faq__nav {
+	display: flex;
+	flex-direction: row;
+}
+
+.mbn-faq__nav {
+	--bs-nav-tabs-border-width: 0;
+	--bs-nav-tabs-border-color: transparent;
+	--bs-nav-tabs-link-active-color: var(--mbn-brand-blue, #0F69C4);
+	--bs-nav-tabs-link-active-bg: transparent;
+	--bs-nav-tabs-link-active-border-color: transparent;
+	--bs-nav-tabs-link-hover-border-color: transparent;
+	--bs-nav-tabs-border-radius: 0;
+	--bs-nav-link-color: var(--mbn-text-strong, #373737);
+	--bs-nav-link-hover-color: var(--mbn-brand-blue, #0F69C4);
+	--bs-nav-link-padding-x: 8px;
+	--bs-nav-link-padding-y: 10px;
+	--bs-nav-link-font-size: var(--mbn-roboto-body-small-font-size, 16px);
+	flex-wrap: nowrap;
+	align-items: stretch;
+	margin: 0;
+	padding: 0;
+}
+
+/* En la maqueta las dos pestañas se reparten los 367px a partes iguales
+   (183,5 cada una). El ancho base las mantiene regulares aunque los rótulos
+   midan distinto, y `flex-grow: 0` impide que dos pestañas cortas estiren la
+   línea gris hasta el botón. */
+.mbn-faq__nav-item {
+	display: flex;
+	flex: 0 0 auto;
+	min-width: 184px;
+	max-width: 280px;
+}
+
+.mbn-faq__tab {
+	width: 100%;
+	font-family: var(--mbn-roboto-body-small-font-family, "Roboto", sans-serif);
+	font-weight: 400;
+	line-height: 1.5;
+	text-align: center;
+	/* El Figma aplica `capitalize` al rótulo. Misma divergencia deliberada que
+	   en `content-tabs`: en frases en español produciría «Ir A Trámites», así
+	   que el texto se pinta como lo escriba el editor. */
+	text-transform: none;
+	/* El subrayado del estado activo se dibuja aquí y no con el borde del
+	   `nav-tabs`: el de Bootstrap rodea la pestaña por tres lados. */
+	border-bottom: 4px solid transparent;
+	transition: color 120ms ease-out, border-color 120ms ease-out;
+}
+
+.mbn-faq__tab.active {
+	font-weight: 700;
+	border-bottom-color: var(--mbn-brand-blue, #0F69C4);
+}
+
+.mbn-faq__tab:focus-visible {
+	outline: 3px solid var(--mbn-brand-blue, #0F69C4);
+	outline-offset: -3px;
+	box-shadow: none;
+}
+
+/* «Boton» del design system (Figma 731:6245): 120x40, radio 24, relleno 8/16.
+   Es `.btn` de Bootstrap con sus variables redefinidas (§7.3). */
+.mbn-faq__cta {
+	--bs-btn-bg: var(--mbn-action-primary, #0046A8);
+	--bs-btn-border-color: var(--mbn-action-primary, #0046A8);
+	--bs-btn-color: var(--mbn-text-on-primary, #E7ECFF);
+	--bs-btn-hover-bg: var(--mbn-brand-blue-dark, #00268D);
+	--bs-btn-hover-border-color: var(--mbn-brand-blue-dark, #00268D);
+	--bs-btn-hover-color: var(--mbn-text-on-primary, #E7ECFF);
+	--bs-btn-active-bg: var(--mbn-brand-blue-dark, #00268D);
+	--bs-btn-active-border-color: var(--mbn-brand-blue-dark, #00268D);
+	--bs-btn-active-color: var(--mbn-text-on-primary, #E7ECFF);
+	--bs-btn-padding-x: 16px;
+	--bs-btn-padding-y: 8px;
+	--bs-btn-font-family: var(--mbn-roboto-body-button-font-family, "Roboto", sans-serif);
+	--bs-btn-font-size: var(--mbn-roboto-body-button-font-size, 16px);
+	--bs-btn-font-weight: 700;
+	--bs-btn-line-height: 1.5;
+	--bs-btn-border-radius: 24px;
+	flex: 0 0 auto;
+	white-space: nowrap;
+}
+
+.mbn-faq__cta:focus-visible {
+	outline: 3px solid var(--mbn-brand-blue, #0F69C4);
+	outline-offset: 2px;
+	box-shadow: none;
+}
+
+/* ---------- Flechas de las botoneras ----------
+   «Boton Icono» de 40x40 con el glifo de 24. Nacen con `hidden` en el marcado y
+   solo las revela el script cuando la fila desborda de verdad. */
+
+.mbn-faq__scroller {
+	flex: 0 0 auto;
+	align-self: center;
+	width: 40px;
+	height: 40px;
+	padding: 8px;
+	background: none;
+	border: 0;
+	border-radius: 50%;
+	cursor: pointer;
+}
+
+.mbn-faq__scroller::before {
+	content: "";
+	display: block;
+	width: 24px;
+	height: 24px;
+	/* `mask-image` y no `<img>`: la flecha cambia de color al llegar al extremo
+	   y un SVG servido como imagen no toma `currentColor` (§8). La URL llega
+	   inline desde el template y es absoluta: dentro de una custom property se
+	   resolvería contra la hoja que la consume. Propiedades largas, no el
+	   atajo `mask`: un var() dentro del atajo no se resuelve de forma fiable. */
+	background-color: var(--mbn-brand-blue, #0F69C4);
+	mask-repeat: no-repeat;
+	mask-position: center;
+	mask-size: 24px 24px;
+	-webkit-mask-repeat: no-repeat;
+	-webkit-mask-position: center;
+	-webkit-mask-size: 24px 24px;
+}
+
+.mbn-faq__scroller--prev::before {
+	mask-image: var(--mbn-faq-prev-icon);
+	-webkit-mask-image: var(--mbn-faq-prev-icon);
+}
+
+.mbn-faq__scroller--next::before {
+	mask-image: var(--mbn-faq-next-icon);
+	-webkit-mask-image: var(--mbn-faq-next-icon);
+}
+
+.mbn-faq__scroller:hover {
+	background-color: var(--mbn-surface-hover, #F2F2F2);
+}
+
+.mbn-faq__scroller:focus-visible {
+	outline: 3px solid var(--mbn-brand-blue, #0F69C4);
+	outline-offset: 2px;
+}
+
+/* En los extremos, `aria-disabled` y no `disabled`: un `disabled` que aparece
+   con el foco puesto lo pierde y deja al teclado sin ancla (§8). */
+.mbn-faq__scroller[aria-disabled="true"] {
+	cursor: default;
+}
+
+.mbn-faq__scroller[aria-disabled="true"]::before {
+	background-color: var(--mbn-text-muted, #808080);
+}
+
+.mbn-faq__scroller[aria-disabled="true"]:hover {
+	background-color: transparent;
+}
+
+/* ---------- Panel de un grupo: columna de categorías + acordeón ---------- */
+
+.mbn-faq__group:focus {
+	outline: none;
+}
+
+/* 180 + 24 de separación + el resto, que es lo que mide el panel de la maqueta
+   (916 sobre 1120). */
+.mbn-faq__layout {
+	display: grid;
+	grid-template-columns: 180px minmax(0, 1fr);
+	gap: 24px;
+	align-items: start;
+}
+
+.mbn-faq__side {
+	display: flex;
+	flex-direction: column;
+	min-width: 0;
+}
+
+/* La misma trampa de `base.css` que en la botonera horizontal, aquí para
+   imponer la columna. */
+.mbn-faq .mbn-faq__side-nav {
+	display: flex;
+	flex-direction: column;
+}
+
+.mbn-faq__side-nav {
+	--bs-nav-link-color: var(--mbn-brand-blue-darken-4, #00135A);
+	--bs-nav-link-hover-color: var(--mbn-brand-blue, #0F69C4);
+	--bs-nav-link-padding-x: 7px;
+	--bs-nav-link-padding-y: 12px;
+	--bs-nav-link-font-size: var(--mbn-roboto-body-small-font-size, 16px);
+	flex-wrap: nowrap;
+	margin: 0;
+	padding: 0;
+	/* La línea gris mide lo que mide la lista (301px en la maqueta), no lo que
+	   mide el panel: por eso el borde va aquí y no en `.mbn-faq__side`. */
+	border-right: 1px solid var(--mbn-border-default, #CCCCCC);
+}
+
+.mbn-faq__side-item {
+	display: flex;
+}
+
+.mbn-faq__cat {
+	width: 100%;
+	font-family: var(--mbn-roboto-body-small-font-family, "Roboto", sans-serif);
+	font-weight: 400;
+	line-height: 1.5;
+	/* Texto alineado a la derecha, contra la línea: es lo que dibuja la maqueta
+	   y lo que hace que la barra azul del estado activo se lea como el borde
+	   del bloque de texto. */
+	text-align: right;
+	text-transform: none;
+	/* La barra del estado activo queda pegada por dentro a la línea gris de la
+	   lista, igual que en el Figma (x 175→179 dentro de un item de 179). */
+	border-right: 4px solid transparent;
+	transition: color 120ms ease-out, border-color 120ms ease-out;
+}
+
+.mbn-faq__cat.active {
+	font-weight: 700;
+	color: var(--mbn-brand-blue, #0F69C4);
+	border-right-color: var(--mbn-brand-blue, #0F69C4);
+}
+
+.mbn-faq__cat:focus-visible {
+	outline: 3px solid var(--mbn-brand-blue, #0F69C4);
+	outline-offset: -3px;
+	box-shadow: none;
+}
+
+.mbn-faq__panels {
+	min-width: 0;
+}
+
+.mbn-faq__panel:focus {
+	outline: none;
+}
+
+/* ---------- Responsive ----------
+   Sin canvas de referencia (ver la cabecera). Bajo `lg` la columna de 180px
+   dejaría el acordeón en menos de 600px con las preguntas partidas en tres
+   líneas, así que las categorías pasan a botonera horizontal desplazable: es el
+   mismo patrón que ya usan `content-tabs` y `authorities` en pantallas
+   estrechas, de modo que el sitio se navega igual en todas sus secciones. */
+
+@media (max-width: 991.98px) {
+	.mbn-faq__layout {
+		grid-template-columns: minmax(0, 1fr);
+	}
+
+	.mbn-faq__side {
+		flex-direction: row;
+		align-items: stretch;
+		gap: 4px;
+		border-bottom: 1px solid var(--mbn-border-header, #B3B3B3);
+	}
+
+	.mbn-faq .mbn-faq__side-nav {
+		flex-direction: row;
+	}
+
+	.mbn-faq__side-nav {
+		--bs-nav-link-padding-x: 8px;
+		--bs-nav-link-padding-y: 10px;
+		align-items: stretch;
+		border-right: 0;
+	}
+
+	.mbn-faq__side-item {
+		flex: 0 0 auto;
+		min-width: 160px;
+		max-width: 280px;
+	}
+
+	.mbn-faq__cat {
+		text-align: center;
+		border-right: 0;
+		border-bottom: 4px solid transparent;
+	}
+
+	.mbn-faq__cat.active {
+		border-right-color: transparent;
+		border-bottom-color: var(--mbn-brand-blue, #0F69C4);
+	}
+}
+
+/* Bajo `sm` el botón ya no cabe al lado de la botonera sin estrujarla: pasa
+   debajo, alineado a la izquierda como el resto del contenido. */
+@media (max-width: 575.98px) {
+	.mbn-faq__bar {
+		flex-direction: column;
+		align-items: stretch;
+		gap: 16px;
+	}
+
+	.mbn-faq__cta {
+		align-self: flex-start;
+	}
+}

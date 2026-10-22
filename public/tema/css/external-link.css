@@ -1,0 +1,174 @@
+/* ============================================================
+ * Shell — Aviso de salida a un sitio externo
+ * (template-parts/external-link-modal.php)
+ *
+ * Sin maqueta de Figma: la referencia es la captura del diálogo de salida del
+ * design system gob.cl que acompaña al encargo. Es el `modal` de Bootstrap con
+ * las variables `--bs-modal-*` redefinidas (§7.3), como `pdf-viewer.css`.
+ *
+ * Dos divergencias conscientes con la captura, para no abrir un dialecto nuevo
+ * dentro del sitio:
+ *   - El título va en Roboto Slab, la del título de `pdf-modal`, y no en la
+ *     sans de la captura: son los dos únicos diálogos del sitio.
+ *   - El azul es `--mbn-action-primary` (#0046A8), el de todos los botones
+ *     primarios del theme, en vez del #0B5ED7 aproximado de la imagen.
+ *
+ * El alto contraste NO se resuelve aquí: el barrido de `a11y.css` cubre
+ * `:is(main, .modal)`, y el icono de máscara está en su lista de máscaras.
+ * ============================================================ */
+
+.mbn-external-modal {
+	--bs-modal-width: 560px;
+	--bs-modal-color: var(--mbn-text-primary, #333333);
+	--bs-modal-bg: var(--mbn-surface-white, #FFFFFF);
+	--bs-modal-border-width: 0;
+	/* Esquinas casi rectas, como en la captura: el radio de 16px de las
+	   tarjetas haría de esto otra tarjeta. */
+	--bs-modal-border-radius: 4px;
+	--bs-modal-inner-border-radius: 4px;
+	--bs-modal-box-shadow: var(--mbn-shadow-elevation-2);
+	--bs-modal-header-padding: 16px 24px;
+	--bs-modal-header-border-color: var(--mbn-border-divider, #E6E6E6);
+	--bs-modal-padding: 24px;
+	/* El pie no lleva línea: en la captura los botones flotan sobre el fondo
+	   del diálogo. */
+	--bs-modal-footer-border-width: 0;
+	--bs-modal-footer-gap: 8px;
+}
+
+/* ---------- Cabecera ---------- */
+
+.mbn-external-modal__heading {
+	display: flex;
+	align-items: center;
+	gap: 16px;
+	min-width: 0;
+}
+
+/* El icono `info` del catálogo, teñido con máscara para que tome el azul de
+   marca: el SVG trae el #2196F3 del estado informativo y un <img> no admite
+   currentColor (§8). Propiedades largas, no el atajo `mask`: un var() dentro
+   del atajo no se resuelve de forma fiable (misma nota que breadcrumbs.css). */
+.mbn-external-modal__icon {
+	flex: 0 0 auto;
+	width: 24px;
+	height: 24px;
+	background-color: var(--mbn-brand-blue, #0F69C4);
+	mask-image: var(--mbn-external-modal-icon);
+	mask-repeat: no-repeat;
+	mask-position: center;
+	mask-size: 24px 24px;
+	-webkit-mask-image: var(--mbn-external-modal-icon);
+	-webkit-mask-repeat: no-repeat;
+	-webkit-mask-position: center;
+	-webkit-mask-size: 24px 24px;
+}
+
+/* base.css: `h2 { font-weight: 500 !important; font-family: Roboto
+   !important }`. La Roboto Slab necesita !important para ganarle. */
+.mbn-external-modal__title {
+	margin: 0;
+	font-family: var(--mbn-roboto-slab-medium-font-family, "Roboto Slab", serif) !important;
+	font-weight: var(--mbn-roboto-slab-medium-font-weight, 500) !important;
+	font-size: calc(20px * var(--mbn-text-scale, 1));
+	line-height: 1.5;
+	color: var(--mbn-text-primary, #333333);
+}
+
+/* El foco del theme es un outline de 3px, no el anillo de Bootstrap, que
+   `.btn-close:focus` pone con `box-shadow` y quitando el outline. */
+.mbn-external-modal .btn-close {
+	--bs-btn-close-focus-shadow: none;
+	flex: 0 0 auto;
+}
+
+.mbn-external-modal .btn-close:focus-visible {
+	outline: 3px solid var(--mbn-brand-blue, #0F69C4);
+	outline-offset: 2px;
+}
+
+/* ---------- Cuerpo ---------- */
+
+/* base.css: `main p { margin-bottom: 20px; color: #4a4a4a }`, sin !important, y
+   además el diálogo cuelga fuera de `main`; la clase (0,1,0) manda de todas
+   formas. */
+.mbn-external-modal__text {
+	margin: 0;
+	font-family: var(--mbn-roboto-body-small-font-family, "Roboto", sans-serif);
+	font-size: var(--mbn-roboto-body-small-font-size, 16px);
+	line-height: 1.5;
+	color: var(--mbn-text-primary, #333333);
+}
+
+/* ---------- Pie ---------- */
+
+.mbn-external-modal__footer {
+	padding-top: 0;
+}
+
+/* Los dos botones comparten métrica: Button/Body Small • Bold (16px) con el
+   relleno 8x16 del theme y el mismo radio casi recto del diálogo. */
+.mbn-external-modal__cancel,
+.mbn-external-modal__confirm {
+	--bs-btn-padding-x: 24px;
+	--bs-btn-padding-y: 8px;
+	--bs-btn-font-family: var(--mbn-roboto-body-button-font-family, "Roboto", sans-serif);
+	--bs-btn-font-size: var(--mbn-roboto-body-button-font-size, 16px);
+	--bs-btn-font-weight: 700;
+	--bs-btn-line-height: 1.5;
+	--bs-btn-border-radius: 4px;
+	margin: 0;
+}
+
+/* «Cancelar»: botón de texto, sin fondo ni borde. */
+.mbn-external-modal__cancel {
+	--bs-btn-bg: transparent;
+	--bs-btn-border-color: transparent;
+	--bs-btn-color: var(--mbn-action-primary, #0046A8);
+	--bs-btn-hover-bg: var(--mbn-surface-hover, #F2F2F2);
+	--bs-btn-hover-border-color: transparent;
+	--bs-btn-hover-color: var(--mbn-brand-blue-dark, #00268D);
+	--bs-btn-active-bg: var(--mbn-surface-hover, #F2F2F2);
+	--bs-btn-active-border-color: transparent;
+	--bs-btn-active-color: var(--mbn-brand-blue-dark, #00268D);
+}
+
+/* «Continuar»: el primario del theme, el mismo de `.mbn-tramite__cta`. */
+.mbn-external-modal__confirm {
+	--bs-btn-bg: var(--mbn-action-primary, #0046A8);
+	--bs-btn-border-color: var(--mbn-action-primary, #0046A8);
+	--bs-btn-color: var(--mbn-text-on-primary, #E7ECFF);
+	--bs-btn-hover-bg: var(--mbn-brand-blue-dark, #00268D);
+	--bs-btn-hover-border-color: var(--mbn-brand-blue-dark, #00268D);
+	--bs-btn-hover-color: var(--mbn-text-on-primary, #E7ECFF);
+	--bs-btn-active-bg: var(--mbn-brand-blue-dark, #00268D);
+	--bs-btn-active-border-color: var(--mbn-brand-blue-dark, #00268D);
+	--bs-btn-active-color: var(--mbn-text-on-primary, #E7ECFF);
+}
+
+.mbn-external-modal__cancel:focus-visible,
+.mbn-external-modal__confirm:focus-visible {
+	outline: 3px solid var(--mbn-brand-blue, #0F69C4);
+	outline-offset: 2px;
+	box-shadow: none;
+}
+
+/* ---------- Móvil ----------
+   Por debajo de `sm` el diálogo de Bootstrap ya ocupa el ancho menos su margen.
+   Lo único que cambia es el pie: dos botones de 16px en una fila de 300px se
+   aprietan contra los bordes, así que se apilan y ocupan el ancho. El orden se
+   conserva —«Cancelar» arriba, «Continuar» abajo—: invertirlo con `order` para
+   acercar la acción principal al pulgar dejaría el orden visual peleado con el
+   del foco. */
+
+@media (max-width: 575.98px) {
+	.mbn-external-modal__footer {
+		flex-direction: column;
+		align-items: stretch;
+	}
+
+	.mbn-external-modal__cancel,
+	.mbn-external-modal__confirm {
+		width: 100%;
+	}
+}

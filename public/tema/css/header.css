@@ -1,0 +1,394 @@
+/* Header — bloques headerDesktop / headerTablet / headerMobile + botonera accesibilidad.
+ *
+ * Bloques del contrato: header-footer-contract-v1.json → blocks.headerDesktop/Tablet/Mobile
+ * Decisión humana: Bootstrap 5.3.3 Offcanvas anclado a la derecha
+ * (openQuestions.resolvedAt 2026-08-25T05:01).
+ *
+ * Visibilidad por viewport:
+ *   - desktop ≥1200px → .mbn-header--desktop visible, --mobile oculto
+ *   - tablet/mobile <1200px → .mbn-header--desktop oculto, --mobile visible
+ *
+ * Tokens (assets/css/tokens.css):
+ *   --mbn-surface-white        #FFFFFF
+ *   --mbn-text-primary         #333333
+ *   --mbn-brand-blue           #0F69C4
+ *   --mbn-action-primary       #0046A8
+ *   --mbn-border-header        #B3B3B3 (border bottom header desktop)
+ *   --mbn-border-divider       #E6E6E6 (divider row1/row2 desktop + border bottom mobile)
+ *   --mbn-header-padding-horizontal-h (no existe; uso fallback 24px)
+ */
+
+/* ---------- compartido ---------- */
+
+.mbn-header {
+	background: var(--mbn-surface-white, #FFFFFF);
+	color: var(--mbn-text-primary, #333333);
+	position: relative;
+	z-index: 1020;
+}
+
+.mbn-header__container {
+	max-width: var(--mbn-width-frame-desktop, 1440px);
+	margin-inline: auto;
+	padding-inline: 24px;
+}
+
+.mbn-header__row {
+	display: flex;
+	align-items: center;
+	gap: 16px;
+}
+
+.mbn-header__logo {
+	display: inline-flex;
+	flex-direction: column;
+	align-items: flex-start;
+	gap: 16px;
+	text-decoration: none;
+	color: inherit;
+}
+
+.mbn-header__logo:focus-visible {
+	outline: 3px solid var(--mbn-brand-blue, #0F69C4);
+	outline-offset: 4px;
+}
+
+.mbn-header__logo-franja {
+	display: block;
+	width: 100%;
+	max-width: 220px;
+	height: 8px;
+}
+
+.mbn-header__logo-img {
+	display: block;
+	width: 220px;
+	height: auto;
+	max-width: 100%;
+}
+
+/* La versión de alto contraste sólo se ve con html.mbn-contrast (a11y.css). */
+.mbn-header__logo-img--contrast {
+	display: none;
+}
+
+.mbn-header__divider {
+	height: 1px;
+	background: var(--mbn-border-divider, #E6E6E6);
+	border: 0;
+	margin: 0;
+}
+
+/* ---------- Desktop ≥1200px ---------- */
+
+.mbn-header--desktop {
+	display: none;
+	border-bottom: 1px solid var(--mbn-border-header, #B3B3B3);
+}
+
+.mbn-header--desktop .mbn-header__row--top {
+	min-height: 100px;
+	padding-block: 0;
+	justify-content: space-between;
+}
+
+.mbn-header--desktop .mbn-header__search {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	width: 347px;
+	max-width: 100%;
+	/* border: 1px solid var(--mbn-text-primary, #333333); */
+	/* border-radius: 24px; */
+	padding: 8px 12px;
+	background: var(--mbn-surface-white, #FFFFFF);
+}
+
+.mbn-header--desktop .mbn-header__search:focus-within {
+	border-color: var(--mbn-action-primary, #0046A8);
+	box-shadow: 0 0 0 3px rgba(15, 105, 196, 0.18);
+}
+
+.mbn-header--desktop .mbn-header__search-icon {
+	width: 24px;
+	height: 24px;
+}
+
+.mbn-header--desktop .mbn-header__search-input {
+	flex: 1;
+	min-width: 0;
+	border: 0;
+	background: transparent;
+	font: 400 16px/1.5 "Roboto", system-ui, sans-serif;
+	/* El atajo `font` reinicia el tamaño: se reescribe escalado. */
+	font-size: calc(16px * var(--mbn-text-scale, 1));
+	color: var(--mbn-text-primary, #333333);
+	outline: none;
+	padding: 0;
+}
+
+.mbn-header--desktop .mbn-header__search-input::placeholder {
+	color: var(--mbn-text-primary, #333333);
+	opacity: 1;
+}
+
+.mbn-header--desktop .mbn-header__row--nav {
+	padding-block: 8px;
+	justify-content: space-between;
+}
+
+.mbn-header--desktop .mbn-header__nav-list {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px 24px;
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+
+.mbn-header--desktop .mbn-header__nav-item {
+	display: flex;
+	align-items: center;
+}
+
+/* Figma 359:7449: cada ítem lleva su propio padding de 16px y gap de 8px
+ * (utilidades .p-3 / .gap-2 en el template); la fila no usa gap adicional. */
+.mbn-header--desktop .mbn-header__nav-link,
+.mbn-header--desktop .mbn-header__nav-button {
+	color: var(--mbn-text-primary, #333333);
+	background: transparent;
+	border: 0;
+	font: 400 16px/1.5 "Roboto", system-ui, sans-serif;
+	/* El atajo `font` reinicia el tamaño: se reescribe escalado. */
+	font-size: calc(16px * var(--mbn-text-scale, 1));
+	text-decoration: none;
+	cursor: pointer;
+	border-radius: 4px;
+}
+
+.mbn-header--desktop .mbn-header__nav-link:focus-visible,
+.mbn-header--desktop .mbn-header__nav-button:focus-visible {
+	outline: 3px solid var(--mbn-brand-blue, #0F69C4);
+	outline-offset: 2px;
+}
+
+.mbn-header--desktop .mbn-header__nav-button[aria-expanded="true"] {
+	color: var(--mbn-brand-blue-dark, #00268D);
+}
+
+.mbn-header--desktop .mbn-header__nav-button[aria-expanded="true"] .mbn-header__nav-button-icon {
+	transform: rotate(180deg);
+}
+
+.mbn-header--desktop .mbn-header__nav-button-icon {
+	width: 24px;
+	height: 24px;
+	transition: transform 200ms ease-out;
+}
+
+.mbn-header--desktop .mbn-header__nav-link--ministerio {
+	border: 2px solid var(--mbn-action-primary, #0046A8);
+	border-radius: 24px;
+	background: var(--mbn-surface-white, #FFFFFF);
+	color: var(--mbn-brand-blue-dark, #00268D);
+	font-weight: 700;
+}
+
+.mbn-header--desktop .mbn-header__nav-link--ministerio:hover {
+	background: rgba(0, 70, 168, 0.06);
+}
+
+/* Botonera accesibilidad — Figma node 359:7464 ("Botonera Accesibilidad").
+ * Frame de 146px con justify-content:space-between: 3 botones de 38px
+ * ⇒ 16px de separación. Display/alineación se resuelven con utilidades
+ * Bootstrap en el template; aquí sólo van las medidas y colores de la maqueta.
+ */
+.mbn-header__a11y {
+	width: 146px;
+}
+
+.mbn-header__a11y-button {
+	width: 38px;
+	height: 38px;
+	background: var(--mbn-surface-white, #FFFFFF);
+	border: 1px solid var(--mbn-a11y-button-border, #373737);
+	color: var(--mbn-text-primary, #333333);
+	cursor: pointer;
+}
+
+.mbn-header__a11y-button:hover:not(:disabled):not([aria-disabled="true"]) {
+	background: var(--mbn-surface-hover, #F2F2F2);
+}
+
+.mbn-header__a11y-button:focus-visible {
+	outline: 3px solid var(--mbn-brand-blue, #0F69C4);
+	outline-offset: 2px;
+}
+
+/* Estado apagado del nodo I359:7464;47:29022 — fill #E6E6E6, stroke #808080.
+   En los topes de la escala el botón lleva `aria-disabled` y no `disabled`
+   (§8), así que el estado se pinta por los dos. */
+.mbn-header__a11y-button:disabled,
+.mbn-header__a11y-button[aria-disabled="true"] {
+	background: var(--mbn-a11y-button-surface-disabled, #E6E6E6);
+	border-color: var(--mbn-a11y-button-border-disabled, #808080);
+	cursor: not-allowed;
+}
+
+.mbn-header__a11y-button[aria-pressed="true"] {
+	background: var(--mbn-text-primary, #333333);
+	color: var(--mbn-surface-white, #FFFFFF);
+}
+
+/* Los iconos son <img>, así que no heredan currentColor: se invierten. */
+.mbn-header__a11y-button[aria-pressed="true"] img {
+	filter: invert(1);
+}
+
+.mbn-header__a11y-button img {
+	width: 24px;
+	height: 24px;
+}
+
+/* ---------- Mobile/Tablet <1200px ---------- */
+
+.mbn-header--mobile {
+	display: block;
+	border-bottom: 1px solid var(--mbn-border-divider, #E6E6E6);
+}
+
+.mbn-header--mobile .mbn-header__row--top {
+	min-height: 100px;
+	justify-content: space-between;
+}
+
+.mbn-header--mobile .mbn-header__logo {
+	max-width: 220px;
+}
+
+.mbn-header--mobile .mbn-header__menu-trigger {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 44px;
+	height: 44px;
+	padding: 0;
+	background: transparent;
+	border: 1px solid transparent;
+	border-radius: 4px;
+	color: var(--mbn-text-primary, #333333);
+	cursor: pointer;
+}
+
+.mbn-header--mobile .mbn-header__menu-trigger:hover {
+	background: var(--mbn-surface-hover, #F2F2F2);
+}
+
+.mbn-header--mobile .mbn-header__menu-trigger:focus-visible {
+	outline: 3px solid var(--mbn-brand-blue, #0F69C4);
+	outline-offset: 2px;
+}
+
+.mbn-header--mobile .mbn-header__menu-trigger img {
+	width: 24px;
+	height: 24px;
+}
+
+/* ---------- viewport switch ---------- */
+
+/* el header conserva su lugar en el documento al quedar fijo */
+.mbn-header__sticky-nav {
+	position: relative;
+}
+
+.mbn-header__sticky-stripe {
+	display: block;
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: var(--mbn-sticky-stripe-width, 220px);
+	height: 8px;
+	pointer-events: none;
+	opacity: 0;
+	visibility: hidden;
+	transform: translateY(-6px);
+	transition: opacity 220ms ease-out, transform 220ms ease-out, visibility 0s linear 220ms;
+}
+
+.mbn-header__sticky-stripe img {
+	display: block;
+	width: 100%;
+	height: 8px;
+}
+
+.mbn-header__sticky-stripe .mbn-header__sticky-stripe--contrast {
+	display: none;
+}
+
+html.mbn-contrast .mbn-header__sticky-stripe--normal {
+	display: none;
+}
+
+html.mbn-contrast .mbn-header__sticky-stripe .mbn-header__sticky-stripe--contrast {
+	display: block;
+}
+
+#primary [id] {
+	scroll-margin-top: var(--mbn-sticky-offset, 0px);
+}
+
+.mbn-header[data-mbn-sticky="true"] {
+	transition: box-shadow 220ms ease-out;
+}
+
+.mbn-header[data-mbn-sticky="true"].mbn-header--stuck {
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+@media (min-width: 1200px) {
+	.mbn-header--desktop[data-mbn-sticky="true"] {
+		position: sticky;
+		top: calc(var(--mbn-sticky-admin-offset, 0px) - var(--mbn-sticky-top-height, 100px));
+	}
+
+	.mbn-header--desktop[data-mbn-sticky="true"].mbn-header--stuck .mbn-header__sticky-stripe {
+		opacity: 1;
+		visibility: visible;
+		transform: translateY(0);
+		transition-delay: 0s;
+	}
+}
+
+@media (max-width: 1199.98px) {
+	.mbn-header--mobile[data-mbn-sticky="true"] {
+		position: sticky;
+		top: var(--mbn-sticky-admin-offset, 0px);
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.mbn-header[data-mbn-sticky="true"],
+	.mbn-header__sticky-stripe {
+		transition: none;
+	}
+}
+
+@media print {
+	.mbn-header[data-mbn-sticky="true"] {
+		position: relative;
+		top: auto;
+		box-shadow: none;
+	}
+	.mbn-header__sticky-stripe {
+		display: none !important;
+	}
+}
+
+@media (min-width: 1200px) {
+	.mbn-header--desktop {
+		display: block;
+	}
+	.mbn-header--mobile {
+		display: none;
+	}
+}

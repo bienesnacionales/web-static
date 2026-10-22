@@ -1,0 +1,319 @@
+/* ============================================================
+ * Plantilla — Resultados de búsqueda (search.php)
+ *
+ * Maqueta: Figma 1357:6976, solo canvas de 1440. Medidas del nodo:
+ *   1362:5928  total, Roboto Bold 16, 24 por debajo
+ *   1362:5918  bloque de cabecera: h1 Roboto Bold 32, bajada 16, campo de 48
+ *              con borde #CCC y radio 4, botón de 120 en #0046A8, y la línea
+ *              «Resultados encontrados» en 14 #666; 16 entre piezas y 24 debajo
+ *   1362:5931  resultado: chip, título Roboto Bold 18 #00268D, texto 14 #333 y
+ *              «Conocer más» Bold 14 con flecha de 16; 8 entre piezas, 16
+ *              arriba y abajo, línea #CCC al pie
+ *   1362:6061  paginación centrada, celdas de 36 con radio 4, 4 entre ellas y
+ *              32 encima; la actual en #0046A8 con el número en blanco y negrita
+ *
+ * Divergencias deliberadas (AGENTS.md §11):
+ * - El contenido mide 1120 (`.mbn-container`), no 1440: el frame de la maqueta
+ *   desborda su propio canvas, igual que el del footer.
+ * - Arriba van los 24 de `--mbn-space-page-top` y no los 48 del Figma, el
+ *   ritmo vertical homologado del sitio (§6).
+ * - El título baja a 28 por debajo de `md`; la maqueta no tiene canvas móvil.
+ *
+ * Ojo con base.css (el Base Kit de Siigsa): `h1` fuerza Roboto Slab y peso 700,
+ * `h2` el peso 500 y `main p` el 400, todos con !important. Donde hace falta
+ * !important para ganarles está anotado.
+ * ============================================================ */
+
+.mbn-search {
+	padding-block: var(--mbn-space-page-top, 24px) var(--mbn-space-section, 36px);
+	background: var(--mbn-surface-white, #FFFFFF);
+}
+
+.mbn-search__container {
+	display: flex;
+	flex-direction: column;
+	gap: var(--mbn-space-stack, 24px);
+}
+
+/* ---------- Total y cabecera ---------- */
+
+/* base.css: `main p { font-weight: 400 !important }`. */
+.mbn-search__count {
+	margin: 0;
+	font-family: "Roboto", sans-serif;
+	font-size: calc(16px * var(--mbn-text-scale, 1));
+	font-weight: 700 !important;
+	line-height: 1.25;
+	color: var(--mbn-text-primary, #333333);
+}
+
+.mbn-search__header {
+	display: flex;
+	flex-direction: column;
+	gap: 16px;
+}
+
+/* base.css: `h1 { font-family: Roboto Slab !important; font-weight: 700
+   !important }`. La maqueta pide Roboto, no la Slab de las demás páginas. */
+.mbn-search__title {
+	margin: 0;
+	font-family: "Roboto", sans-serif !important;
+	font-weight: 700 !important;
+	font-size: calc(28px * var(--mbn-text-scale, 1));
+	line-height: 1.25;
+	color: var(--mbn-text-primary, #333333);
+}
+
+.mbn-search__intro {
+	margin: 0;
+	font-family: "Roboto", sans-serif;
+	font-size: calc(16px * var(--mbn-text-scale, 1));
+	line-height: 1.5;
+	color: var(--mbn-text-primary, #333333);
+}
+
+.mbn-search__caption {
+	margin: 0;
+	font-family: "Roboto", sans-serif;
+	font-size: calc(14px * var(--mbn-text-scale, 1));
+	line-height: 1.25;
+	color: var(--mbn-text-subtle, #666666);
+}
+
+/* ---------- Formulario ----------
+   `input-group` de Bootstrap (§7.3): la lupa, el campo y el botón comparten
+   borde. El anillo de foco se pinta alrededor del grupo entero y no solo del
+   campo, porque la lupa forma parte visual del mismo control. */
+
+.mbn-search__group {
+	min-height: 48px;
+}
+
+.mbn-search__field-icon {
+	padding: 0 8px 0 16px;
+	background-color: var(--mbn-surface-white, #FFFFFF);
+	border: 1px solid var(--mbn-border-default, #CCCCCC);
+	border-right: 0;
+	border-radius: 4px 0 0 4px;
+}
+
+.mbn-search__field-icon img {
+	display: block;
+	width: 20px;
+	height: 20px;
+}
+
+.mbn-search__input.form-control {
+	min-height: 48px;
+	padding: 0 16px 0 0;
+	border: 1px solid var(--mbn-border-default, #CCCCCC);
+	border-left: 0;
+	border-radius: 0;
+	font-family: "Roboto", sans-serif;
+	font-size: calc(16px * var(--mbn-text-scale, 1));
+	color: var(--mbn-text-primary, #333333);
+	background-color: var(--mbn-surface-white, #FFFFFF);
+}
+
+.mbn-search__input.form-control::placeholder {
+	color: var(--mbn-text-placeholder, #999999);
+	opacity: 1;
+}
+
+.mbn-search__input.form-control:focus {
+	border-color: var(--mbn-border-default, #CCCCCC);
+	box-shadow: none;
+	outline: none;
+}
+
+.mbn-search__group:has(.mbn-search__input:focus-visible) {
+	outline: 3px solid var(--mbn-brand-blue, #0F69C4);
+	outline-offset: 3px;
+	border-radius: 4px;
+}
+
+.mbn-search__button.btn {
+	--bs-btn-padding-x: 16px;
+	--bs-btn-font-family: "Roboto", sans-serif;
+	--bs-btn-font-size: calc(16px * var(--mbn-text-scale, 1));
+	--bs-btn-font-weight: 700;
+	--bs-btn-color: var(--mbn-surface-white, #FFFFFF);
+	--bs-btn-bg: var(--mbn-action-primary, #0046A8);
+	--bs-btn-border-color: var(--mbn-action-primary, #0046A8);
+	--bs-btn-hover-color: var(--mbn-surface-white, #FFFFFF);
+	--bs-btn-hover-bg: var(--mbn-brand-blue-dark, #00268D);
+	--bs-btn-hover-border-color: var(--mbn-brand-blue-dark, #00268D);
+	--bs-btn-active-color: var(--mbn-surface-white, #FFFFFF);
+	--bs-btn-active-bg: var(--mbn-brand-blue-dark, #00268D);
+	--bs-btn-active-border-color: var(--mbn-brand-blue-dark, #00268D);
+	min-width: 96px;
+	border-radius: 0 4px 4px 0;
+}
+
+/* ---------- Resultados ---------- */
+
+.mbn-search__list {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.mbn-search__item {
+	border-bottom: 1px solid var(--mbn-border-default, #CCCCCC);
+}
+
+/* `position: relative` es el ancla del `.stretched-link` de «Conocer más»: la
+   fila entera es clicable con un solo enlace. */
+.mbn-search__result {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	gap: 8px;
+	padding-block: 16px;
+}
+
+/* Chip del design system (Figma 94:1393), en su variante con contorno. El
+   Figma dibuja el borde por dentro (4/8 incluyen el trazo): 3/7 más el borde de
+   1 dan los 29 de alto de la maqueta. */
+.mbn-search__chip {
+	display: inline-flex;
+	align-items: center;
+	padding: 3px 7px;
+	border: 1px solid var(--mbn-brand-blue-dark, #00268D);
+	border-radius: 4px;
+	font-family: "Roboto", sans-serif;
+	font-size: calc(14px * var(--mbn-text-scale, 1));
+	font-weight: 700;
+	line-height: 1.5;
+	color: var(--mbn-brand-blue-dark, #00268D);
+}
+
+/* base.css: `h2 { font-weight: 500 !important; font-family: Roboto !important }`
+   y bajo 767px vuelve a fijar tamaño y alto de línea. */
+.mbn-search__result-title {
+	margin: 0;
+	font-family: "Roboto", sans-serif !important;
+	font-weight: 700 !important;
+	font-size: calc(18px * var(--mbn-text-scale, 1)) !important;
+	line-height: 1.2 !important;
+	color: var(--mbn-brand-blue-dark, #00268D);
+	overflow-wrap: anywhere;
+}
+
+/* Dos líneas como mucho: la descripción es un anticipo, no el contenido. El
+   alto de línea es 1.4 y no el `normal` (≈1.17) de la maqueta, que la dibuja en
+   una sola línea: a dos líneas de 14px, 1.17 queda apretado. */
+.mbn-search__result-text {
+	display: -webkit-box;
+	margin: 0;
+	overflow: hidden;
+	-webkit-box-orient: vertical;
+	-webkit-line-clamp: 2;
+	line-clamp: 2;
+	font-family: "Roboto", sans-serif;
+	font-size: calc(14px * var(--mbn-text-scale, 1));
+	line-height: 1.4;
+	color: var(--mbn-text-primary, #333333);
+}
+
+.mbn-search__more {
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
+	font-family: "Roboto", sans-serif;
+	font-size: calc(14px * var(--mbn-text-scale, 1));
+	font-weight: 700;
+	line-height: 1.2;
+	color: var(--mbn-brand-blue-dark, #00268D);
+	text-decoration: none;
+}
+
+/* La flecha es una máscara y no un <img> para que siga el color del enlace,
+   también en alto contraste (a11y.css la tiene en su lista de máscaras). */
+.mbn-search__more-icon {
+	flex: 0 0 16px;
+	width: 16px;
+	height: 16px;
+	background-color: currentColor;
+	-webkit-mask-image: url("../images/components/icon-arrow-right.svg");
+	mask-image: url("../images/components/icon-arrow-right.svg");
+	-webkit-mask-repeat: no-repeat;
+	mask-repeat: no-repeat;
+	-webkit-mask-size: 16px 16px;
+	mask-size: 16px 16px;
+}
+
+/* Sin estado de hover en la maqueta. Se subraya el título, que es lo que se
+   lee como destino, porque toda la fila es clicable. */
+.mbn-search__result:hover .mbn-search__result-title,
+.mbn-search__result:focus-within .mbn-search__result-title,
+.mbn-search__more:hover,
+.mbn-search__more:focus-visible {
+	text-decoration: underline;
+	text-underline-offset: 3px;
+}
+
+.mbn-search__empty {
+	margin: 0;
+	font-family: "Roboto", sans-serif;
+	font-size: calc(16px * var(--mbn-text-scale, 1));
+	line-height: 1.5;
+	color: var(--mbn-text-primary, #333333);
+}
+
+/* ---------- Paginación ----------
+   Marcado de `paginate_links()`: `a.page-numbers`, `span.current` y
+   `span.dots`. Sin flechas, como la maqueta. */
+
+.mbn-search__pagination {
+	padding-top: 8px; /* + los 24 del contenedor = los 32 de la maqueta */
+}
+
+.mbn-search__pages {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: center;
+	gap: 4px;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.mbn-search__page .page-numbers {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	min-width: 36px;
+	height: 36px;
+	padding-inline: 6px;
+	border-radius: 4px;
+	font-family: "Roboto", sans-serif;
+	font-size: calc(14px * var(--mbn-text-scale, 1));
+	font-weight: 400;
+	color: var(--mbn-text-primary, #333333);
+	text-decoration: none;
+}
+
+.mbn-search__page a.page-numbers:hover {
+	background-color: var(--mbn-surface-hover, #F2F2F2);
+	text-decoration: underline;
+}
+
+.mbn-search__page .page-numbers.current {
+	font-weight: 700;
+	color: var(--mbn-surface-white, #FFFFFF);
+	background-color: var(--mbn-action-primary, #0046A8);
+}
+
+/* ---------- md ≥ 768px ---------- */
+
+@media (min-width: 768px) {
+	.mbn-search__title {
+		font-size: calc(32px * var(--mbn-text-scale, 1));
+	}
+
+	.mbn-search__button.btn {
+		min-width: 120px;
+	}
+}

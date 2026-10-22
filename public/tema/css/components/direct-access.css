@@ -1,0 +1,158 @@
+/* ============================================================
+ * Componente global — Accesos directos
+ * Maqueta: Figma 359:5404 (frame 1440x172; tarjetas de 548x100, gap 24).
+ *
+ * Cada tarjeta es un <a> completo: el ícono y el texto viven dentro del
+ * enlace, de modo que toda la superficie es un único objetivo de
+ * activación.
+ * ============================================================ */
+
+.mbn-direct-access {
+	background: var(--mbn-surface-page, rgba(255, 255, 255, 0.95));
+	padding: var(--mbn-space-section, 36px) 24px;
+}
+
+.mbn-direct-access__container {
+	max-width: var(--mbn-width-content, 1120px);
+	margin-inline: auto;
+}
+
+/* auto-fit reparte el ancho sin que el CSS tenga que saber cuántas tarjetas
+   hay: una sola ocupa la fila completa, dos se van a 548px en el canvas de
+   1440 (la medida del Figma) y las pistas sobrantes colapsan. */
+.mbn-direct-access__list {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	display: grid;
+	gap: 24px;
+	grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
+}
+
+.mbn-direct-access__item {
+	display: flex;
+}
+
+.mbn-direct-access__card {
+	display: flex;
+	align-items: center;
+	gap: 16px;
+	width: 100%;
+	min-height: 100px;
+	padding: 24px;
+	background: var(--mbn-surface-white, #FFFFFF);
+	border: 1px solid var(--mbn-border-default, #CCCCCC);
+	border-radius: 16px;
+	color: var(--mbn-text-primary, #333333);
+	text-decoration: none;
+	/* Ancla del degradado de hover, que va en un ::before absoluto. */
+	position: relative;
+	transition: border-color 160ms ease-out, color 160ms ease-out, box-shadow 160ms ease-out;
+}
+
+/* ---------- Hover ----------
+ *
+ * El mismo realce que `card-grid` desde el 2026-09-29 (decisión del equipo):
+ * degradado en lugar del azul sólido que pedía el Figma 413:6072, para que las
+ * dos rejillas de tarjetas de la portada —que van una debajo de la otra— no
+ * respondan distinto al ratón.
+ *
+ * El degradado va en un pseudo-elemento y no en el `background-image` de la
+ * tarjeta: los degradados no son interpolables, así que animar su opacidad es
+ * la única forma de que la transición no sea un salto seco. Se pinta antes que
+ * los hijos en el orden del DOM y ellos llevan `position: relative`, de modo
+ * que quedan por encima sin necesidad de z-index.
+ *
+ * El recuadro del ícono no cambia —conserva su gris y su glifo azul—, igual que
+ * en `card-grid`. */
+.mbn-direct-access__card::before {
+	content: "";
+	position: absolute;
+	inset: 0;
+	border-radius: inherit;
+	background-image: var(--mbn-card-hover-gradient, linear-gradient(to left, #0F69C4 0%, #0046A8 100%));
+	opacity: 0;
+	transition: opacity 160ms ease-out;
+	pointer-events: none;
+}
+
+.mbn-direct-access__card > * {
+	position: relative;
+}
+
+/* Aquí basta `:focus-visible` y no el `:focus-within` de `card-grid`: la
+   tarjeta **es** el enlace, así que no hay ningún control dentro que pueda
+   recibir el foco por su cuenta. */
+.mbn-direct-access__card:hover,
+.mbn-direct-access__card:focus-visible {
+	/* El Figma mantiene el borde gris, pero sobre el azul deja un halo claro
+	   alrededor de la tarjeta; se lleva al extremo oscuro del degradado, que es
+	   lo que hace `card-grid`. */
+	border-color: var(--mbn-action-primary, #0046A8);
+	color: var(--mbn-text-on-brand-soft, rgba(255, 255, 255, 0.95));
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.10);
+}
+
+.mbn-direct-access__card:hover::before,
+.mbn-direct-access__card:focus-visible::before {
+	opacity: 1;
+}
+
+.mbn-direct-access__card:focus-visible {
+	outline: 3px solid var(--mbn-brand-blue, #0F69C4);
+	outline-offset: 2px;
+}
+
+.mbn-direct-access__tile {
+	flex: 0 0 auto;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	padding: 8px;
+	background: var(--mbn-surface-hover, #F2F2F2);
+	border-radius: 8px;
+}
+
+.mbn-direct-access__icon {
+	display: block;
+	width: 36px;
+	height: 36px;
+}
+
+.mbn-direct-access__text {
+	font-family: var(--mbn-roboto-body-small-font-family, "Roboto", sans-serif);
+	font-weight: 500;
+	font-size: calc(19px * var(--mbn-text-scale, 1));
+	line-height: 1.5;
+}
+
+/* ---------- md ≥ 768px ---------- */
+
+@media (min-width: 768px) {
+	.mbn-direct-access {
+		padding-inline: 40px;
+	}
+}
+
+/* ---------- xl ≥ 1200px (canvas 1440 del Figma) ---------- */
+
+@media (min-width: 1200px) {
+	.mbn-direct-access {
+		padding-inline: 160px;
+	}
+
+	/* El Figma fija el texto en 24px y sin salto de línea. El `nowrap` no se
+	   replica: con títulos más largos que los medidos recortaría el texto. */
+	.mbn-direct-access__text {
+		font-size: calc(24px * var(--mbn-text-scale, 1));
+	}
+}
+
+/* ---------- Movimiento reducido ---------- */
+
+@media (prefers-reduced-motion: reduce) {
+	.mbn-direct-access__card,
+	.mbn-direct-access__card::before {
+		transition: none;
+	}
+}

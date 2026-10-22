@@ -1,56 +1,73 @@
 ---
-// Fuentes self-hosted: cero peticiones a terceros (mejor para Lighthouse y
-// para no filtrar la IP de los visitantes a un CDN externo).
-//
-// OpenDyslexic sólo aporta reglas `@font-face`. El navegador no descarga el
-// archivo hasta que un elemento renderizado usa esa familia, es decir, sólo
-// cuando alguien activa la opción en el widget A11y: coste cero para el resto.
-import '@fontsource-variable/inter';
-import '@fontsource-variable/plus-jakarta-sans';
-import '@fontsource/opendyslexic/400.css';
-import '@fontsource/opendyslexic/700.css';
-
-// Los `.woff2` del subconjunto latino se importan con `?url` para obtener su
-// ruta final con hash y poder precargarlos. Sin la precarga el navegador sólo
-// descubre la fuente al analizar el CSS, llega después del primer pintado y
-// el cambio de tipografía desplaza el texto (CLS).
-import interWoff2 from '@fontsource-variable/inter/files/inter-latin-wght-normal.woff2?url';
-import jakartaWoff2 from '@fontsource-variable/plus-jakarta-sans/files/plus-jakarta-sans-latin-wght-normal.woff2?url';
-
-import '@/styles/global.css';
-import Header from '@/components/Header.astro';
-import Footer from '@/components/Footer.astro';
-import AccessibilityWidget from '@/components/AccessibilityWidget.tsx';
-import VisorPdf from '@/components/VisorPdf.astro';
+/**
+ * Marco de todas las páginas: réplica del tema `mbn` del sitio del Ministerio.
+ *
+ * La cabecera, el pie y los estilos salen tal cual del tema original
+ * (`src/contenido/marco/`), y los scripts se cargan en el mismo orden que los
+ * encola WordPress: los componentes del tema se buscan a sí mismos en la página
+ * por sus atributos `data-mbn-*`, así que basta con que estén todos.
+ */
+import cabecera from '@/contenido/marco/cabecera.html?raw';
+import pie from '@/contenido/marco/pie.html?raw';
+import extrasPortada from '@/contenido/marco/portada.html?raw';
+import estilos from '@/contenido/marco/head.html?raw';
+import config from '@/contenido/marco/scripts.json';
 import { SITIO_PUBLICO } from '@/lib/publicacion';
 import { politicaCsp } from '@/lib/seguridad';
 
 interface Props {
+  /** Título completo del documento, tal como lo arma el sitio original. */
   titulo: string;
   descripcion?: string;
+  /** Imagen para redes sociales (`og:image`), ruta del sitio. */
+  imagen?: string;
+  /** Clases del `<body>`: el CSS del tema depende de algunas. */
+  clases?: string;
+  /** La portada lleva además la encuesta de satisfacción y el aviso emergente. */
+  portada?: boolean;
+  /** La página incrusta publicaciones de Instagram. */
+  instagram?: boolean;
   /** Excluye la página de los buscadores (ej. 404). */
   sinIndexar?: boolean;
-  /**
-   * La cabecera flota sobre el contenido en vez de empujarlo.
-   *
-   * Lo pide la página que abre con algo a sangre por debajo del menú (un Hero
-   * fotográfico). Quien lo active tiene que encargarse de que su primer
-   * elemento reserve `--altura-cabecera` y garantice el contraste del menú
-   * sobre lo que haya debajo.
-   */
-  cabeceraFlotante?: boolean;
 }
 
 const {
   titulo,
-  descripcion = 'Sitio del Ministerio de Bienes Nacionales: quiénes somos, documentación, trámites de adjudicación y contacto.',
+  descripcion = '',
+  imagen = '',
+  clases = 'wp-embed-responsive wp-theme-mbn',
+  portada = false,
+  instagram = false,
   sinIndexar = false,
-  cabeceraFlotante = false,
 } = Astro.props;
 
-const tituloCompleto = `${titulo} — Ministerio de Bienes Nacionales`;
 const urlCanonica = new URL(Astro.url.pathname, Astro.site);
-const gaId = import.meta.env.PUBLIC_GA_ID;
+const urlImagen = imagen ? new URL(imagen, Astro.site) : null;
+const conFaq = clases.includes('template-faq');
+
+/*
+  Scripts del tema, en el orden de WordPress. `listados-estaticos.js` va antes
+  que los buscadores de noticias y trámites: responde en el navegador las
+  peticiones que ellos hacían al servidor.
+*/
+const componentes = [
+  '/tema/vendor/bootstrap/5.3.3/js/bootstrap.bundle.min.js',
+  '/tema/js/header-nav.js',
+  '/tema/js/external-link.js',
+  '/tema/js/components/slider.js',
+  '/tema/js/components/media-cards.js',
+  '/tema/js/components/icon-links.js',
+];
+const componentesTras = [
+  '/tema/js/components/authorities.js',
+  '/tema/js/components/content-tabs.js',
+  '/tema/js/components/faq.js',
+  '/tema/js/components/share.js',
+  '/tema/js/components/gallery.js',
+  '/js/listados-estaticos.js',
+  '/tema/js/components/news-search.js',
+  '/tema/js/components/procedure-search.js',
+];
 ---
 
 <!doctype html>
@@ -58,43 +75,28 @@ const gaId = import.meta.env.PUBLIC_GA_ID;
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-
     {/*
-      Política de seguridad de contenido. Va en un `<meta>` y no en una cabecera
-      HTTP porque el sitio es estático: así viaja dentro del paquete y protege
-      lo aloje quien lo aloje, sin depender de que alguien configure nada.
-
-      Tiene que ir lo más arriba posible del `<head>`: sólo cuenta para los
-      recursos que el analizador encuentre **después** de leerla. El porqué de
-      cada directiva, en `src/lib/seguridad.ts`.
+      Política de seguridad de contenido, lo más arriba posible: sólo cuenta
+      para lo que el navegador encuentre después. Detalle en `seguridad.ts`.
     */}
-    <meta http-equiv="content-security-policy" content={politicaCsp(gaId)} />
+    <meta http-equiv="content-security-policy" content={politicaCsp(import.meta.env.PUBLIC_GA_ID)} />
 
-    <title>{tituloCompleto}</title>
-    <meta name="description" content={descripcion} />
+    <title>{titulo}</title>
+    {descripcion && <meta name="description" content={descripcion} />}
     <link rel="canonical" href={urlCanonica} />
-
-    {/* `crossorigin` es obligatorio en la precarga de fuentes aunque sean del
-        mismo origen: sin él el navegador descarga el archivo dos veces. */}
-    <link rel="preload" as="font" type="font/woff2" href={interWoff2} crossorigin />
-    <link rel="preload" as="font" type="font/woff2" href={jakartaWoff2} crossorigin />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="generator" content={Astro.generator} />
+    <link rel="icon" href="/tema/images/favicon.ico" sizes="16x16 32x32" type="image/x-icon" />
 
     <meta property="og:type" content="website" />
-    <meta property="og:title" content={tituloCompleto} />
-    <meta property="og:description" content={descripcion} />
+    <meta property="og:title" content={titulo} />
+    {descripcion && <meta property="og:description" content={descripcion} />}
     <meta property="og:url" content={urlCanonica} />
+    {urlImagen && <meta property="og:image" content={urlImagen} />}
     <meta property="og:locale" content="es_CL" />
-    <meta name="twitter:card" content="summary_large_image" />
 
     {/*
       Dos motivos distintos para no indexar, y el del sitio manda sobre el de la
-      página: mientras el portal no esté en su dominio definitivo ninguna página
-      debe indexarse, esté o no marcada `sinIndexar`.
-
-      `nofollow` además de `noindex`: sin él el rastreador sigue los enlaces y
-      descubre todas las páginas aunque no indexe ninguna.
+      página. `nofollow` además de `noindex`: sin él el rastreador sigue los
+      enlaces y descubre todas las páginas aunque no indexe ninguna.
     */}
     {!SITIO_PUBLICO ? (
       <meta name="robots" content="noindex, nofollow" />
@@ -102,112 +104,32 @@ const gaId = import.meta.env.PUBLIC_GA_ID;
       sinIndexar && <meta name="robots" content="noindex" />
     )}
 
-    {/*
-      Aplica el tema y las preferencias de accesibilidad antes del primer
-      pintado para evitar el parpadeo de tema (FOUC). Debe ser `is:inline`
-      y bloqueante: no puede diferirse.
-    */}
-    <script is:inline>
-      (() => {
-        const raiz = document.documentElement;
-
-        /*
-          Marca de que hay JavaScript, antes del primer pintado. La regla que
-          vuelve transparente la cabecera flotante cuelga de este atributo:
-          sin JavaScript el observador que le devuelve el fondo no existe.
-        */
-        raiz.dataset.js = '';
-
-        try {
-          const p = JSON.parse(localStorage.getItem('ccaa-a11y') || '{}');
-          /*
-            El tema por defecto es el claro, y no se consulta
-            `prefers-color-scheme`: el sitio se presenta siempre igual a quien
-            llega por primera vez. El widget de accesibilidad permite cambiarlo
-            y guarda la elección.
-
-            **Este valor está duplicado en `AccessibilityWidget.tsx`**, y tiene
-            que ser el mismo. Si divergen, la página se pinta con un tema y el
-            interruptor del widget marca el otro.
-          */
-          const tema = p.tema ?? 'claro';
-
-          if (tema === 'oscuro') raiz.classList.add('dark');
-          if (tema === 'alto-contraste') raiz.dataset.contraste = 'alto';
-          if (p.dislexia) raiz.dataset.dislexia = 'true';
-          if (p.espaciado) raiz.dataset.espaciado = 'amplio';
-          // Se refleja también 'normal': es la señal de que el usuario
-          // desactivó la reducción de movimiento a propósito.
-          if (p.movimiento) raiz.dataset.movimiento = p.movimiento;
-          if (p.enlaces) raiz.dataset.enlaces = 'destacados';
-          if (p.escalaFuente) {
-            raiz.style.setProperty('--a11y-escala-fuente', String(p.escalaFuente));
-          }
-        } catch {
-          /* localStorage no disponible: se usan los valores por defecto. */
-        }
-      })();
-    </script>
-
-    {/*
-      GA4 diferido a `requestIdleCallback` para no competir con el hilo
-      principal durante la carga.
-    */}
-    {gaId && (
-      <script is:inline define:vars={{ gaId }}>
-        (() => {
-          const cargar = () => {
-            const s = document.createElement('script');
-            s.async = true;
-            s.src = `https://www.googletagmanager.com/gtag/js?id=${gaId}`;
-            document.head.appendChild(s);
-            window.dataLayer = window.dataLayer || [];
-            function gtag() { window.dataLayer.push(arguments); }
-            gtag('js', new Date());
-            gtag('config', gaId, { anonymize_ip: true });
-          };
-          if ('requestIdleCallback' in window) requestIdleCallback(cargar, { timeout: 4000 });
-          else window.addEventListener('load', () => setTimeout(cargar, 1200));
-        })();
-      </script>
-    )}
+    {/* Estilos del tema y el script que aplica contraste y tamaño de texto antes del primer pintado. */}
+    <Fragment set:html={estilos} />
+    {portada && <link rel="stylesheet" href="/uploads/pum/pum-site-styles.css" />}
+    <script is:inline src="/tema/js/large-screen.js"></script>
   </head>
 
-  <body class="flex min-h-dvh flex-col">
-    <a class="skip-link" href="#contenido-principal">Saltar al contenido principal</a>
+  <body class={clases}>
+    <Fragment set:html={cabecera} />
+    <slot />
+    <Fragment set:html={pie} />
+    {portada && <Fragment set:html={extrasPortada} />}
 
-    <Header flotante={cabeceraFlotante} />
+    {/* Asistente virtual. Sin backend, cae en su aviso de «no disponible». */}
+    <script is:inline src="/chatbot/history.js"></script>
+    <script is:inline src="/chatbot/conversation.js"></script>
+    <script is:inline set:html={`window.MBNChatbot=${JSON.stringify(config.chatbot)};`} />
+    <script is:inline src="/chatbot/chatbot.js"></script>
+    {conFaq && <script is:inline src="/chatbot/faq-links.js"></script>}
 
-    {/*
-      `data-pagefind-body` acota la indexación a este contenedor. Sin él
-      Pagefind indexa el <body> completo y cada resultado arrastra el menú y
-      el pie, que son idénticos en todas las páginas. Las páginas marcadas
-      `sinIndexar` (404, buscar) quedan fuera del índice.
-    */}
-    <main
-      id="contenido-principal"
-      class="flex-1"
-      tabindex="-1"
-      {...(!sinIndexar && { 'data-pagefind-body': true })}
-    >
-      <slot />
-    </main>
+    {componentes.map((src) => <script is:inline src={src}></script>)}
+    <script is:inline set:html={`window.mbnPdfViewer = ${JSON.stringify(config.pdfViewer)};`} />
+    <script is:inline src="/tema/js/components/pdf-viewer.js"></script>
+    {componentesTras.map((src) => <script is:inline src={src}></script>)}
 
-    <Footer />
-
-    {/*
-      `client:idle`: el tema y las preferencias ya los aplicó el script inline
-      de <head>, así que el widget puede hidratarse sin prisa sin que el
-      usuario perciba un estado incorrecto.
-    */}
-    <div data-pagefind-ignore>
-      <AccessibilityWidget client:idle />
-    </div>
-
-    {/* Visor modal para los PDF del sitio; sin JavaScript los enlaces navegan
-        al archivo como siempre. Fuera del índice: se repite en cada página. */}
-    <div data-pagefind-ignore>
-      <VisorPdf />
-    </div>
+    {portada && <script is:inline src="/tema/js/survey.js"></script>}
+    {portada && <script is:inline src="/js/aviso-portada.js"></script>}
+    {instagram && <script is:inline async src="https://www.instagram.com/embed.js"></script>}
   </body>
 </html>
