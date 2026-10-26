@@ -34,6 +34,31 @@ public/uploads/**/*.mp4
 public/uploads/**/*.pptx
 public/uploads/**/*.xlsx
 public/uploads/**/*.docx
- 
+# Excepto los formularios y documentos de los trámites, que sí se publican.
+!public/uploads/2024/11/F2.2_Declaracion_Jurada_articulo-6.pdf
+!public/uploads/2024/11/Formulario-n°2.pdf
+!public/uploads/2024/11/Formulario-n°3.pdf
+!public/uploads/2026/08/Anexo-Agregar-Profesional.pdf
+!public/uploads/2026/08/Anexo-Documentos-Obligatorios_compressed.pdf
+!public/uploads/2026/08/Comprobante-Persona-Natural.pdf
+!public/uploads/2026/08/Declaracion_Jurada-2.pdf
+!public/uploads/2026/08/FORMULARIO-1-HOJA-ANEXA-OTROS-SOLICITANTES-2026-004.pdf
+!public/uploads/2026/08/Formulacion-Donacion-de-Bienes.pdf
+!public/uploads/2026/08/Formulario-5-Cuponera-Version-final-ano-2023.pdf
+!public/uploads/2026/08/Formulario-Registro-Contratistas-Persona-Juridica.pdf
+!public/uploads/2026/08/Formulario-Registro-Contratistas-Persona-Natural.pdf
+!public/uploads/2026/08/Formulario-Solicitud-Registro-de-Goce-Singular.pdf
+!public/uploads/2026/08/Formulario-Solicitud-de-Propiedad-Fiscal.pdf
+!public/uploads/2026/08/Formulario-Titulo-Gratuito-Ley-del-Sur.pdf
+!public/uploads/2026/08/Formulario-n1_BBNN_-junio-2026.pdf
+!public/uploads/2026/08/Formulario-n°4-1.pdf
+!public/uploads/2026/08/Formulario-n°4.pdf
+!public/uploads/2026/08/Formulario-n°6-16.06.2026.pdf
+!public/uploads/2026/08/Formulario-n°7.pdf
+!public/uploads/2026/08/FormularioOposicion.pdf
+!public/uploads/2026/08/Solicitud-de-Alzamiento-de-Hipotecas-Gravamenes-y-Prohibiciones.pdf
+!public/uploads/2026/08/Titulo-Gratuito-Persona-Juridica.pdf
+!public/uploads/2026/08/Titulo-Gratuito-Persona-Natural.pdf
+
 # Informes generados (Excel de enlaces rotos).
 informes/
