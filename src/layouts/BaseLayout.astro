@@ -12,6 +12,7 @@ import pie from '@/contenido/marco/pie.html?raw';
 // import extrasPortada from '@/contenido/marco/portada.html?raw';
 import estilos from '@/contenido/marco/head.html?raw';
 import config from '@/contenido/marco/scripts.json';
+import { CONTENEDORES_GTM } from '@/config/sitio.mjs';
 import { SITIO_PUBLICO } from '@/lib/publicacion';
 import { politicaCsp } from '@/lib/seguridad';
 
@@ -44,6 +45,7 @@ const {
 const urlCanonica = new URL(Astro.url.pathname, Astro.site);
 const urlImagen = imagen ? new URL(imagen, Astro.site) : null;
 const conFaq = clases.includes('template-faq');
+const contenedoresGtm = SITIO_PUBLICO ? CONTENEDORES_GTM : [];
 
 /*
   Scripts del tema, en el orden de WordPress. `listados-estaticos.js` va antes
@@ -79,7 +81,18 @@ const componentesTras = [
       Política de seguridad de contenido, lo más arriba posible: sólo cuenta
       para lo que el navegador encuentre después. Detalle en `seguridad.ts`.
     */}
-    <meta http-equiv="content-security-policy" content={politicaCsp(import.meta.env.PUBLIC_GA_ID)} />
+    <meta
+      http-equiv="content-security-policy"
+      content={politicaCsp(Boolean(import.meta.env.PUBLIC_GA_ID) || contenedoresGtm.length > 0)}
+    />
+
+    {/* Google Tag Manager: el fragmento oficial, uno por contenedor. */}
+    {contenedoresGtm.map((id) => (
+      <script
+        is:inline
+        set:html={`(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer',${JSON.stringify(id)});`}
+      />
+    ))}
 
     <title>{titulo}</title>
     {descripcion && <meta name="description" content={descripcion} />}

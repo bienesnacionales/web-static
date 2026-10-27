@@ -32,3 +32,16 @@ export const MODO_MANTENCION = interruptor('MODO_MANTENCION', false);
  * sacaría al Ministerio de los resultados de búsqueda.
  */
 export const SITIO_PUBLICO = interruptor('SITIO_PUBLICO', true);
+
+/**
+ * Contenedores de Google Tag Manager del Ministerio, los mismos que cargaba el
+ * sitio anterior. Cada uno publica en su propiedad de Google Analytics 4. Sólo
+ * se cargan con `SITIO_PUBLICO`.
+ */
+export const CONTENEDORES_GTM = [
+  'GTM-W223SKX', // General (G-ZMS9ZHNTZW)
+  'GTM-MLH6ZBL', // Registro de Goce Singular (G-C2LF9FNF8D)
+  'GTM-NVSV5PN', // Registro Nacional de Contratistas (G-NR22DBEYGQ)
+  'GTM-5QF3NC9', // Donación de Bienes (G-E3VJ1MCYXJ)
+  'GTM-T26K4RS', // Permuta (G-3FS58CZ776)
+];

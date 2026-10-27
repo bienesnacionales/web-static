@@ -27,7 +27,7 @@
 const GA_SCRIPT = 'https://www.googletagmanager.com';
 
 /*
-  Los cuatro destinos de medición, y ninguno sobra. En CSP,
+  Los destinos de medición, y ninguno sobra. En CSP,
   `*.analytics.google.com` NO cubre `analytics.google.com`: el asterisco exige
   un subdominio, y GA4 usa el dominio pelado. `*.google-analytics.com` está por
   los endpoints regionales (`region1`, `region2`…), que GA4 elige según desde
@@ -38,15 +38,16 @@ const GA_CONEXION = [
   'https://*.google-analytics.com',
   'https://analytics.google.com',
   'https://*.analytics.google.com',
+  // Tag Manager pide desde aquí la configuración de cada etiqueta de GA4.
+  'https://*.googletagmanager.com',
 ];
 
 /**
  * La política, como cadena lista para el atributo `content` del `<meta>`.
  *
- * @param gaId  Identificador de GA4, si la analítica está encendida.
+ * @param conGa  Si la página carga Google Analytics (directo o con Tag Manager).
  */
-export function politicaCsp(gaId?: string): string {
-  const conGa = Boolean(gaId);
+export function politicaCsp(conGa = false): string {
 
   const directivas: Record<string, string[]> = {
     // Base cerrada: todo lo que no se nombre abajo tiene que ser del sitio.
