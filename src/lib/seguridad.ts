@@ -96,7 +96,9 @@ export function politicaCsp(conGa = false): string {
     // Pagefind pide su índice al mismo origen, y los listados sus datos.
     'connect-src': ["'self'", ...(conGa ? GA_CONEXION : [])],
 
-    'object-src': ["'none'"],
+    // Los visores de PDF (Plan Estratégico, Código de Ética) usan `<object>`
+    // con documentos del propio sitio.
+    'object-src': ["'self'"],
 
     // Impide que un `<base>` inyectado reescriba a dónde apuntan todas las
     // rutas relativas de la página de golpe.
