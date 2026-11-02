@@ -1,16 +1,4 @@
-/* ============================================================
- * Plantilla — Participación Ciudadana (template-participacion.php)
- * Maqueta: Figma 323:4716 (frame 1440; contenido de 1120).
- *
- * Este archivo solo aporta el andamiaje de la página y las piezas que no son
- * componentes: el título y el contenido del editor. Las pestañas son un
- * componente global y traen su propia hoja (`components/content-tabs.css`).
- *
- * Ojo con base.css (el Base Kit de Siigsa): `main p` fija color, tamaño y un
- * `font-weight: 400 !important`, y `h1` fuerza familia y peso. Donde hace
- * falta !important para ganarle está anotado.
- * ============================================================ */
-
+/* define la presentación de participación ciudadana */
 .mbn-participacion {
 	padding-block: var(--mbn-space-page-top, 24px) var(--mbn-space-section, 36px);
 	background: var(--mbn-surface-white, #FFFFFF);
@@ -19,14 +7,11 @@
 .mbn-participacion__container {
 	display: flex;
 	flex-direction: column;
-	/* 24 + los 12 de padding propio de las migas = los 36 (spacing-l) que
-	   separan la fila de migas del contenido, igual que en «Ministerio». */
+
 	gap: 24px;
 }
 
-/* base.css: `h1 { font-weight: 700 !important; font-family: Roboto Slab
-   !important }`. La familia coincide con la maqueta (Heading/Slab/Large); el
-   peso 500 necesita !important para ganarle. */
+
 .mbn-participacion__title {
 	margin: 0;
 	font-family: var(--mbn-roboto-slab-large-font-family, "Roboto Slab", serif) !important;
@@ -77,7 +62,7 @@
 	height: auto;
 }
 
-/* ---------- md ≥ 768px (canvas 834 del Figma) ---------- */
+
 
 @media (min-width: 768px) {
 	.mbn-participacion__title {
@@ -85,7 +70,7 @@
 	}
 }
 
-/* ---------- xl ≥ 1200px (canvas 1440 del Figma) ---------- */
+/* ajustes de presentación para escritorio */
 
 @media (min-width: 1200px) {
 	.mbn-participacion__title {

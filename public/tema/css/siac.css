@@ -1,22 +1,5 @@
-/* ============================================================
- * Plantilla — Estado de consulta SIAC (template-siac.php)
- *
- * **Sin maqueta de Figma**: la página no tiene canvas en el archivo (§11), así
- * que este andamiaje es una decisión propia y no el calco de un nodo. Se copia
- * el de «Preguntas Frecuentes» y «Participación Ciudadana», que son las páginas
- * hermanas: mismo `padding-block`, mismos 24px entre piezas y la misma escala
- * de título 28 / 32 / 36 en base, `md` y `xl`. Hacerlo de otro modo dejaría
- * cuatro páginas del mismo tipo con títulos de distinto tamaño en el mismo
- * ancho de ventana.
- *
- * Este archivo solo aporta el andamiaje y las piezas que no son componentes: el
- * título y el contenido del editor. El marco de la aplicación es el componente
- * `embed` y trae su propia hoja (`components/embed.css`).
- *
- * Ojo con base.css (el Base Kit de Siigsa): `main p` fija color, tamaño y un
- * `font-weight: 400 !important`, y `h1` fuerza familia y peso. Donde hace falta
- * !important para ganarle está anotado.
- * ============================================================ */
+/* define la presentación de consulta de solicitudes ciudadanas */
+/* ajustes de presentación para escritorio */
 
 .mbn-siac {
 	padding-block: var(--mbn-space-page-top, 24px) var(--mbn-space-section, 36px);
@@ -26,16 +9,11 @@
 .mbn-siac__container {
 	display: flex;
 	flex-direction: column;
-	/* 24 + los 12 de padding propio de las migas = los 36 (spacing-l) que
-	   separan la fila de migas del contenido, igual que en las tres páginas
-	   hermanas. Dentro del cuerpo, los 24 son los que separan el h1, el texto
-	   del editor y el marco. */
+
 	gap: 24px;
 }
 
-/* base.css: `h1 { font-weight: 700 !important; font-family: Roboto Slab
-   !important }`. La familia coincide con la del sistema de diseño
-   (Heading/Slab/Large); el peso 500 necesita !important para ganarle. */
+
 .mbn-siac__title {
 	margin: 0;
 	font-family: var(--mbn-roboto-slab-large-font-family, "Roboto Slab", serif) !important;
@@ -45,10 +23,7 @@
 	color: var(--mbn-text-primary, #333333);
 }
 
-/* ---------- Contenido del editor ----------
-   Producción no lo usa: el texto explicativo vive dentro de la aplicación
-   embebida. Se pinta si existe, y es lo único legible de la página si el
-   consultor está bloqueado por su cabecera `X-Frame-Options`. */
+
 
 .mbn-siac__content p,
 .mbn-siac__content li {
@@ -91,7 +66,7 @@
 	height: auto;
 }
 
-/* ---------- md ≥ 768px ---------- */
+/* md ≥ 768px */
 
 @media (min-width: 768px) {
 	.mbn-siac__title {
@@ -99,7 +74,7 @@
 	}
 }
 
-/* ---------- xl ≥ 1200px ---------- */
+/* ajustes de presentación para escritorio */
 
 @media (min-width: 1200px) {
 	.mbn-siac__title {

@@ -1,31 +1,5 @@
-/* ============================================================
- * Plantilla — Detalle de trámite (single-tramites.php)
- *
- * También la carga «Denuncias Externas» (template-denuncias.php), que es este
- * mismo formato sin chips, sin aviso y sin tarjeta de ayuda: una hoja para las
- * dos, para que no puedan divergir. Lo único propio de esa página es el
- * modificador `.mbn-tramite--sin-chips` del bloque xl.
- *
- * Maquetas: Figma 169:3365 (desktop 1440; contenido de 1120 en una rejilla
- * de 3 columnas con gap 16: el detalle ocupa 2 y la columna lateral 1),
- * 672:8558 (tablet 834) y 442:28694 (mobile 402).
- *
- * Tablet y mobile son la MISMA composición en una columna, con tres cambios
- * de escala respecto del desktop: el título baja a 24px (Heading/Slab/Medium),
- * el botón del portal a 16px con relleno 8x16 (Button/Body Small • Bold) y las
- * migas a 14px (ver breadcrumbs.css). El resto —chips, acordeón, aviso y
- * tarjeta de ayuda— mide igual en los tres anchos.
- *
- * El layout es el grid de Bootstrap (`row` + `col-xl-8` / `col-xl-4`, §7.2);
- * este archivo solo aporta el andamiaje y las piezas que no son componentes:
- * los chips de tipo, el título, el cuerpo, el botón del portal y la tarjeta
- * de ayuda. El acordeón y el aviso «Importante» son componentes globales y
- * traen su propia hoja.
- *
- * Ojo con base.css (el Base Kit de Siigsa): `main p` fija color, tamaño y un
- * `font-weight: 400 !important`, y `h1` fuerza familia y peso. Donde hace
- * falta !important para ganarle está anotado.
- * ============================================================ */
+/* define la presentación de detalle de trámites */
+/* ajustes de presentación para escritorio */
 
 .mbn-tramite {
 	padding-block: var(--mbn-space-page-top, 24px) var(--mbn-space-section, 36px);
@@ -35,8 +9,7 @@
 .mbn-tramite__container {
 	display: flex;
 	flex-direction: column;
-	/* 24 + los 12 de padding propio de las migas = los 36 (spacing-l) que
-	   separan la fila de migas del contenido en la maqueta. */
+
 	gap: 24px;
 }
 
@@ -47,7 +20,7 @@
 	min-width: 0;
 }
 
-/* ---------- Chips con el tipo de trámite ---------- */
+/* chips con el tipo de trámite */
 
 .mbn-tramite__chips {
 	list-style: none;
@@ -85,24 +58,20 @@ a.mbn-tramite__chip:focus-visible {
 	outline-offset: 2px;
 }
 
-/* ---------- Título y cuerpo ---------- */
+/* título y cuerpo */
 
-/* base.css: `h1 { font-weight: 700 !important; font-family: Roboto Slab
-   !important }`. La familia coincide con la maqueta (Heading/Slab/Large); el
-   peso 500 necesita !important para ganarle. */
+
 .mbn-tramite__title {
 	margin: 0;
 	font-family: var(--mbn-roboto-slab-large-font-family, "Roboto Slab", serif) !important;
 	font-weight: var(--mbn-roboto-slab-large-font-weight, 500) !important;
-	/* Heading/Slab/Medium (24px) en tablet y mobile —maquetas 672:8573 y
-	   442:28700—; sube a Heading/Slab/Large (36px) en el canvas desktop. */
+
 	font-size: var(--mbn-roboto-slab-medium-font-size, 24px);
 	line-height: 1.5;
 	color: var(--mbn-text-black, #000000);
 }
 
-/* El bloque «título + descripción» es una sola pieza en la maqueta (nodo
-   173:1028) y va con gap 8, no con los 24 que separan las secciones. */
+
 .mbn-tramite__intro {
 	display: flex;
 	flex-direction: column;
@@ -118,8 +87,7 @@ a.mbn-tramite__chip:focus-visible {
 	color: var(--mbn-text-primary, #333333);
 }
 
-/* 32px entre párrafos, no los 24 del detalle de noticia: es lo que declaran los
-   tres canvas del trámite (169:3369, 672:8574 y 442:28701). */
+
 .mbn-tramite__content p {
 	margin-bottom: 32px;
 }
@@ -148,9 +116,7 @@ a.mbn-tramite__chip:focus-visible {
 	color: var(--mbn-brand-blue-dark, #00268D);
 }
 
-/* base.css declara familia y peso de h2-h6 con !important, así que los
-   subtítulos que el editor escriba se quedan con los del kit; aquí solo se
-   ajustan tamaño, color y ritmo vertical. */
+
 .mbn-tramite__content h2,
 .mbn-tramite__content h3,
 .mbn-tramite__content h4 {
@@ -174,26 +140,14 @@ a.mbn-tramite__chip:focus-visible {
 	height: auto;
 }
 
-/* ---------- Acordeón: la barra del panel abierto en azul ----------
-   Decisión del equipo (2026-09-29), por coherencia con el resto del sitio: la
-   barra del panel ABIERTO va en `--mbn-brand-blue` con el título en blanco,
-   como la barra abierta de «Preguntas Frecuentes» y las cabeceras de tabla de
-   «Participación Ciudadana». Solo cambia la barra: el cuerpo sigue blanco con
-   su borde gris, y la barra cerrada, blanca con borde.
-   Se acota a `.mbn-tramite` —el detalle de trámite y «Denuncias Externas», que
-   comparten formato— y no a la variante `default`, porque esa variante la usan
-   también los acordeones de `content-tabs`, que siguen en gris. */
+
 
 .mbn-tramite .mbn-accordion__list {
 	--bs-accordion-active-bg: var(--mbn-brand-blue, #0F69C4);
 	--bs-accordion-active-color: var(--mbn-text-on-brand-soft, rgba(255, 255, 255, 0.95));
 }
 
-/* El chevron de la variante por defecto es un SVG en `#333` servido como
-   imagen de fondo, que sobre el azul no se ve y no toma `currentColor`. Se
-   pinta con `mask-image`, igual que en la variante `brand`: oscuro en la barra
-   cerrada y blanco en la abierta. La rotación sigue siendo la de
-   accordion.css. Propiedades largas, no el atajo `mask` (§10). */
+
 .mbn-tramite .mbn-accordion .accordion-button::after {
 	background-image: none;
 	background-color: currentColor;
@@ -207,13 +161,12 @@ a.mbn-tramite__chip:focus-visible {
 	-webkit-mask-size: contain;
 }
 
-/* El outline de foco del componente es azul de marca: sobre la barra abierta
-   desaparecería. */
+
 .mbn-tramite .mbn-accordion .accordion-button:not(.collapsed):focus-visible {
 	outline-color: var(--mbn-surface-white, #FFFFFF);
 }
 
-/* ---------- Columna lateral ---------- */
+/* columna lateral */
 
 .mbn-tramite__aside {
 	display: flex;
@@ -222,8 +175,7 @@ a.mbn-tramite__chip:focus-visible {
 	min-width: 0;
 }
 
-/* Botón del portal: `btn` de Bootstrap con las variables del design system
-   (§7.3). Ocupa el ancho de la columna, como en la maqueta. */
+
 .mbn-tramite__cta {
 	--bs-btn-bg: var(--mbn-action-primary, #0046A8);
 	--bs-btn-border-color: var(--mbn-action-primary, #0046A8);
@@ -234,8 +186,7 @@ a.mbn-tramite__chip:focus-visible {
 	--bs-btn-active-bg: var(--mbn-brand-blue-dark, #00268D);
 	--bs-btn-active-border-color: var(--mbn-brand-blue-dark, #00268D);
 	--bs-btn-active-color: var(--mbn-text-on-primary, #E7ECFF);
-	/* Tablet y mobile: Button/Body Small • Bold (16px) con relleno 8x16
-	   (672:8582 y 442:28709). El canvas desktop lo sube a 19px con 12x24. */
+
 	--bs-btn-padding-x: 16px;
 	--bs-btn-padding-y: 8px;
 	--bs-btn-font-family: var(--mbn-roboto-body-button-font-family, "Roboto", sans-serif);
@@ -253,12 +204,7 @@ a.mbn-tramite__chip:focus-visible {
 	box-shadow: none;
 }
 
-/* Tarjeta de ayuda: es la «Cards Verticales» del design system (Figma
-   93:4805), pero sin enlace. Por eso NO reutiliza partials/vertical-card.php:
-   esa pieza trae el estado hover de una tarjeta clicable —degradado azul y
-   texto en blanco— que aquí sería un realce sobre algo que no lleva a ningún
-   sitio. El relleno de 32px es la suma de las dos cajas anidadas del Figma
-   (16 + 16) en una sola. */
+
 .mbn-tramite__help {
 	display: flex;
 	flex-direction: column;
@@ -269,8 +215,7 @@ a.mbn-tramite__chip:focus-visible {
 	border-radius: 8px;
 }
 
-/* base.css: `main p { font-weight: 400 !important }`, así que el peso 500 del
-   estilo Heading/Sans/Medium necesita !important. */
+
 .mbn-tramite__help-title {
 	margin: 0;
 	font-family: var(--mbn-roboto-sans-medium-font-family, "Roboto", sans-serif);
@@ -305,11 +250,7 @@ a.mbn-tramite__chip:focus-visible {
 	text-decoration: underline;
 }
 
-/* ---------- xl ≥ 1200px (canvas 1440 del Figma) ----------
-   Las dos columnas aparecen solo aquí, y ahora con maqueta que lo respalda: la
-   de tablet (672:8558) apila el botón y la tarjeta debajo del aviso, igual que
-   la de mobile. Por debajo de xl, la columna lateral se apila después del
-   detalle, que es donde también la coloca el flujo del DOM. */
+/* ajustes de presentación para escritorio */
 
 @media (min-width: 1200px) {
 	.mbn-tramite__title {
@@ -323,17 +264,12 @@ a.mbn-tramite__chip:focus-visible {
 		--bs-btn-font-size: var(--mbn-roboto-body-button-large-font-size, 19px);
 	}
 
-	/* En la maqueta el botón del portal arranca a la altura del título, no a la
-	   del chip: son los 64px que el frame 169:3777 declara como padding
-	   superior de la columna. */
+
 	.mbn-tramite__aside {
 		padding-top: 64px;
 	}
 
-	/* Sin chips —la página «Denuncias Externas», template-denuncias.php— el
-	   título abre la columna, así que el botón arranca arriba para seguir a su
-	   altura. El descendiente (0,2,0) le gana a la regla de arriba sin depender
-	   del orden. */
+
 	.mbn-tramite--sin-chips .mbn-tramite__aside {
 		padding-top: 0;
 	}

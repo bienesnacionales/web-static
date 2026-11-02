@@ -1,28 +1,5 @@
-/* ============================================================
- * Plantilla — Resultados de búsqueda (search.php)
- *
- * Maqueta: Figma 1357:6976, solo canvas de 1440. Medidas del nodo:
- *   1362:5928  total, Roboto Bold 16, 24 por debajo
- *   1362:5918  bloque de cabecera: h1 Roboto Bold 32, bajada 16, campo de 48
- *              con borde #CCC y radio 4, botón de 120 en #0046A8, y la línea
- *              «Resultados encontrados» en 14 #666; 16 entre piezas y 24 debajo
- *   1362:5931  resultado: chip, título Roboto Bold 18 #00268D, texto 14 #333 y
- *              «Conocer más» Bold 14 con flecha de 16; 8 entre piezas, 16
- *              arriba y abajo, línea #CCC al pie
- *   1362:6061  paginación centrada, celdas de 36 con radio 4, 4 entre ellas y
- *              32 encima; la actual en #0046A8 con el número en blanco y negrita
- *
- * Divergencias deliberadas (AGENTS.md §11):
- * - El contenido mide 1120 (`.mbn-container`), no 1440: el frame de la maqueta
- *   desborda su propio canvas, igual que el del footer.
- * - Arriba van los 24 de `--mbn-space-page-top` y no los 48 del Figma, el
- *   ritmo vertical homologado del sitio (§6).
- * - El título baja a 28 por debajo de `md`; la maqueta no tiene canvas móvil.
- *
- * Ojo con base.css (el Base Kit de Siigsa): `h1` fuerza Roboto Slab y peso 700,
- * `h2` el peso 500 y `main p` el 400, todos con !important. Donde hace falta
- * !important para ganarles está anotado.
- * ============================================================ */
+/* define la presentación de búsqueda general del sitio */
+/* ajustes de presentación para móviles */
 
 .mbn-search {
 	padding-block: var(--mbn-space-page-top, 24px) var(--mbn-space-section, 36px);
@@ -35,9 +12,9 @@
 	gap: var(--mbn-space-stack, 24px);
 }
 
-/* ---------- Total y cabecera ---------- */
+/* total y cabecera */
 
-/* base.css: `main p { font-weight: 400 !important }`. */
+
 .mbn-search__count {
 	margin: 0;
 	font-family: "Roboto", sans-serif;
@@ -53,8 +30,7 @@
 	gap: 16px;
 }
 
-/* base.css: `h1 { font-family: Roboto Slab !important; font-weight: 700
-   !important }`. La maqueta pide Roboto, no la Slab de las demás páginas. */
+
 .mbn-search__title {
 	margin: 0;
 	font-family: "Roboto", sans-serif !important;
@@ -80,10 +56,7 @@
 	color: var(--mbn-text-subtle, #666666);
 }
 
-/* ---------- Formulario ----------
-   `input-group` de Bootstrap (§7.3): la lupa, el campo y el botón comparten
-   borde. El anillo de foco se pinta alrededor del grupo entero y no solo del
-   campo, porque la lupa forma parte visual del mismo control. */
+
 
 .mbn-search__group {
 	min-height: 48px;
@@ -150,7 +123,7 @@
 	border-radius: 0 4px 4px 0;
 }
 
-/* ---------- Resultados ---------- */
+/* resultados */
 
 .mbn-search__list {
 	margin: 0;
@@ -162,8 +135,7 @@
 	border-bottom: 1px solid var(--mbn-border-default, #CCCCCC);
 }
 
-/* `position: relative` es el ancla del `.stretched-link` de «Conocer más»: la
-   fila entera es clicable con un solo enlace. */
+
 .mbn-search__result {
 	position: relative;
 	display: flex;
@@ -173,9 +145,7 @@
 	padding-block: 16px;
 }
 
-/* Chip del design system (Figma 94:1393), en su variante con contorno. El
-   Figma dibuja el borde por dentro (4/8 incluyen el trazo): 3/7 más el borde de
-   1 dan los 29 de alto de la maqueta. */
+
 .mbn-search__chip {
 	display: inline-flex;
 	align-items: center;
@@ -189,8 +159,7 @@
 	color: var(--mbn-brand-blue-dark, #00268D);
 }
 
-/* base.css: `h2 { font-weight: 500 !important; font-family: Roboto !important }`
-   y bajo 767px vuelve a fijar tamaño y alto de línea. */
+
 .mbn-search__result-title {
 	margin: 0;
 	font-family: "Roboto", sans-serif !important;
@@ -201,9 +170,7 @@
 	overflow-wrap: anywhere;
 }
 
-/* Dos líneas como mucho: la descripción es un anticipo, no el contenido. El
-   alto de línea es 1.4 y no el `normal` (≈1.17) de la maqueta, que la dibuja en
-   una sola línea: a dos líneas de 14px, 1.17 queda apretado. */
+
 .mbn-search__result-text {
 	display: -webkit-box;
 	margin: 0;
@@ -229,8 +196,7 @@
 	text-decoration: none;
 }
 
-/* La flecha es una máscara y no un <img> para que siga el color del enlace,
-   también en alto contraste (a11y.css la tiene en su lista de máscaras). */
+
 .mbn-search__more-icon {
 	flex: 0 0 16px;
 	width: 16px;
@@ -244,8 +210,7 @@
 	mask-size: 16px 16px;
 }
 
-/* Sin estado de hover en la maqueta. Se subraya el título, que es lo que se
-   lee como destino, porque toda la fila es clicable. */
+
 .mbn-search__result:hover .mbn-search__result-title,
 .mbn-search__result:focus-within .mbn-search__result-title,
 .mbn-search__more:hover,
@@ -262,12 +227,10 @@
 	color: var(--mbn-text-primary, #333333);
 }
 
-/* ---------- Paginación ----------
-   Marcado de `paginate_links()`: `a.page-numbers`, `span.current` y
-   `span.dots`. Sin flechas, como la maqueta. */
+
 
 .mbn-search__pagination {
-	padding-top: 8px; /* + los 24 del contenedor = los 32 de la maqueta */
+	padding-top: 8px; 
 }
 
 .mbn-search__pages {
@@ -306,7 +269,7 @@
 	background-color: var(--mbn-action-primary, #0046A8);
 }
 
-/* ---------- md ≥ 768px ---------- */
+/* md ≥ 768px */
 
 @media (min-width: 768px) {
 	.mbn-search__title {

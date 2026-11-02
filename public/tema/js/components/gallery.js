@@ -1,29 +1,10 @@
-/**
- * Componente global — Galería en carrusel.
- *
- * El carrusel funciona sin este archivo: el viewport es una zona desplazable
- * nativa con scroll-snap, así que el gesto táctil, la rueda y las flechas del
- * teclado ya recorren las fotografías. Lo que añade el script es la capa de
- * control explícito —flechas, indicadores y contador—, que nace oculta en el
- * HTML y se revela aquí: un botón que no hace nada es peor que ningún botón.
- *
- * La caja de luz NO se toca: la implementa WordPress (core/image + core/gallery
- * con el atributo `lightbox`) mediante su API de interactividad. Ver
- * `inc/components/gallery.php`.
- *
- * @package mbn
- */
-
+/* gestiona las interacciones de galerías de imágenes */
 ( function () {
 	'use strict';
 
 	var SELECTOR = '[data-mbn-gallery]';
 
-	/**
-	 * Indica si el usuario pidió reducir el movimiento.
-	 *
-	 * @return {boolean} true si hay que evitar el desplazamiento animado.
-	 */
+
 	function prefersReducedMotion() {
 		return (
 			window.matchMedia &&
@@ -31,12 +12,7 @@
 		);
 	}
 
-	/**
-	 * Cablea una galería.
-	 *
-	 * @param {HTMLElement} gallery Raíz del componente.
-	 * @return {void}
-	 */
+	// inicializa una galería
 	function setupGallery( gallery ) {
 		var viewport = gallery.querySelector( '[data-mbn-gallery-viewport]' );
 		var controls = gallery.querySelector( '[data-mbn-gallery-controls]' );
@@ -45,9 +21,7 @@
 			return;
 		}
 
-		// Las diapositivas son las figures que genera core/gallery. Se leen del
-		// DOM y no de un dato de PHP: si core cambiara el número de figures
-		// (por ejemplo al descartar un adjunto), los controles siguen cuadrando.
+		// obtiene las diapositivas renderizadas por core/gallery
 		var slides = viewport.querySelectorAll( '.wp-block-gallery > figure' );
 
 		if ( slides.length < 2 ) {
@@ -63,12 +37,7 @@
 
 		controls.removeAttribute( 'hidden' );
 
-		/**
-		 * Desplaza el viewport hasta una diapositiva.
-		 *
-		 * @param {number} index Índice de destino.
-		 * @return {void}
-		 */
+		// desplaza el contenedor hasta la diapositiva seleccionada
 		function goTo( index ) {
 			if ( index < 0 || index >= slides.length ) {
 				return;
@@ -80,12 +49,7 @@
 			} );
 		}
 
-		/**
-		 * Refleja el índice visible en los controles.
-		 *
-		 * @param {number} index Índice visible.
-		 * @return {void}
-		 */
+		// refleja el índice visible en los controles
 		function render( index ) {
 			current = index;
 
@@ -109,8 +73,7 @@
 			}
 
 			if ( status && statusTemplate ) {
-				// El texto de PHP ya viene traducido y con el total correcto:
-				// solo hay que sustituir el número de la fotografía actual.
+				// actualiza el número de fotografía y conserva el texto traducido del contador
 				status.textContent = statusTemplate.replace(
 					/\d+/,
 					String( index + 1 )
@@ -141,9 +104,7 @@
 			} );
 		}
 
-		// El estado se deriva de lo que está a la vista, no de quién pulsó qué:
-		// así queda igual de correcto tras un gesto táctil, un scroll con la
-		// rueda o un salto con las flechas del teclado.
+
 		if ( 'IntersectionObserver' in window ) {
 			var observer = new IntersectionObserver(
 				function ( entries ) {
@@ -178,11 +139,7 @@
 		render( 0 );
 	}
 
-	/**
-	 * Inicializa todas las galerías del documento.
-	 *
-	 * @return {void}
-	 */
+	// inicializa todas las galerías del documento
 	function init() {
 		var galleries = document.querySelectorAll( SELECTOR );
 

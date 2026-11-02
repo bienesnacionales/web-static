@@ -1,13 +1,4 @@
-/* ============================================================
- * Componente global — Migas de pan
- * Maqueta: Figma 364:4963 (fila 1120x62, padding vertical 12).
- *
- * Enlaces subrayados en gris con un chevron de 24px entre migas; la
- * última es texto en negrita sin enlace. El chevron se pinta con
- * mask-image para que tome el color desde el CSS: es el mismo criterio
- * que icon-links.css, y evita duplicar el asset por color.
- * ============================================================ */
-
+/* define la presentación de migas de pan */
 .mbn-breadcrumbs {
 	padding-block: 12px;
 }
@@ -22,12 +13,7 @@
 	gap: 8px;
 }
 
-/* Tipografía mobile-first: por debajo de `xl` la ruta va en «Gob/Mobile/Link/
-   Body Small» —Roboto Regular de 14px—, y solo en el canvas desktop sube a
-   «Gob/Desktop/Link/Body Small», de 16px y peso 500. Sale de las tres maquetas
-   del detalle de trámite: 169:3366 (desktop), 672:8561 (tablet) y 442:32409
-   (mobile). Como es el estilo del design system para esos anchos, se aplica en
-   el componente y no en una plantilla: afecta a todas las páginas. */
+
 .mbn-breadcrumbs__item {
 	display: flex;
 	align-items: center;
@@ -37,8 +23,7 @@
 	line-height: 1.5;
 }
 
-/* Tablet y mobile parten la ruta en dos filas: las migas navegables arriba y la
-   actual debajo, en su propia línea aunque quepa en la primera. */
+
 .mbn-breadcrumbs__item--current {
 	flex: 1 1 100%;
 }
@@ -51,9 +36,7 @@
 	text-underline-position: from-font;
 }
 
-/* base.css declara `p a, main a { color: #006fb3 }` con especificidad (0,0,2):
-   la clase gana sin necesidad de !important, pero hay que declararlo también
-   en :hover porque esa regla tiene su propio estado. */
+
 .mbn-breadcrumbs__link:hover,
 .mbn-breadcrumbs__link:focus-visible {
 	color: var(--mbn-action-primary, #0046A8);
@@ -74,8 +57,7 @@
 	width: 24px;
 	height: 24px;
 	background-color: var(--mbn-icon-muted, #4D4D4D);
-	/* Propiedades largas, no el atajo `mask`: un var() dentro del atajo no se
-	   resuelve de forma fiable (ver la nota de icon-links en AGENTS.md §18). */
+
 	mask-image: var(--mbn-breadcrumbs-chevron);
 	mask-repeat: no-repeat;
 	mask-position: center;
@@ -86,10 +68,7 @@
 	-webkit-mask-size: 24px 24px;
 }
 
-/* ---------- Móvil: la ruta se mantiene, el título se recorta ----------
-   La última miga es el título del contenido y en un móvil ocupa tres
-   líneas. Se recorta a una con ellipsis: el mismo título aparece íntegro
-   en el <h1> inmediatamente debajo, así que no se pierde información. */
+/* ajustes de presentación para móviles */
 
 @media (max-width: 767.98px) {
 	.mbn-breadcrumbs__item--current .mbn-breadcrumbs__label {
@@ -101,8 +80,7 @@
 	}
 }
 
-/* ---------- xl ≥ 1200px (canvas 1440 del Figma) ----------
-   La ruta cabe en una sola fila y la tipografía sube a la escala desktop. */
+/* ajustes de presentación para escritorio */
 
 @media (min-width: 1200px) {
 	.mbn-breadcrumbs__item {
@@ -114,7 +92,7 @@
 		flex: 0 1 auto;
 	}
 
-	/* La miga actual conserva su 700: su regla es (0,2,0) y gana a esta. */
+
 	.mbn-breadcrumbs__link,
 	.mbn-breadcrumbs__label {
 		font-weight: 500;

@@ -1,25 +1,5 @@
-/* Header nav interactions — dropdowns Desktop + offcanvas focus return + topbar ecosistema.
- *
- * Dropdowns Desktop:
- *   - open-on-click (no hover) [OPEN-Q-HF-004 resuelta por Leonardo 2026-08-25T05:01]
- *   - open también por focus / Enter / Space (visible focus)
- *   - close por Escape / click-fuera / Tab-out
- *
- * Offcanvas (mobile/tablet):
- *   - Bootstrap 5.3.3 Offcanvas provee backdrop, scrollLock, focusTrap, closeOnEsc
- *   - este script añade focusReturn al disparador (decisión humana).
- *
- * TopBar ecosistema button:
- *   - toggle del panel informativo.
- *
- * Botonera de accesibilidad (header desktop + offcanvas):
- *   - alto contraste y escala de texto de ±2 niveles, guardados en localStorage
- *     y restituidos por el arranque en línea de inc/a11y.php (§6).
- *
- * Sin dependencias externas (vanilla JS). Sin jQuery. Compatible con WP sin AMD.
- *
- * @package mbn
- */
+/* gestiona las interacciones de navegación y accesibilidad de la cabecera */
+// inicializa la navegación, los menús desplegables y los controles de cabecera
 
 ( function () {
 	'use strict';
@@ -28,9 +8,7 @@
 		return;
 	}
 
-	/**
-	 * Helpers
-	 */
+
 
 	const $$ = ( selector, root ) => Array.prototype.slice.call( ( root || document ).querySelectorAll( selector ) );
 
@@ -48,20 +26,9 @@
 		} );
 	}
 
-	/**
-	 * Dropdowns Desktop
-	 */
+	// configura los menús desplegables de escritorio
 
-	/*
-	 * Ancho del panel: parte del de la plantilla (256px, dropdown.css) y una
-	 * opción puede ocupar dos líneas, nunca tres. Si alguna llega a tres, se
-	 * busca por bisección el ancho mínimo en que todas caben en dos, con la
-	 * versión de una sola línea (max-content) como techo.
-	 *
-	 * Se mide al abrir y no al cargar: el [hidden] del panel no lo saca del
-	 * layout —solo lo vuelve invisible—, y la escala de texto de la botonera de
-	 * accesibilidad puede haber cambiado los renglones desde la última vez.
-	 */
+	// ajusta el ancho del menú para limitar las opciones a dos líneas
 	const MAX_OPTION_LINES = 2;
 
 	function screenScale() {
@@ -105,10 +72,7 @@
 		panel.style.width = high + 'px';
 	}
 
-	/*
-	 * Ensanchado, el panel del último ítem del menú puede salirse de la
-	 * ventana: si desborda, se ancla por la derecha del botón.
-	 */
+	// alinea el menú con el borde del botón cuando existe desbordamiento lateral
 	function alignDropdown( panel ) {
 		sizeDropdown( panel );
 		panel.classList.remove( 'mbn-dropdown--end' );
@@ -194,7 +158,7 @@
 				}
 			} );
 
-			// Click en option: cerrar dropdown tras click (UX típica de menú).
+			// cierra el menú desplegable después de seleccionar una opción
 			$$( '.mbn-dropdown__option', panel ).forEach( ( option ) => {
 				option.addEventListener( 'click', () => {
 					closeDropdown( true );
@@ -225,7 +189,7 @@
 			} );
 		} );
 
-		// click-fuera y Escape global.
+		// cierra los menús mediante Escape o un clic fuera de la navegación
 		document.addEventListener( 'click', ( event ) => {
 			const target = event.target;
 			if (
@@ -244,15 +208,7 @@
 		} );
 	}
 
-	/**
-	 * Offcanvas (mobile/tablet) — focusReturn al disparador.
-	 *
-	 * Bootstrap 5.3.3 ya provee:
-	 *   - backdrop, scrollLock, focusTrap, closeOnEsc
-	 *   - aria-modal automático
-	 * Este handler solo implementa la decisión humana de devolver foco al
-	 * elemento que disparó la apertura.
-	 */
+	// restablece el foco del botón de apertura al cerrar el menú móvil
 
 	function initOffcanvasFocusReturn() {
 		$$( '.offcanvas.mbn-offcanvas' ).forEach( ( offcanvas ) => {
@@ -271,7 +227,7 @@
 				triggers.forEach( ( t ) => {
 					t.setAttribute( 'aria-expanded', 'false' );
 				} );
-				// Devolver foco al último disparador activo si lo hay.
+				// devuelve el foco al último control de apertura disponible
 				const lastTrigger = triggers[ triggers.length - 1 ];
 				if ( lastTrigger && typeof lastTrigger.focus === 'function' ) {
 					lastTrigger.focus();
@@ -283,7 +239,7 @@
 				triggers.forEach( ( t ) => {
 					t.setAttribute( 'aria-expanded', 'true' );
 				} );
-				// Auto-focus al título para que screen reader anuncie el menú.
+				// establece el foco en el título para anunciar la apertura del menú
 				const title = offcanvas.querySelector( '.mbn-offcanvas__title' );
 				if ( title && typeof title.focus === 'function' ) {
 					title.setAttribute( 'tabindex', '-1' );
@@ -293,9 +249,7 @@
 		} );
 	}
 
-	/**
-	 * TopBar ecosistema button (toggle panel).
-	 */
+	// alterna la visibilidad del panel de identificación del Gobierno de Chile
 
 	function initTopbarEcosistema() {
 		$$( '[data-mbn-ecosistema-toggle]' ).forEach( ( toggle ) => {
@@ -328,7 +282,7 @@
 			} );
 		} );
 
-		// click-fuera para el panel ecosistema.
+		// cierra el panel de identificación al hacer clic fuera de sus límites
 		document.addEventListener( 'click', ( event ) => {
 			const target = event.target;
 			if (
@@ -348,49 +302,23 @@
 		} );
 	}
 
-	/**
-	 * Botonera de accesibilidad — contraste y tamaño del texto.
-	 *
-	 * El estado vive en <html> y **es de todo el sitio**: lo escribe también el
-	 * arranque inline de inc/a11y.php antes del primer pintado, leyendo el mismo
-	 * localStorage, para que al cambiar de página no haya ni parpadeo ni pérdida
-	 * del ajuste. Este script mantiene el estado y la botonera en sincronía (§6).
-	 *
-	 *   html.mbn-contrast          → alto contraste.
-	 *   html[data-mbn-text-step]   → nivel de escala, de -2 a 2.
-	 *   --mbn-text-scale           → el factor del nivel, en línea sobre <html>.
-	 *
-	 * Un nivel son 2 puntos sobre el cuerpo de 16px, dos niveles por sentido:
-	 * 12 / 14 / 16 / 18 / 20px (factores 0.75 / 0.875 / 1 / 1.125 / 1.25). Los
-	 * tamaños del theme están escritos como `calc(Npx * var(--mbn-text-scale))`,
-	 * así que basta con mover el factor (a11y.css).
-	 *
-	 * En los topes se marca `aria-disabled`, **no `disabled`**: un `disabled` que
-	 * aparece con el foco puesto lo pierde y deja al teclado sin ancla (§8), que
-	 * es justo lo que pasa al pulsar A+ hasta el máximo.
-	 *
-	 * Hay dos botoneras en el DOM —header desktop y offcanvas— y las dos reflejan
-	 * el mismo estado, así que se actualizan todas a la vez.
-	 */
+	// botonera de accesibilidad — contraste y tamaño del texto
 
 	const MBN_TEXT_STEP_MIN = -2;
 	const MBN_TEXT_STEP_MAX = 2;
 
-	// 2 puntos por nivel sobre un cuerpo de 16px.
+	// 2 puntos por nivel sobre un cuerpo de 16px
 	const mbnTextScaleFor = ( step ) => ( 16 + ( step * 2 ) ) / 16;
 
 	const MBN_STORE_CONTRAST = 'mbn-a11y-contrast';
 	const MBN_STORE_TEXT_STEP = 'mbn-a11y-text-step';
 
-	/**
-	 * localStorage puede lanzar (navegación privada, cookies de terceros
-	 * bloqueadas). El ajuste es una comodidad, no puede tumbar la botonera.
-	 */
+	// gestiona las restricciones de acceso al almacenamiento local
 	function mbnStore( key, value ) {
 		try {
 			window.localStorage.setItem( key, value );
 		} catch ( e ) {
-			/* sin persistencia: el ajuste vale solo para esta página */
+			// mantiene las preferencias de la página cuando el almacenamiento no está disponible
 		}
 	}
 
@@ -465,14 +393,11 @@
 			} );
 		} );
 
-		// El arranque inline ya dejó <html> con el estado guardado; aquí solo se
-		// pone la botonera al día (y se cubre el caso de que ese script falte).
+		// sincroniza los controles con las preferencias de accesibilidad restauradas
 		sync();
 	}
 
-	/**
-	 * Init
-	 */
+
 
 	function init() {
 		initDropdowns();
@@ -488,7 +413,7 @@
 	}
 }() );
 
-/* mantiene visible el menú de escritorio o el header completo en móvil */
+// mantiene fija la navegación de escritorio o la cabecera completa en móviles
 (() => {
 	'use strict';
 	const root = document.documentElement;

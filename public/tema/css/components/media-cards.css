@@ -1,12 +1,4 @@
-/* ============================================================
- * Componente global — Tarjetas con imagen
- * Maqueta: Figma 280:2663 (frame 1440x924; tarjeta destacada 401:6002).
- *
- * Patrón "destacado + lista": la primera tarjeta ocupa la columna
- * izquierda a doble alto y muestra extracto; las demás se apilan a la
- * derecha con imagen, título y botón.
- * ============================================================ */
-
+/* define la presentación de noticias destacadas */
 .mbn-media-cards {
 	background: var(--mbn-surface-soft, #F9F9F9);
 	padding: var(--mbn-space-section, 36px) 24px;
@@ -21,7 +13,7 @@
 	margin-inline: auto;
 }
 
-/* ---------- Encabezado ---------- */
+/* encabezado */
 
 .mbn-media-cards__header {
 	display: flex;
@@ -32,7 +24,7 @@
 	margin-bottom: 24px;
 }
 
-/* base.css declara font-family y font-weight de h1-h6 con !important. */
+
 .mbn-media-cards__title {
 	margin: 0;
 	font-family: var(--mbn-roboto-slab-large-font-family, "Roboto Slab", serif) !important;
@@ -73,7 +65,7 @@
 	display: none;
 }
 
-/* ---------- Rejilla ---------- */
+/* rejilla */
 
 .mbn-media-cards__grid {
 	list-style: none;
@@ -101,8 +93,7 @@
 	transition: border-color 120ms ease-out, box-shadow 120ms ease-out;
 }
 
-/* El área clicable es toda la tarjeta (stretched-link), así que el realce de
-   hover y de foco va aquí y no solo en el botón. */
+
 .mbn-media-cards__card:hover,
 .mbn-media-cards__card:focus-within {
 	border-color: var(--mbn-action-primary, #0046A8);
@@ -114,9 +105,7 @@
 	overflow: hidden;
 }
 
-/* Las tres imágenes del Figma miden 319, 138 y 169 px de alto. Las dos
-   secundarias se uniforman: la diferencia entre ellas viene de que la columna
-   estira las tarjetas para cuadrar con la destacada, no del diseño. */
+
 .mbn-media-cards__image {
 	display: block;
 	width: 100%;
@@ -128,9 +117,7 @@
 	height: 220px;
 }
 
-/* `flex: 1` para que el cuerpo ocupe el alto sobrante de la tarjeta: sin él,
-   el `margin-top: auto` del botón no tiene contra qué empujar y las tarjetas de
-   una misma fila dejan el CTA a distinta altura. */
+
 .mbn-media-cards__body {
 	display: flex;
 	flex: 1 1 auto;
@@ -194,7 +181,7 @@
 	outline-offset: 2px;
 }
 
-/* ---------- md ≥ 768px ---------- */
+/* md ≥ 768px */
 
 @media (min-width: 768px) {
 	.mbn-media-cards {
@@ -205,9 +192,7 @@
 		grid-template-columns: repeat(2, 1fr);
 	}
 
-	/* La destacada ocupa la columna izquierda a doble alto; las siguientes se
-	   apilan a la derecha. Con más de tres tarjetas, las sobrantes fluyen en
-	   filas nuevas sin romper el patrón. */
+
 	.mbn-media-cards__item--featured {
 		grid-row: span 2;
 	}
@@ -221,7 +206,7 @@
 	}
 }
 
-/* ---------- xl ≥ 1200px (canvas 1440 del Figma) ---------- */
+/* ajustes de presentación para escritorio */
 
 @media (min-width: 1200px) {
 	.mbn-media-cards {
@@ -241,7 +226,7 @@
 	}
 }
 
-/* Por debajo de xl el enlace del encabezado usa su texto alternativo. */
+
 @media (max-width: 1199.98px) {
 	.mbn-media-cards__all-link-label--desktop {
 		display: none;
@@ -252,7 +237,7 @@
 	}
 }
 
-/* ---------- Movimiento reducido ---------- */
+/* movimiento reducido */
 
 @media (prefers-reduced-motion: reduce) {
 	.mbn-media-cards__card,
@@ -262,7 +247,7 @@
 	}
 }
 
-/* conserva completas las portadas de las cápsulas */
+
 .mbn-media-cards--original .mbn-media-cards__image {
     height: auto;
     object-fit: contain;
@@ -275,7 +260,7 @@
     }
 }
 
-/* portada: más espacio para el contenido de la noticia principal */
+
 .home .mbn-media-cards__item--featured .mbn-media-cards__card-title {
     font-size: calc(22px * var(--mbn-text-scale, 1));
 }
@@ -290,9 +275,9 @@
     }
 }
 
-/* conserva una lectura breve en la tarjeta cuando las noticias se apilan */
+
 @media (min-width: 768px) {
-    /* las dos tarjetas secundarias determinan las filas de la rejilla */
+
     .home .mbn-media-cards__item--featured {
         contain: size;
         min-height: 0;

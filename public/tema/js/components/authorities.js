@@ -1,49 +1,8 @@
-/**
- * Componente global — Autoridades (pestañas).
- *
- * El cambio de panel, el foco y las flechas los resuelve el plugin `tab` de
- * Bootstrap: este archivo solo añade el enlace profundo, que es lo que el
- * plugin no trae.
- *
- *   1. Al cargar, si la URL termina en el id de un panel o de una pestaña, se
- *      abre esa pestaña. Permite enlazar desde el menú del header a
- *      `/ministerio/#<id>-panel-2` y aterrizar en «Autoridades» directamente.
- *   2. Al cambiar de pestaña, el hash se actualiza con `replaceState`, de modo
- *      que copiar la URL de la barra comparte lo que se está viendo. Se usa
- *      `replaceState` y no `pushState` a propósito: cada pestaña abierta no es
- *      un paso atrás en el historial, y con `pushState` salir de la página
- *      exigiría tantos «atrás» como pestañas se hubieran mirado.
- *   3. **Un enlace a una pestaña de esta misma página se resuelve sin recargar**
- *      (2026-10-07). Los submenús «Autoridades», «Seremi Regionales» y
- *      «Divisiones» del header apuntan a `/ministerio/#<id>-panel-N`. Estando ya
- *      en /ministerio, el navegador no recarga ante un enlace que solo cambia el
- *      ancla, así que el paso 1 no se ejecutaba y la pestaña no cambiaba; y si
- *      el ancla era la misma que ya había en la barra —el paso 2 la deja ahí—,
- *      no ocurría absolutamente nada. En móvil, además, el menú lateral se
- *      quedaba abierto encima de la página. Ahora el clic se intercepta: abre la
- *      pestaña, cierra el menú lateral si el enlace venía de él, lleva la vista
- *      al bloque y deja el foco en la pestaña, que es lo que haría una
- *      navegación de verdad. `hashchange` cubre el resto —atrás, adelante, un
- *      ancla escrita a mano—.
- *
- * El script es no-op si no hay bloque en la página o si Bootstrap no cargó: el
- * bloque ya viene con una pestaña activa desde el servidor.
- *
- * @package mbn
- */
-
+/* gestiona las interacciones de autoridades */
 ( function () {
 	'use strict';
 
-	/**
-	 * Botón de pestaña asociado a un id de panel o de botón.
-	 *
-	 * Solo devuelve pestañas de un bloque `.mbn-authorities`: un ancla a
-	 * cualquier otra cosa de la página no es asunto de este script.
-	 *
-	 * @param {string} id Identificador sin almohadilla.
-	 * @return {HTMLElement|null} El botón, o null.
-	 */
+	// botón de pestaña asociado a un id de panel o de botón
 	function findTrigger( id ) {
 		if ( ! id ) {
 			return null;
@@ -55,7 +14,7 @@
 			return null;
 		}
 
-		// El hash puede apuntar al panel o al propio botón.
+		// el hash puede apuntar al panel o al propio botón
 		var trigger = target.classList.contains( 'mbn-authorities__tab' )
 			? target
 			: document.querySelector( '[data-bs-target="#' + CSS.escape( id ) + '"]' );
@@ -67,12 +26,7 @@
 		return trigger;
 	}
 
-	/**
-	 * Activa la pestaña asociada a un id de panel o de botón.
-	 *
-	 * @param {string} id Identificador sin almohadilla.
-	 * @return {boolean} true si se activó alguna pestaña.
-	 */
+	// activa la pestaña asociada a un id de panel o de botón
 	function activateFromId( id ) {
 		var trigger = findTrigger( id );
 
@@ -82,10 +36,7 @@
 
 		window.bootstrap.Tab.getOrCreateInstance( trigger ).show();
 
-		// La botonera se desplaza en horizontal cuando no cabe (móvil), así que
-		// una pestaña abierta por el hash puede quedar fuera de la vista. Solo
-		// se desplaza el contenedor de la botonera, no la página: `block:
-		// "nearest"` evita el salto vertical que daría el valor por defecto.
+		// mantiene visible la pestaña activa dentro de la navegación horizontal
 		if ( trigger.scrollIntoView ) {
 			trigger.scrollIntoView( { block: 'nearest', inline: 'nearest' } );
 		}
@@ -93,12 +44,7 @@
 		return true;
 	}
 
-	/**
-	 * Engancha un bloque de pestañas.
-	 *
-	 * @param {HTMLElement} block Contenedor `.mbn-authorities`.
-	 * @return {void}
-	 */
+	// inicializa los eventos del bloque de pestañas
 	function setupBlock( block ) {
 		var triggers = block.querySelectorAll( '[data-bs-toggle="tab"]' );
 
@@ -115,16 +61,7 @@
 		} );
 	}
 
-	/**
-	 * Id del ancla si el enlace apunta a ESTA página.
-	 *
-	 * Solo cuenta una URL que difiera de la actual únicamente en el ancla: es el
-	 * caso en que el navegador no recarga. Con otra ruta o con otra cadena de
-	 * consulta hay recarga, y de eso ya se encarga el paso 1 al cargar.
-	 *
-	 * @param {HTMLAnchorElement} link Enlace pulsado.
-	 * @return {string} Id sin almohadilla, o '' si no aplica.
-	 */
+	// obtiene el identificador del ancla de un enlace interno
 	function samePageHash( link ) {
 		var url;
 
@@ -134,7 +71,7 @@
 			return '';
 		}
 
-		// `/ministerio` y `/ministerio/` son la misma página.
+		// /ministerio y /ministerio/ son la misma página
 		var clean = function ( path ) {
 			return path.replace( /\/+$/, '' );
 		};
@@ -155,19 +92,9 @@
 		}
 	}
 
-	/**
-	 * Clic en cualquier enlace del documento que apunte a una pestaña de esta
-	 * página: los submenús del header, sobre todo (ver el paso 3 del docblock).
-	 *
-	 * Se escucha en el documento, en fase de burbuja: el menú del header cierra
-	 * su desplegable en el propio enlace, antes de llegar aquí.
-	 *
-	 * @param {MouseEvent} event Clic.
-	 * @return {void}
-	 */
+	// activa la pestaña indicada por los enlaces internos del documento
 	function onDocumentClick( event ) {
-		// Lo que el navegador abre por su cuenta —pestaña nueva, ventana nueva,
-		// descarga— no se toca.
+		// conserva el comportamiento nativo de las nuevas ventanas y las descargas
 		if ( event.defaultPrevented || 0 !== event.button || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey ) {
 			return;
 		}
@@ -188,17 +115,14 @@
 		event.preventDefault();
 		activateFromId( id );
 
-		// Si la pestaña ya estaba abierta, `shown.bs.tab` no salta y el ancla
-		// de la barra no se actualizaría: se escribe aquí, la del panel.
+		// sincroniza el ancla aunque la pestaña seleccionada ya esté activa
 		var panelId = ( trigger.getAttribute( 'data-bs-target' ) || '' ).replace( '#', '' );
 
 		if ( panelId && window.history && window.history.replaceState ) {
 			window.history.replaceState( null, '', '#' + panelId );
 		}
 
-		// Aterrizar como lo haría una navegación: la vista en el bloque y el
-		// foco en su pestaña. El foco va sin desplazamiento propio para no
-		// pelear con el `scrollIntoView`.
+		// desplaza la vista al bloque y establece el foco en la pestaña activa
 		var land = function () {
 			var block = trigger.closest( '.mbn-authorities' );
 
@@ -209,11 +133,7 @@
 			trigger.focus( { preventScroll: true } );
 		};
 
-		// Desde el menú lateral (tablet y móvil): cerrarlo primero. Mientras
-		// está abierto, Bootstrap bloquea el desplazamiento del cuerpo, así que
-		// el aterrizaje espera a que termine de cerrarse. Ese listener se
-		// registra después del de `header-nav.js`, que devuelve el foco a la
-		// hamburguesa, y por eso el foco acaba en la pestaña.
+		// cierra el menú lateral antes de activar la pestaña de destino
 		var offcanvas = link.closest( '.offcanvas' );
 		var instance  = offcanvas && window.bootstrap.Offcanvas ? window.bootstrap.Offcanvas.getInstance( offcanvas ) : null;
 
@@ -226,11 +146,7 @@
 		land();
 	}
 
-	/**
-	 * Inicializa todos los bloques de la página.
-	 *
-	 * @return {void}
-	 */
+	// inicializa todos los bloques de la página
 	function init() {
 		var blocks = document.querySelectorAll( '.mbn-authorities' );
 
@@ -242,14 +158,12 @@
 
 		document.addEventListener( 'click', onDocumentClick );
 
-		// Atrás, adelante o un ancla escrita a mano en la barra. `replaceState`
-		// no dispara `hashchange`, así que el paso 2 no entra en bucle.
+		// sincroniza la pestaña activa con los cambios del historial y del ancla
 		window.addEventListener( 'hashchange', function () {
 			activateFromId( window.location.hash.slice( 1 ) );
 		} );
 
-		// El salto del navegador al ancla ya ocurrió; activar la pestaña
-		// después solo cambia qué panel se ve, no la posición del scroll.
+		// activa el panel asociado al ancla sin modificar la posición de desplazamiento
 		if ( window.location.hash.length > 1 ) {
 			activateFromId( window.location.hash.slice( 1 ) );
 		}

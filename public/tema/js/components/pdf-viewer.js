@@ -1,69 +1,17 @@
-/**
- * Componente global — Visor de PDF.
- *
- * Tres cometidos, en este orden de antigüedad:
- *
- * 1. **Carga diferida** (2026-09-11). Un visor con `lazy` —el de
- *    `partials/pdf-modal.php`— nace con la URL en `data-mbn-pdf-src` y sin
- *    `data`, así que el navegador no pide el documento hasta que se abre el
- *    modal que lo contiene. Se escucha `show.bs.modal` en el documento: los
- *    eventos de Bootstrap burbujean, y un modal que llegue después al DOM
- *    queda cubierto igual.
- *
- * 2. **Elegir entre dos URL** (2026-10-07). El visor diferido trae también
- *    `data-mbn-pdf-src-narrow`, la misma dirección con los parámetros de
- *    apertura de pantalla estrecha (`view=Fit`): una página A4 al `zoom=90` de
- *    siempre no cabe por debajo de `md`. El ancho se mira al abrir, una vez.
- *
- * 3. **Pintar el PDF con PDF.js donde el visor del navegador no sirve**
- *    (2026-10-08). El `<object>` depende del visor integrado, y en móvil ese
- *    visor falla de dos maneras: **Chrome en Android no tiene** —se ve la
- *    reserva, «Este navegador no puede mostrar el documento»— y **Safari en
- *    iOS pinta el PDF pero no deja desplazarse por él** dentro de la página.
- *    En esos casos el `<object>` se sustituye por un visor propio: las páginas
- *    en `<canvas>`, una debajo de otra, ajustadas al ancho, dentro de una caja
- *    que se desplaza como cualquier otra, con botones de zoom, contador de
- *    página y una capa de texto que deja seleccionar y que lee el lector de
- *    pantalla.
- *
- *    **Cuándo se usa cada uno** (`usaVisorNativo()`): el nativo solo cuando el
- *    navegador declara visor (`navigator.pdfViewerEnabled`) y **no hay ningún
- *    puntero táctil** (`any-pointer: coarse`). Es decir, el escritorio de
- *    siempre conserva el visor del navegador —con su búsqueda, impresión y
- *    descarga—, y teléfonos y tabletas, incluido el iPad con teclado, pasan a
- *    PDF.js. `window.mbnPdfViewerMode = 'pdfjs' | 'native'` lo fuerza, para el
- *    harness.
- *
- *    PDF.js vive en `assets/vendor/pdfjs/<versión>/` —build `legacy`, sin CDN
- *    (§8)— y **solo se descarga cuando hace falta**: al abrir el modal, o al
- *    cargar una página con un visor suelto en un dispositivo táctil. Los
- *    archivos van con extensión `.js` y no `.mjs`: nginx no conoce `.mjs`, lo
- *    serviría como `application/octet-stream` y el navegador se niega a
- *    ejecutar un módulo con ese tipo.
- *
- * La ruta de la librería y los textos llegan de PHP en `window.mbnPdfViewer`
- * (`mbn_component_pdf_viewer_script_config()`); sin ellos, la ruta se deduce
- * de este mismo script y los textos caen al castellano de abajo.
- *
- * @package mbn
- */
-
+/* gestiona las interacciones de visualización de documentos PDF */
 ( function () {
 	'use strict';
 
 	var ESTRECHO = '(max-width: 767.98px)';
 
-	/** Niveles de zoom, relativos al ajuste al ancho (1 = «100 %»). */
+	// niveles de zoom, relativos al ajuste al ancho (1 = «100 %»)
 	var ZOOMS = [ 0.5, 0.75, 1, 1.25, 1.5, 2, 3 ];
 	var ZOOM_INICIAL = 2;
 
-	/** Relleno de la caja de páginas; tiene que coincidir con el CSS. */
+	// define el relleno de las páginas conforme a los estilos del visor
 	var RELLENO = 16;
 
-	/**
-	 * Píxeles máximos de un canvas. Safari en iOS no pinta los que pasan de
-	 * 16 777 216 (4096²): el canvas sale en blanco sin error.
-	 */
+	// limita la cantidad de píxeles del lienzo de renderizado
 	var MAX_PIXELES = 16777216;
 
 	var config = window.mbnPdfViewer || {};
@@ -82,10 +30,7 @@
 		TEXTOS[ clave ] = config.text[ clave ];
 	} );
 
-	/**
-	 * Carpeta de PDF.js. La imprime PHP; sin ella, se resuelve contra la URL de
-	 * este script, que vive en `assets/js/components/`.
-	 */
+	// carpeta de PDF.js
 	var BASE = config.base || ( function () {
 		var propio = document.currentScript || document.querySelector( 'script[src*="/assets/js/components/pdf-viewer.js"]' );
 
@@ -116,11 +61,7 @@
 		return nodo;
 	}
 
-	/**
-	 * ¿Sirve el visor del navegador? Ver el punto 3 del docblock.
-	 *
-	 * @return {boolean}
-	 */
+	// comprueba la compatibilidad del visor PDF integrado del navegador
 	function usaVisorNativo() {
 		if ( 'native' === window.mbnPdfViewerMode ) {
 			return true;
@@ -135,9 +76,7 @@
 		return true === navigator.pdfViewerEnabled && ! tactil;
 	}
 
-	/* ---------------------------------------------------------------------
-	 * PDF.js: se importa una sola vez, la primera que se necesita.
-	 * ------------------------------------------------------------------ */
+	// carga PDF.js bajo demanda y reutiliza la instancia disponible
 
 	var libreria = null;
 
@@ -149,7 +88,7 @@
 				return lib;
 			} );
 
-			// Un fallo de red no deja la librería rota para el siguiente intento.
+			// permite reintentar la carga de la biblioteca después de un error de red
 			libreria.catch( function () {
 				libreria = null;
 			} );
@@ -158,24 +97,16 @@
 		return libreria;
 	}
 
-	/* ---------------------------------------------------------------------
-	 * El visor propio.
-	 * ------------------------------------------------------------------ */
+	// inicializa el visor PDF del componente
 
-	/**
-	 * Sustituye un `<object>` del visor por las páginas pintadas con PDF.js.
-	 *
-	 * @param {HTMLObjectElement} frame El `<object>` del componente.
-	 * @return {HTMLElement} La caja que lo sustituye; lleva `mbnPdf.ajusta()`.
-	 */
+	// sustituye el objeto PDF por las páginas renderizadas con PDF.js
 	function montaDocumento( frame ) {
 		var url      = ( frame.getAttribute( 'data-mbn-pdf-src' ) || frame.getAttribute( 'data' ) || '' ).split( '#' )[ 0 ];
 		var etiqueta = frame.getAttribute( 'title' ) || '';
 		var reserva  = frame.querySelector( '.mbn-notice' );
 		var enModal  = !! frame.closest( '.mbn-pdf-modal' );
 
-		// Las dos clases: la del panel (alto, radio, fondo y, en el modal, el
-		// reparto del flex) y la propia, que lo convierte en columna.
+		// conserva las clases del panel y configura la distribución vertical del visor
 		var raiz = el( 'div', 'mbn-pdf-viewer__frame mbn-pdf-viewer__doc' );
 		raiz.setAttribute( 'style', frame.getAttribute( 'style' ) || '' );
 
@@ -192,7 +123,7 @@
 		mas.textContent = '+';
 		mas.setAttribute( 'aria-label', TEXTOS.zoomIn );
 
-		// El porcentaje se anuncia al cambiar: es la respuesta a los botones.
+		// anuncia los cambios del porcentaje de ampliación en la región de estado
 		var nivel = el( 'span', 'mbn-pdf-viewer__scale' );
 		nivel.setAttribute( 'role', 'status' );
 
@@ -203,7 +134,7 @@
 		barra.appendChild( mas );
 		barra.appendChild( contador );
 
-		// Dentro del modal, «Descargar» ya está en su cabecera.
+		// reutiliza el enlace de descarga disponible en la cabecera del diálogo
 		if ( ! enModal && url ) {
 			var descarga = el( 'a', 'mbn-pdf-viewer__download' );
 			var oculto   = el( 'span', 'visually-hidden' );
@@ -305,7 +236,7 @@
 					return;
 				}
 
-				// Las páginas de otro tamaño que la primera se corrigen aquí.
+				// ajusta individualmente las dimensiones de cada página del documento
 				var natural = page.getViewport( { scale: 1 } );
 
 				if ( Math.abs( natural.width - p.w ) > 0.5 || Math.abs( natural.height - p.h ) > 0.5 ) {
@@ -321,8 +252,7 @@
 					dpr = Math.sqrt( MAX_PIXELES / ( vp.width * vp.height ) );
 				}
 
-				// Se pinta en un canvas nuevo y se cambia al terminar: al hacer
-				// zoom, el anterior queda estirado por CSS en vez de en blanco.
+				// renderiza en un lienzo nuevo y conserva la página visible hasta completar la sustitución
 				var canvas = el( 'canvas', 'mbn-pdf-viewer__canvas' );
 				canvas.width = Math.floor( vp.width * dpr );
 				canvas.height = Math.floor( vp.height * dpr );
@@ -350,8 +280,7 @@
 					p.canvas = canvas;
 					p.pintada = true;
 
-					// La capa de texto: transparente sobre el canvas, para
-					// seleccionar y para el lector de pantalla.
+					// superpone la capa de texto para permitir selección y lectura accesible
 					var capa = el( 'div', 'mbn-pdf-viewer__text' );
 
 					new estado.lib.TextLayer( {
@@ -370,7 +299,7 @@
 			} ).catch( function ( error ) {
 				p.tarea = null;
 
-				// Cancelar al hacer zoom o al alejarse no es un error.
+				// descarta las tareas de renderizado canceladas por cambios de escala o visibilidad
 				if ( ! error || 'RenderingCancelledException' !== error.name ) {
 					p.pintada = false;
 				}
@@ -401,10 +330,7 @@
 			}
 		}
 
-		/**
-		 * Recoloca todas las páginas a la escala actual conservando la
-		 * posición relativa del desplazamiento, y repinta las que se ven.
-		 */
+		// ajusta las páginas a la escala actual y conserva la posición relativa del documento
 		function recoloca() {
 			var proporcion = hoja.scrollHeight > 0 ? hoja.scrollTop / hoja.scrollHeight : 0;
 
@@ -532,8 +458,7 @@
 			actualizaBarra();
 			actualizaContador();
 
-			// Girar el teléfono, abrir un panel que estaba oculto: cualquier
-			// cambio del ancho vuelve a ajustar las páginas.
+			// recalcula el tamaño de las páginas cuando cambia el ancho del visor
 			if ( 'ResizeObserver' in window ) {
 				new ResizeObserver( function () {
 					ajusta();
@@ -569,16 +494,9 @@
 		return raiz;
 	}
 
-	/* ---------------------------------------------------------------------
-	 * Enganches.
-	 * ------------------------------------------------------------------ */
 
-	/**
-	 * URL que le toca al visor nativo según el ancho de la ventana.
-	 *
-	 * @param {Element} frame El `<object>` del visor.
-	 * @return {string} URL con sus parámetros de apertura.
-	 */
+
+	// selecciona la dirección del visor nativo según el ancho disponible
 	function fuente( frame ) {
 		var estrecha = frame.getAttribute( 'data-mbn-pdf-src-narrow' );
 
@@ -589,8 +507,7 @@
 		return frame.getAttribute( 'data-mbn-pdf-src' );
 	}
 
-	// Al abrir el modal: el visor nativo recibe su URL; para PDF.js se
-	// adelanta la descarga de la librería mientras dura la animación.
+	// prepara la dirección o la biblioteca PDF durante la apertura del diálogo
 	document.addEventListener( 'show.bs.modal', function ( event ) {
 		var modal = event.target;
 
@@ -617,7 +534,7 @@
 		} );
 	} );
 
-	// PDF.js necesita el ancho real, que el modal solo tiene ya abierto.
+	// calcula el ancho de PDF.js después de completar la apertura del diálogo
 	document.addEventListener( 'shown.bs.modal', function ( event ) {
 		var modal = event.target;
 
@@ -634,7 +551,7 @@
 		} );
 	} );
 
-	// Los visores sueltos —«Código de Ética»— se cambian al cargar la página.
+	// inicializa los visores integrados directamente en el contenido de la página
 	function init() {
 		if ( usaVisorNativo() ) {
 			return;

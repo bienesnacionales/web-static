@@ -1,35 +1,4 @@
-/* ============================================================
- * Componente global — Archivo de trámites
- * Maqueta: Figma 117:822 (canvas 1440; contenido 1120; padding
- * lateral 160 y vertical 24).
- *
- * Ritmo vertical del archivo: el del resto del sitio (tokens
- * --mbn-space-*): 24px entre bloques (migas → encabezado →
- * controles → rejilla) y entre buscador y filtros, 16px dentro del
- * encabezado, 24 dentro de la rejilla y antes de la paginación, y 36
- * abajo. El Figma usa 36 / 32 / 62; se homologó con las plantillas
- * (2026-09-29).
- *
- * Las piezas del design system de gob.cl que se replican aquí:
- *   Buscador   93:338    campo + botón unidos, radio 4
- *   Chips      94:1393   14px bold, radio 4, relleno o borde
- *   Botón      93:363    píldora de radio 24
- *   Paginación 101:1216  «Mostrando X - Y de Z» + flechas y números
- *
- * La TARJETA no se estiliza aquí: es «Cards Verticales»
- * (.mbn-card-grid__card*), que se consume desde el parcial compartido
- * `template-parts/components/partials/vertical-card.php`. Lo único
- * que este bloque ajusta son las dos medidas en las que la maqueta
- * del archivo difiere de la de la portada (ver más abajo).
- *
- * ⚠️ Los controles (buscador, chips y paginación) repiten los de
- * `news-search.css` con clases propias en vez de compartir una capa.
- * Es deliberado: extraerla obligaría a reescribir un bloque que ya
- * está en producción y verificado en el navegador, y el precio de la
- * repetición es CSS, no comportamiento. Si aparece un TERCER listado,
- * ese es el momento de extraer `.mbn-listing__*` y migrar los dos.
- * ============================================================ */
-
+/* define la presentación de búsqueda de trámites */
 .mbn-procedure-search {
 	background: var(--mbn-surface-white, #FFFFFF);
 	padding: var(--mbn-space-page-top, 24px) 24px var(--mbn-space-section, 36px);
@@ -47,13 +16,12 @@
 	margin-inline: auto;
 }
 
-/* Las migas traen su propio padding vertical de 12px: el gap del contenedor
-   ya las separa del título, y sumar margen las despegaría de más. */
+
 .mbn-procedure-search__container > .mbn-breadcrumbs {
 	margin: 0;
 }
 
-/* ---------- Encabezado (Figma 117:823) ---------- */
+
 
 .mbn-procedure-search__header {
 	display: flex;
@@ -61,9 +29,7 @@
 	gap: 16px;
 }
 
-/* Título y botonera comparten fila en el canvas de 1440. Por debajo, el
-   `wrap` los apila: dos botones de 19px junto a un título de 36 no caben en
-   una tablet, y encogerlos dejaría objetivos por debajo del mínimo. */
+
 .mbn-procedure-search__headline {
 	display: flex;
 	flex-wrap: wrap;
@@ -72,7 +38,7 @@
 	gap: 16px;
 }
 
-/* base.css declara font-family y font-weight de h1-h6 con !important. */
+
 .mbn-procedure-search__title {
 	margin: 0;
 	font-family: var(--mbn-roboto-slab-large-font-family, "Roboto Slab", serif) !important;
@@ -89,8 +55,7 @@
 	gap: 8px;
 }
 
-/* Botón sólido del design system (93:363): píldora de radio 24, relleno de
-   marca y texto Button/Body • Bold. */
+
 .mbn-procedure-search__action {
 	display: inline-flex;
 	align-items: center;
@@ -130,7 +95,7 @@
 	color: var(--mbn-text-black, #000000);
 }
 
-/* ---------- Controles (Figma 117:826) ---------- */
+
 
 .mbn-procedure-search__controls {
 	display: flex;
@@ -138,8 +103,7 @@
 	gap: var(--mbn-space-stack, 24px);
 }
 
-/* «Buscador» y «Filtros de categoría» comparten estilo: el mismo
-   Body/Small • Bold sobre el control que encabezan. */
+
 .mbn-procedure-search__label {
 	display: block;
 	margin: 0 0 8px;
@@ -150,7 +114,7 @@
 	color: var(--mbn-text-primary, #333333);
 }
 
-/* ---------- Buscador (Figma 93:338) ---------- */
+
 
 .mbn-procedure-search__form {
 	margin: 0;
@@ -165,11 +129,10 @@
 .mbn-procedure-search__input {
 	flex: 1 1 auto;
 	min-width: 0;
-	/* 7px y no 8: el trazo del archivo va por dentro de la caja, así que el
-	   borde de 1px sale del padding y el campo mide los 40px de la maqueta. */
+
 	padding: 7px 12px;
 	border: 1px solid var(--mbn-text-primary, #333333);
-	/* El borde derecho lo cierra el botón: en la maqueta son una sola pieza. */
+
 	border-right: 0;
 	border-radius: 4px 0 0 4px;
 	background: var(--mbn-surface-white, #FFFFFF);
@@ -217,7 +180,7 @@
 	outline-offset: 2px;
 }
 
-/* ---------- Filtros por tipo (Figma 94:1393) ---------- */
+
 
 .mbn-procedure-search__chips {
 	list-style: none;
@@ -232,9 +195,7 @@
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
-	/* 3px + 1px de borde = los 4px de padding del archivo, con el chip en los
-	   29px de alto exactos. El chip activo conserva el borde —del color de su
-	   propio relleno— para no cambiar de tamaño al seleccionarse. */
+
 	padding: 3px 7px;
 	border: 1px solid var(--mbn-brand-blue-dark, #00268D);
 	border-radius: 4px;
@@ -258,8 +219,7 @@
 	outline-offset: 2px;
 }
 
-/* El chip activo va relleno. El color no es la única señal: el borde también
-   cambia y el enlace lleva aria-current. */
+
 .mbn-procedure-search__chip--current {
 	border-color: var(--mbn-action-primary, #0046A8);
 	background: var(--mbn-action-primary, #0046A8);
@@ -272,7 +232,7 @@
 	color: var(--mbn-text-on-primary, #E7ECFF);
 }
 
-/* ---------- Resultados ---------- */
+/* resultados */
 
 .mbn-procedure-search__results {
 	display: flex;
@@ -281,9 +241,7 @@
 	scroll-margin-top: 16px;
 }
 
-/* Recibe el foco al paginar. No se dibuja outline alrededor de toda la
-   rejilla: el contenedor no está en el recorrido del tabulador, el foco solo
-   llega aquí de forma programática. */
+
 .mbn-procedure-search__results:focus {
 	outline: none;
 }
@@ -315,9 +273,7 @@
 	grid-template-columns: 1fr;
 }
 
-/* El item estira la tarjeta a todo el alto de su fila del grid: así las
-   tarjetas de una misma fila terminan a la misma altura aunque el texto no
-   mida lo mismo, que es lo que hace la maqueta con sus filas fijas. */
+
 .mbn-procedure-search__item {
 	display: flex;
 }
@@ -327,11 +283,7 @@
 	min-width: 0;
 }
 
-/* Las dos medidas en que la tarjeta del archivo difiere de la de la portada:
-   el relleno de la caja es de 16px (no 24) y la botonera lleva su propio
-   relleno lateral de 16. Se ajustan aquí, dentro del bloque, para no tocar
-   `card-grid`; el descendiente sube la especificidad a (0,2,0) y evita que el
-   resultado dependa del orden en que se carguen las dos hojas. */
+
 .mbn-procedure-search .mbn-card-grid__card {
 	padding: 16px;
 }
@@ -340,7 +292,7 @@
 	padding: 8px 16px;
 }
 
-/* ---------- Paginación (Figma 101:1216) ---------- */
+
 
 .mbn-procedure-search__pagination {
 	display: flex;
@@ -390,9 +342,7 @@
 	text-decoration: none;
 }
 
-/* Los números que no son la página actual llevan una línea inferior, no un
-   subrayado de texto: en el archivo es una barra a lo ancho de la caja de
-   24px, y `text-decoration` la ceñiría a los dígitos. */
+
 .mbn-procedure-search__page--page {
 	box-shadow: inset 0 -1px 0 0 var(--mbn-brand-blue-dark, #00268D);
 }
@@ -419,8 +369,7 @@ a.mbn-procedure-search__page:focus-visible {
 	box-shadow: none;
 }
 
-/* Las flechas son el export del archivo y traen su propia caja gris; el
-   estado inactivo se marca bajando la opacidad, no repintando el SVG. */
+
 .mbn-procedure-search__page--prev,
 .mbn-procedure-search__page--next {
 	min-width: 24px;
@@ -441,7 +390,7 @@ a.mbn-procedure-search__page:focus-visible {
 	box-shadow: none;
 }
 
-/* ---------- md ≥ 768px ---------- */
+/* md ≥ 768px */
 
 @media (min-width: 768px) {
 	.mbn-procedure-search {
@@ -465,7 +414,7 @@ a.mbn-procedure-search__page:focus-visible {
 	}
 }
 
-/* ---------- xl ≥ 1200px (canvas 1440 del Figma) ---------- */
+/* ajustes de presentación para escritorio */
 
 @media (min-width: 1200px) {
 	.mbn-procedure-search {
@@ -480,15 +429,13 @@ a.mbn-procedure-search__page:focus-visible {
 		font-size: var(--mbn-roboto-sans-small-font-size, 19px);
 	}
 
-	/* La tercera columna solo desde xl, mismo criterio que `card-grid` y
-	   `news-search`: por debajo, tres tarjetas de 24px de título quedan
-	   demasiado estrechas. */
+
 	.mbn-procedure-search__grid--cols-3 {
 		grid-template-columns: repeat(3, 1fr);
 	}
 }
 
-/* ---------- Movimiento reducido ---------- */
+/* movimiento reducido */
 
 @media (prefers-reduced-motion: reduce) {
 	.mbn-procedure-search__chip,

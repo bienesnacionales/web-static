@@ -1,12 +1,4 @@
-/* ============================================================
- * Componente global — Enviar por mensaje directo
- * Maqueta: Figma 369:7680 (fila 1120x36; etiqueta Roboto Medium 24 y
- * íconos de 24px con gap 11, todo alineado a la derecha).
- *
- * Los íconos se tiñen con mask-image: los SVG del catálogo son blancos
- * (nacieron para el footer azul oscuro) y aquí van en el azul de marca.
- * ============================================================ */
-
+/* define la presentación de enlaces para compartir contenidos */
 .mbn-share {
 	position: relative;
 	display: flex;
@@ -37,12 +29,7 @@
 	display: flex;
 }
 
-/* El ícono mide 24px, justo el mínimo que pide WCAG 2.5.8 (AA). El área activa
-   se amplía con padding —y el margen negativo lo devuelve al layout, para que
-   la fila siga midiendo lo que dice la maqueta—, pero solo 4px en horizontal:
-   con los 6px de las otras direcciones el objetivo pasaría a 36px sobre un paso
-   de 35 (24 de ícono + 11 de gap) y dos objetivos contiguos se solaparían, de
-   modo que un clic en el borde activaría la red vecina. */
+
 .mbn-share__link {
 	display: inline-flex;
 	align-items: center;
@@ -64,8 +51,7 @@
 	width: 24px;
 	height: 24px;
 	background-color: currentColor;
-	/* Propiedades largas, no el atajo `mask`: un var() dentro del atajo no se
-	   resuelve de forma fiable (ver AGENTS.md §10). */
+
 	mask-image: var(--mbn-share-icon);
 	mask-repeat: no-repeat;
 	mask-position: center;
@@ -76,10 +62,7 @@
 	-webkit-mask-size: contain;
 }
 
-/* ---------- Aviso «Mensaje copiado…» ----------
-   Va en posición absoluta bajo la fila para no desplazar el título cuando
-   aparece. Vacía, la región no tiene caja visible pero sigue en el árbol de
-   accesibilidad (sin display:none): así el lector de pantalla la anuncia. */
+
 
 .mbn-share__notice {
 	position: absolute;
@@ -101,7 +84,7 @@
 	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
-/* ---------- xl ≥ 1200px (canvas 1440 del Figma) ---------- */
+/* ajustes de presentación para escritorio */
 
 @media (min-width: 1200px) {
 	.mbn-share__label {

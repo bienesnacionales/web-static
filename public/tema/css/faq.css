@@ -1,23 +1,5 @@
-/* ============================================================
- * Plantilla — Preguntas Frecuentes (template-faq.php)
- * Maqueta: Figma 359:9804 (frame 1440; contenido de 1120, todas las piezas
- * separadas por 24px).
- *
- * Este archivo solo aporta el andamiaje de la página y las piezas que no son
- * componentes: el título y el contenido del editor. La tira de contacto y el
- * bloque de preguntas son componentes globales y traen sus propias hojas
- * (`components/contact-strip.css` y `components/faq.css`).
- *
- * **No hay canvas de tablet ni de mobile de esta página** —solo el de 1440—,
- * así que la escala del título sigue la de «Participación Ciudadana», que es la
- * página hermana y sí los tiene: 28 / 32 / 36 en base, `md` y `xl`. Hacerlo de
- * otro modo dejaría dos páginas del mismo tipo con títulos de distinto tamaño
- * en el mismo ancho de ventana.
- *
- * Ojo con base.css (el Base Kit de Siigsa): `main p` fija color, tamaño y un
- * `font-weight: 400 !important`, y `h1` fuerza familia y peso. Donde hace
- * falta !important para ganarle está anotado.
- * ============================================================ */
+/* define la presentación de preguntas frecuentes */
+/* ajustes de presentación para escritorio */
 
 .mbn-faq-page {
 	padding-block: var(--mbn-space-page-top, 24px) var(--mbn-space-section, 36px);
@@ -27,16 +9,11 @@
 .mbn-faq-page__container {
 	display: flex;
 	flex-direction: column;
-	/* 24 + los 12 de padding propio de las migas = los 36 (spacing-l) que
-	   separan la fila de migas del contenido, igual que en «Ministerio» y
-	   «Participación Ciudadana». Dentro del cuerpo, los 24 son los que la
-	   maqueta pone entre el h1, la tira de contacto y la botonera. */
+
 	gap: 24px;
 }
 
-/* base.css: `h1 { font-weight: 700 !important; font-family: Roboto Slab
-   !important }`. La familia coincide con la maqueta (Heading/Slab/Large); el
-   peso 500 necesita !important para ganarle. */
+
 .mbn-faq-page__title {
 	margin: 0;
 	font-family: var(--mbn-roboto-slab-large-font-family, "Roboto Slab", serif) !important;
@@ -46,9 +23,23 @@
 	color: var(--mbn-text-primary, #333333);
 }
 
-/* ---------- Contenido del editor ----------
-   No está en la maqueta: se pinta si existe, para que una página recién creada
-   con esta plantilla y todavía sin preguntas no se quede en blanco. */
+.mbn-faq-page__contact {
+	display: flex;
+	flex-direction: column;
+	gap: 24px;
+}
+
+
+.mbn-faq-page__section-title {
+	margin: 0;
+	font-family: var(--mbn-roboto-slab-medium-font-family, "Roboto Slab", serif) !important;
+	font-weight: var(--mbn-roboto-slab-medium-font-weight, 500) !important;
+	font-size: calc(24px * var(--mbn-text-scale, 1));
+	line-height: 1.5;
+	color: var(--mbn-text-primary, #333333);
+}
+
+
 
 .mbn-faq-page__content p,
 .mbn-faq-page__content li {
@@ -91,7 +82,7 @@
 	height: auto;
 }
 
-/* ---------- md ≥ 768px ---------- */
+/* md ≥ 768px */
 
 @media (min-width: 768px) {
 	.mbn-faq-page__title {
@@ -99,7 +90,7 @@
 	}
 }
 
-/* ---------- xl ≥ 1200px (canvas 1440 del Figma) ---------- */
+/* ajustes de presentación para escritorio */
 
 @media (min-width: 1200px) {
 	.mbn-faq-page__title {

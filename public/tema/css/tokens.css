@@ -1,4 +1,4 @@
-/* tokens derivados de mbn-home-responsive-v2 */
+/* define la presentación de variables de diseño del sitio */
 :root {
   --mbn-reference-mobile: 402px;
   --mbn-reference-tablet: 834px;
@@ -11,22 +11,18 @@
   --mbn-surface-white: #FFFFFF;
   --mbn-surface-page: rgba(255, 255, 255, 0.95);
   --mbn-text-primary: #333333;
-  /* Grises del design system gob.cl usados por breadcrumbs y gallery:
-     gris/50, negro/text y gris/70 (Figma 364:4963 y 369:7680). */
+
   --mbn-text-muted: #808080;
   --mbn-text-strong: #373737;
   --mbn-icon-muted: #4D4D4D;
-  /* Negro puro del encabezado del buscador de noticias (Figma 369:8114): el
-     título y la bajada NO usan #333333 como el resto del cuerpo de texto. */
+
   --mbn-text-black: #000000;
   --mbn-brand-blue: #0F69C4;
   --mbn-brand-blue-dark: #00268D;
   --mbn-action-primary: #0046A8;
-  /* Estados hover de las tarjetas (Figma 413:6072, 600:8079, 600:8189). */
+
   --mbn-brand-blue-darken-1: #0051A8;
-  /* primario/darken-4 del design system: el texto de las pestañas verticales
-     INACTIVAS de «Preguntas Frecuentes» (Figma 359:10220). Las horizontales
-     usan --mbn-text-strong para lo mismo; es el archivo el que difiere. */
+
   --mbn-brand-blue-darken-4: #00135A;
   --mbn-card-hover-gradient: linear-gradient(to left, #0F69C4 0%, #0046A8 100%);
   --mbn-text-on-brand-soft: rgba(255, 255, 255, 0.95);
@@ -35,10 +31,7 @@
   --mbn-surface-hover: #F2F2F2;
   --mbn-text-on-primary: #E7ECFF;
   --mbn-border-default: #CCCCCC;
-  /* Organigrama de la pagina Ministerio (Figma 294:3323): el borde de sus
-     cajas es mas claro que el --mbn-border-default del resto del sitio, y la
-     linea punteada que une una unidad con sus subunidades tiene su propio azul
-     desaturado. No estan en theme.json: no son colores que el editor elija. */
+
   --mbn-org-card-border: #E2E2E2;
   --mbn-org-line: #C9D6EE;
   --mbn-org-line-soft: #DBE4F5;
@@ -48,23 +41,12 @@
   --mbn-org-authority-gradient: linear-gradient(168.88deg, #0046A8 0%, #01084D 100%);
   --mbn-border-header: #B3B3B3;
   --mbn-border-divider: #E6E6E6;
-  /* Pagina «Participacion Ciudadana» (Figma 323:4716 y 356:4850).
-     `link/default` es el azul de enlace del design system gob.cl y NO es el
-     --mbn-action-primary de los botones; el recuadro gris de la columna
-     lateral tiene su propio par superficie/borde, mas claros que
-     --mbn-surface-soft y --mbn-border-divider; y la linea que separa las filas
-     de una tabla es un negro al 26%, no un gris opaco. No estan en theme.json:
-     no son colores que el editor elija. */
+
   --mbn-link-default: #1D70B8;
   --mbn-surface-panel: #F7F7F7;
   --mbn-border-panel: #EAEAEC;
   --mbn-table-row-border: rgba(0, 0, 0, 0.26);
-  /* Encuesta de satisfaccion (Figma 918:12068 y 885:8257). La estrella sin
-     elegir es el gris del design system y la elegida, el mismo #0F5AC4 de los
-     iconos de seccion de la portada. El rojo es el de la franja superior del
-     dialogo (red/400), distinto del --mbn-state-alert de los avisos. Los dos
-     grises son gris/60 y gris/40 del design system gob.cl, que el theme aun no
-     tenia. No estan en theme.json: no son colores que el editor elija. */
+
   --mbn-survey-star-empty: #CCCCCC;
   --mbn-survey-star-active: #0F5AC4;
   --mbn-survey-flag-red: #FF2930;
@@ -72,7 +54,7 @@
   --mbn-surface-brand-soft: #E8F0FE;
   --mbn-text-subtle: #666666;
   --mbn-text-placeholder: #999999;
-  /* Botonera accesibilidad — Figma 359:7464 (negro/text, gris/50, gris/10) */
+
   --mbn-a11y-button-border: #373737;
   --mbn-a11y-button-border-disabled: #808080;
   --mbn-a11y-button-surface-disabled: #E6E6E6;
@@ -81,8 +63,7 @@
   --mbn-text-hero: rgba(255, 255, 255, 0.9);
   --mbn-state-inactive: rgba(255, 255, 255, 0.5);
   --mbn-state-alert: #FF0031;
-  /* Estado informativo del design system gob.cl (info/base): borde e icono del
-     componente `notice` (Figma 285:3680). */
+
   --mbn-state-info: #2196F3;
   --mbn-hero-primary: linear-gradient(90deg, rgba(1, 8, 77, 0.85) 0%, rgba(0, 38, 141, 0.55) 50%, rgba(0, 0, 0, 0) 100%);
   --mbn-hero-secondary: linear-gradient(90deg, rgba(77, 1, 1, 0.85) 0%, rgba(141, 0, 0, 0.55) 31%, rgba(0, 0, 0, 0) 100%);
@@ -96,11 +77,7 @@
   --mbn-section-inset-responsive: 36px 16px;
   --mbn-header-padding-horizontal: 0px 24px;
   --mbn-header-nav-height: 100px;
-  /* Ritmo vertical del sitio (2026-09-29), el mismo en todas las secciones y
-     plantillas. NO escala con A+/A-: la botonera mueve el texto, no la maqueta.
-       section   aire arriba y abajo de una banda, y el final de toda pagina
-       page-top  del header a la primera pieza (las migas suman sus 12 = 36)
-       stack     entre piezas de un mismo bloque (migas, titulo, contenido) */
+
   --mbn-space-section: 36px;
   --mbn-space-page-top: 24px;
   --mbn-space-stack: 24px;
@@ -109,12 +86,7 @@
   --mbn-card-radius: 16px;
   --mbn-footer-padding-desktop: 60px 171px 0px;
   --mbn-footer-padding-responsive: 60px 24px;
-  /* Ancho real de la fila del Footer Desktop en la maqueta 179:1154:
-     5 columnas (137+169+247+247+222 = 1022) + 4 gaps de 48 = 1214.
-     El frame Figma declara padding-x 171 sobre 1440 (=1098 utiles), asi que
-     la fila desborda y queda centrada: margen efectivo (1440-1214)/2 = 113.
-     Se toma 1214 como max-width de la fila para reproducir ese render sin
-     replicar el overflow. */
+
   --mbn-footer-row-desktop: 1214px;
   --mbn-footer-col-gap-desktop: 48px;
   --mbn-footer-gap-responsive: 32px;
@@ -125,7 +97,7 @@
   --mbn-dropdown-radius: 0px 0px 4px 4px;
   --mbn-button-round-sentinel: 16777200px;
   --mbn-shadow-elevation-2: 0px 0.47099998593330383px 0.9430000185966492px 0px rgba(0, 0, 0, 0.3), 0px 0.9430000185966492px 2.8289999961853027px 0.9430000185966492px rgba(0, 0, 0, 0.15);
-  /* Gob / Elevación / elevation-3 — el aviso destacado (Figma 285:3680). */
+
   --mbn-shadow-elevation-3: 0px 0.47099998593330383px 1.4140000343322754px 0px rgba(0, 0, 0, 0.3), 0px 1.8860000371932983px 3.7720000743865967px 1.4140000343322754px rgba(0, 0, 0, 0.15);
   --mbn-gobcl-h1-desktop-font-family: "gobCL", sans-serif;
   --mbn-gobcl-h1-desktop-font-weight: 700;
@@ -159,9 +131,7 @@
   --mbn-roboto-body-small-font-weight: 400;
   --mbn-roboto-body-small-font-size: calc(16px * var(--mbn-text-scale, 1));
   --mbn-roboto-body-small-line-height: 1.5em;
-  /* Gob/Desktop/Body/Extra Small — la nota de horario de la barra de contacto
-     (Figma 600:8350). No se duplica en theme.json: no es un tamaño que el
-     editor elija. */
+
   --mbn-roboto-body-xsmall-font-family: "Roboto", sans-serif;
   --mbn-roboto-body-xsmall-font-weight: 400;
   --mbn-roboto-body-xsmall-font-size: calc(14px * var(--mbn-text-scale, 1));

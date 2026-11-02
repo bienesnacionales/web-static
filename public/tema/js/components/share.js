@@ -1,38 +1,10 @@
-/**
- * Componente global — Enviar por mensaje directo.
- *
- * Solo actúa sobre las redes que no admiten un mensaje prellenado por URL
- * (Instagram y Facebook, marcadas con `data-mbn-share-dm`). WhatsApp es un
- * enlace normal a `wa.me/?text=` y no pasa por aquí.
- *
- * Al pulsar una de esas redes:
- *
- *   1. En un dispositivo táctil con Web Share API se abre la hoja de compartir
- *      del sistema con el mensaje y el enlace. Ahí la persona elige Instagram o
- *      Messenger y el contacto. Si la cierra sin compartir, no pasa nada más.
- *   2. En cualquier otro caso se copia al portapapeles el mensaje completo, con
- *      el enlace; se avisa en la región de estado y el enlace sigue su curso
- *      normal: abre la bandeja de mensajes de la red en una pestaña nueva.
- *
- * El criterio del punto 1 es `pointer: coarse` y no solo la existencia de
- * `navigator.share`: Chrome y Edge en Windows también la exponen, pero su hoja
- * no ofrece Instagram ni Messenger, y quien pulsó el ícono de Instagram
- * acabaría ante una lista sin Instagram.
- *
- * @package mbn
- */
-
+/* gestiona las interacciones de enlaces para compartir contenidos */
 ( function () {
 	'use strict';
 
 	var NOTICE_MS = 8000;
 
-	/**
-	 * Indica si conviene usar la hoja de compartir del sistema.
-	 *
-	 * @param {Object} data Datos que se compartirían.
-	 * @return {boolean}
-	 */
+	// comprueba la disponibilidad del diálogo de compartir del sistema
 	function canUseShareSheet( data ) {
 		if ( typeof navigator.share !== 'function' ) {
 			return false;
@@ -53,15 +25,7 @@
 		return true;
 	}
 
-	/**
-	 * Copia un texto con la API del portapapeles y, si no está, con execCommand.
-	 *
-	 * Se llama dentro del propio evento de clic: los navegadores exigen un gesto
-	 * del usuario para escribir en el portapapeles.
-	 *
-	 * @param {string} text Texto a copiar.
-	 * @return {Promise<void>}
-	 */
+	// copia el texto mediante la API disponible del portapapeles
 	function copyText( text ) {
 		if ( navigator.clipboard && typeof navigator.clipboard.writeText === 'function' ) {
 			return navigator.clipboard.writeText( text ).catch( function () {
@@ -72,12 +36,7 @@
 		return legacyCopy( text );
 	}
 
-	/**
-	 * Copia mediante un textarea temporal (contextos sin Clipboard API).
-	 *
-	 * @param {string} text Texto a copiar.
-	 * @return {Promise<void>}
-	 */
+	// utiliza un campo temporal cuando la API del portapapeles no está disponible
 	function legacyCopy( text ) {
 		return new Promise( function ( resolve, reject ) {
 			var area = document.createElement( 'textarea' );
@@ -107,13 +66,7 @@
 		} );
 	}
 
-	/**
-	 * Muestra un aviso en la región de estado del componente.
-	 *
-	 * @param {HTMLElement|null} notice Región de estado.
-	 * @param {string}           text   Texto del aviso.
-	 * @return {void}
-	 */
+	// muestra un aviso en la región de estado del componente
 	function announce( notice, text ) {
 		if ( ! notice ) {
 			return;
@@ -121,8 +74,7 @@
 
 		window.clearTimeout( notice.mbnTimer );
 
-		// Vaciar y volver a escribir en otro tick hace que un lector de pantalla
-		// repita el aviso aunque el texto sea el mismo que la vez anterior.
+		// restablece la región de estado para permitir anuncios consecutivos del mismo mensaje
 		notice.textContent = '';
 
 		window.setTimeout( function () {
@@ -134,12 +86,7 @@
 		}, NOTICE_MS );
 	}
 
-	/**
-	 * Gestiona el clic en una red de mensaje directo.
-	 *
-	 * @param {MouseEvent} event Evento de clic.
-	 * @return {void}
-	 */
+	// gestiona el clic en una red de mensaje directo
 	function onClick( event ) {
 		var link = event.target.closest( '[data-mbn-share-dm]' );
 
@@ -154,8 +101,7 @@
 		var url = link.getAttribute( 'data-mbn-share-url' ) || '';
 		var title = link.getAttribute( 'data-mbn-share-title' ) || '';
 
-		// Con el enlace dentro del texto (marcador {enlace}) se comparte solo el
-		// texto: pasar además `url` lo duplicaría en las apps que concatenan.
+		// evita duplicar la dirección cuando el mensaje ya contiene el enlace
 		var data = url ? { title: title, text: message, url: url } : { title: title, text: text };
 
 		if ( canUseShareSheet( data ) ) {
@@ -166,10 +112,7 @@
 					return;
 				}
 
-				// La hoja falló por otro motivo: se cae al portapapeles. No se abre
-				// la bandeja con window.open: fuera del gesto del usuario el
-				// bloqueador de ventanas emergentes lo impediría en silencio, y el
-				// aviso ya indica dónde pegar el mensaje.
+				// copia el mensaje al portapapeles cuando falla el diálogo del sistema
 				copyText( text ).then( function () {
 					announce( notice, link.getAttribute( 'data-mbn-share-copied' ) || '' );
 				} );
@@ -178,8 +121,7 @@
 			return;
 		}
 
-		// Escritorio: no se cancela la navegación. El enlace abre la bandeja en
-		// una pestaña nueva y, a la vez, el mensaje queda en el portapapeles.
+		// escritorio: no se cancela la navegación
 		copyText( text ).then(
 			function () {
 				announce( notice, link.getAttribute( 'data-mbn-share-copied' ) || '' );
@@ -190,11 +132,7 @@
 		);
 	}
 
-	/**
-	 * Inicializa el componente con delegación de eventos.
-	 *
-	 * @return {void}
-	 */
+	// inicializa el componente con delegación de eventos
 	function init() {
 		if ( ! document.querySelector( '[data-mbn-share]' ) ) {
 			return;

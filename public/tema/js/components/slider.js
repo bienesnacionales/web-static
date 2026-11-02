@@ -1,18 +1,4 @@
-/* Componente global — Slider.
- *
- * Enhancement sobre el Carousel de Bootstrap 5.3.3. Bootstrap ya resuelve la
- * transición, el teclado, el swipe y el autoplay; aquí solo se añade lo que no
- * trae:
- *
- *   1. Live region polite que anuncia la diapositiva activa (WCAG 4.1.3).
- *   2. Control de pausa/reanudación del autoplay (WCAG 2.2.2).
- *   3. Respeto de `prefers-reduced-motion`: el autoplay arranca detenido.
- *
- * Vanilla, sin jQuery. No-op si no hay ningún slider en el DOM.
- *
- * @package mbn
- */
-
+/* gestiona las interacciones de carruseles de portada */
 ( function () {
 	'use strict';
 
@@ -20,12 +6,7 @@
 		return;
 	}
 
-	/**
-	 * Devuelve la instancia de Carousel de Bootstrap, o null si no está disponible.
-	 *
-	 * @param {HTMLElement} el Elemento .carousel.
-	 * @return {Object|null} Instancia.
-	 */
+	// devuelve la instancia de Carousel de Bootstrap, o null si no está disponible
 	function getCarousel( el ) {
 		if ( ! window.bootstrap || ! window.bootstrap.Carousel ) {
 			return null;
@@ -38,11 +19,7 @@
 		}
 	}
 
-	/**
-	 * Inserta la live region y anuncia cada cambio de diapositiva.
-	 *
-	 * @param {HTMLElement} el Elemento .carousel.
-	 */
+	// crea la región de estado y anuncia los cambios de diapositiva
 	function initLiveRegion( el ) {
 		var live = document.createElement( 'div' );
 
@@ -55,7 +32,7 @@
 			var total = el.querySelectorAll( '.carousel-item' ).length;
 			var index = ( typeof event.to === 'number' ? event.to : 0 ) + 1;
 
-			// Se limpia primero para forzar el reanuncio cuando el texto no cambia.
+			// restablece la región de estado antes de repetir un anuncio
 			live.textContent = '';
 
 			window.setTimeout( function () {
@@ -64,12 +41,7 @@
 		} );
 	}
 
-	/**
-	 * Conecta el botón de pausa/reproducción con el ciclo del carrusel.
-	 *
-	 * @param {HTMLElement} el      Elemento .carousel.
-	 * @param {Object}      carousel Instancia de Bootstrap.
-	 */
+	// conecta el botón de pausa/reproducción con el ciclo del carrusel
 	function initPlayPause( el, carousel ) {
 		var button = el.querySelector( '[data-mbn-slider-playpause]' );
 
@@ -102,10 +74,7 @@
 			}
 		} );
 
-		// Bootstrap reanuda el ciclo al salir el puntero o el foco cuando
-		// data-bs-pause="hover". Si el usuario pausó de forma explícita, esa
-		// reanudación automática tiene que anularse: estos listeners se
-		// registran después de los de Bootstrap, así que corren a continuación.
+		// bootstrap reanuda el ciclo al salir el puntero o el foco cuando data-bs-pause="hover"
 		[ 'mouseleave', 'focusout' ].forEach( function ( eventName ) {
 			el.addEventListener( eventName, function () {
 				if ( paused ) {
@@ -114,8 +83,7 @@
 			} );
 		} );
 
-		// Movimiento reducido: el slider queda detenido de entrada, con el
-		// control reflejando el estado real para poder reanudarlo a voluntad.
+		// detiene el carrusel cuando está activa la preferencia de movimiento reducido
 		var reduced = window.matchMedia && window.matchMedia( '(prefers-reduced-motion: reduce)' ).matches;
 
 		if ( reduced ) {

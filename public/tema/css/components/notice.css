@@ -1,12 +1,4 @@
-/* ============================================================
- * Componente global — Aviso destacado
- * Maqueta: Figma 285:3680 («Alerta»), en el detalle de trámite 169:3365.
- * Caja blanca con borde de 2px en #2196F3, radio 4, sombra elevation-3,
- * padding 16 y un icono `info` de 36px separado del texto por 24.
- *
- * Es `.alert` de Bootstrap con sus variables `--bs-alert-*` redefinidas (§7.3).
- * ============================================================ */
-
+/* define la presentación de avisos informativos */
 .mbn-notice {
 	--bs-alert-bg: var(--mbn-surface-white, #FFFFFF);
 	--bs-alert-color: var(--mbn-text-strong, #373737);
@@ -37,8 +29,7 @@
 	min-width: 0;
 }
 
-/* base.css: `main p { font-weight: 400 !important }`, así que el peso 500 del
-   estilo Heading/Sans/Small necesita !important para imponerse. */
+
 .mbn-notice__title {
 	margin: 0;
 	font-family: var(--mbn-roboto-sans-small-font-family, "Roboto", sans-serif);

@@ -1,21 +1,4 @@
-/* ============================================================
- * Componente global — Enlaces con ícono
- * Maqueta: Figma 179:1128 (frame 1440x488; ítem 341x72, gap 48/24).
- *
- * Ícono de 72px a la izquierda y, a la derecha, la franja bicolor sobre
- * dos líneas de texto. Toda la pieza es el enlace.
- *
- * Por debajo de `md` la rejilla pasa a ser un carrusel: la misma lista
- * convertida en pista desplazable con scroll-snap. El desplazamiento es
- * nativo —dedo, rueda y teclado funcionan sin JS—; el script solo añade
- * las flechas y el contador.
- *
- * El orden pintado es siempre el del repeater —izquierda a derecha, arriba
- * abajo—: aquí no se usa `order` de CSS. Reordenar visualmente rompería la
- * correspondencia con el DOM, y con ella el recorrido por teclado y el
- * contador del carrusel, que sí siguen el DOM.
- * ============================================================ */
-
+/* define la presentación de enlaces frecuentes */
 .mbn-icon-links {
 	padding: var(--mbn-space-section, 36px) 24px;
 }
@@ -70,17 +53,13 @@
 	outline-offset: 2px;
 }
 
-/* El ícono se tiñe con mask-image en lugar de servirse como <img>: en esta
-   sección va en gris y los mismos nombres del catálogo se usan en azul en otras
-   secciones. Con la máscara, el color lo decide el CSS y no hay que duplicar el
-   asset. Requiere que el ícono sea una silueta (SVG), no una fotografía. */
+
 .mbn-icon-links__icon {
 	flex: 0 0 auto;
 	width: 56px;
 	height: 56px;
 	background-color: var(--mbn-icon-links-icon-color, #B3B3B3);
-	/* Propiedades largas y no el atajo `mask`: un var() dentro del shorthand no
-	   se resuelve en todos los motores y el ícono desaparece sin previo aviso. */
+
 	-webkit-mask-image: var(--mbn-icon-links-icon);
 	-webkit-mask-repeat: no-repeat;
 	-webkit-mask-position: center;
@@ -99,8 +78,7 @@
 	min-width: 0;
 }
 
-/* La franja se estira al ancho del bloque de texto: el SVG del catálogo lleva
-   preserveAspectRatio="none" y mantiene la proporción 37/63 de color. */
+
 .mbn-icon-links__franja {
 	display: block;
 	width: 100%;
@@ -128,11 +106,9 @@
 	font-weight: 700;
 }
 
-/* ---------- Carrusel (solo por debajo de md) ---------- */
+/* carrusel (solo por debajo de md) */
 
-/* La pista y los controles solo existen mientras la sección es un carrusel.
-   A partir de `md` todo esto se desactiva y vuelve la rejilla, así que las
-   reglas viven dentro de la media query de máximo ancho de más abajo. */
+
 
 .mbn-icon-links__controls {
 	display: flex;
@@ -155,8 +131,7 @@
 	transition: background-color 120ms ease-out, border-color 120ms ease-out, opacity 120ms ease-out;
 }
 
-/* La flecha se dibuja con dos bordes girados: evita añadir un asset más para
-   un glifo que el CSS resuelve con tres declaraciones. */
+
 .mbn-icon-links__nav::before {
 	content: "";
 	position: absolute;
@@ -189,8 +164,7 @@
 	outline-offset: 2px;
 }
 
-/* En los extremos el botón se deshabilita en vez de ocultarse: si desapareciera,
-   los controles se reordenarían y el contador saltaría de sitio. */
+
 .mbn-icon-links__nav:disabled {
 	border-color: var(--mbn-border-default, #CCCCCC);
 	opacity: 0.5;
@@ -221,10 +195,9 @@
 		overflow-y: hidden;
 		scroll-snap-type: x mandatory;
 		overscroll-behavior-x: contain;
-		/* La barra de scroll se oculta porque los controles ya indican la
-		   posición; el desplazamiento táctil y por teclado no se ve afectado. */
+
 		scrollbar-width: none;
-		/* Aire para que el foco de un enlace no quede pegado al borde. */
+
 		padding: 4px;
 		margin: -4px;
 	}
@@ -238,8 +211,7 @@
 		outline-offset: 3px;
 	}
 
-	/* 86% deja asomar el siguiente enlace: es lo que avisa de que la lista
-	   continúa, sin necesidad de un indicador extra. */
+
 	.mbn-icon-links__item {
 		flex: 0 0 86%;
 		scroll-snap-align: center;
@@ -247,10 +219,10 @@
 	}
 }
 
-/* ---------- md ≥ 768px ---------- */
+/* md ≥ 768px */
 
 @media (min-width: 768px) {
-	/* Fuera del carrusel los controles no pintan nada, ni siquiera revelados. */
+
 	.mbn-icon-links__controls {
 		display: none;
 	}
@@ -265,7 +237,7 @@
 	}
 }
 
-/* ---------- xl ≥ 1200px (canvas 1440 del Figma) ---------- */
+/* ajustes de presentación para escritorio */
 
 @media (min-width: 1200px) {
 	.mbn-icon-links {
@@ -282,7 +254,7 @@
 	}
 }
 
-/* ---------- Movimiento reducido ---------- */
+/* movimiento reducido */
 
 @media (prefers-reduced-motion: reduce) {
 	.mbn-icon-links__link,
@@ -290,8 +262,7 @@
 		transition: none;
 	}
 
-	/* El JS ya evita el desplazamiento animado; esto cubre además el que
-	   provoca el navegador al llevar el foco a un enlace fuera de vista. */
+
 	.mbn-icon-links__grid {
 		scroll-behavior: auto;
 	}

@@ -1,4 +1,5 @@
-/* ajusta el extracto al alto que dejan las noticias secundarias */
+/* gestiona las interacciones de noticias destacadas */
+// ajusta el extracto al alto que dejan las noticias secundarias
 (() => {
     'use strict';
 

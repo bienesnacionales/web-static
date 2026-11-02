@@ -1,37 +1,5 @@
-/**
- * Shell — Encuesta de satisfacción.
- *
- * Gobierna el botón flotante y el diálogo que imprime
- * `inc/survey-frontend.php`: el paso a paso, la escala de estrellas, el
- * progreso guardado y el envío.
- *
- * Decisiones:
- *
- * - **El marcado ya viene hecho desde PHP.** Este script no construye pasos ni
- *   pide el cuestionario al servidor: sólo muestra uno y oculta el resto. Un
- *   error de red no puede dejar el diálogo vacío, y las respuestas marcadas
- *   siguen en el DOM aunque el envío falle.
- * - **La escala es un `radiogroup` con «roving tabindex»**: un solo punto de
- *   entrada con el tabulador y las flechas para moverse dentro, que es lo que
- *   un lector de pantalla espera de un grupo de opciones excluyentes.
- * - **El almacenamiento local es opcional y desechable.** Guarda versión, paso,
- *   valoraciones y marca de tiempo —nada personal— y se descarta solo a las 24
- *   horas o en cuanto cambia la versión del cuestionario. Si el navegador lo
- *   impide (modo privado) o el sitio no lo permite, la encuesta funciona igual
- *   con el progreso en memoria.
- * - **La apertura automática cuenta tiempo de navegación, no de reloj.** Sólo
- *   suma con la pestaña a la vista, se acumula de una página a otra dentro de
- *   la misma visita y abre el diálogo **una sola vez**: después, el botón
- *   flotante sigue siendo la única vía.
- * - **El bloqueo por frecuencia lo decide el servidor.** Aquí sólo se oculta el
- *   botón —apariencia— con lo último que el servidor respondió; el envío se
- *   comprueba de nuevo del otro lado.
- * - **El foco vuelve al botón flotante al cerrar**: Bootstrap sólo lo devuelve
- *   cuando la apertura vino de un `data-bs-toggle`, y aquí viene de un clic
- *   interceptado (mismo caso que `external-link.js`).
- *
- * @package mbn
- */
+/* gestiona las interacciones de encuesta de satisfacción */
+// inicializa el diálogo de la encuesta de satisfacción
 
 ( function () {
 	'use strict';
@@ -44,23 +12,12 @@
 	var STORAGE_VISITOR  = 'mbn-survey-visitor';
 	var STORAGE_BLOCKED  = 'mbn-survey-blocked';
 
-	// Las dos de la apertura automática viven en `sessionStorage`: el tiempo de
-	// navegación es de ESTA visita, y guardarlo en `localStorage` haría que la
-	// siguiente empezara con el contador ya vencido.
+
 	var SESION_TIEMPO = 'mbn-survey-browsing';
 	var SESION_AUTO   = 'mbn-survey-auto';
+	var SESION_CIERRE = 'mbn-survey-close-notice';
 
-	/**
-	 * Acceso a un almacén del navegador que nunca lanza.
-	 *
-	 * En modo privado, con las cookies bloqueadas o si el sitio veta el
-	 * almacenamiento (`window.mbnSurveyStorageAllowed === false`, el gancho para
-	 * el gestor de consentimiento), se cae a un objeto en memoria: el progreso
-	 * dura lo que la pestaña, que es exactamente lo que se espera.
-	 *
-	 * @param {string} tipo 'localStorage' o 'sessionStorage'.
-	 * @return {Object} Las tres operaciones, a prueba de excepciones.
-	 */
+	// gestiona el acceso al almacenamiento del navegador y sus restricciones
 	function crearAlmacen( tipo ) {
 		var memoria = {};
 		var permitido = window.mbnSurveyStorageAllowed !== false;
@@ -124,15 +81,7 @@
 	var almacen = crearAlmacen( 'localStorage' );
 	var sesion  = crearAlmacen( 'sessionStorage' );
 
-	/**
-	 * El identificador anónimo del visitante.
-	 *
-	 * Aleatorio de verdad (`crypto.getRandomValues`) y sin ninguna relación con
-	 * el equipo, el navegador ni la persona: no es una huella, es un número que
-	 * sólo sirve para que el servidor sepa que ya respondió.
-	 *
-	 * @return {string} 32 caracteres hexadecimales.
-	 */
+	// el identificador anónimo del visitante
 	function identificador() {
 		var guardado = almacen.lee( STORAGE_VISITOR );
 
@@ -145,9 +94,7 @@
 		if ( window.crypto && window.crypto.getRandomValues ) {
 			window.crypto.getRandomValues( bytes );
 		} else {
-			// Sin `crypto` no hay forma de generar algo imprevisible; el valor
-			// sirve igual para distinguir visitas, y el bloqueo real lo decide
-			// el servidor.
+			// genera el identificador local de visita y conserva la validación de frecuencia del servidor
 			for ( var i = 0; i < bytes.length; i++ ) {
 				bytes[ i ] = Math.floor( Math.random() * 256 );
 			}
@@ -164,17 +111,7 @@
 		return salida;
 	}
 
-	/**
-	 * El tabindex que corresponde a una estrella.
-	 *
-	 * «Roving tabindex»: sólo una estrella del grupo entra con el tabulador —la
-	 * elegida, o la primera si aún no hay respuesta— y dentro se circula con las
-	 * flechas.
-	 *
-	 * @param {number} propio  Valor de la estrella.
-	 * @param {number} elegido Valor elegido en el paso.
-	 * @return {string}
-	 */
+	// el tabindex que corresponde a una estrella
 	function tabindexDe( propio, elegido ) {
 		if ( ! elegido ) {
 			return 1 === propio ? '0' : '-1';
@@ -183,12 +120,7 @@
 		return propio === elegido ? '0' : '-1';
 	}
 
-	/**
-	 * Arranca la encuesta de un documento.
-	 *
-	 * @param {HTMLElement} modal El diálogo.
-	 * @param {HTMLElement} lanzador El botón flotante.
-	 */
+	// inicializa la encuesta del documento
 	function Encuesta( modal, lanzador ) {
 		var self = this;
 
@@ -215,6 +147,14 @@
 		this.oculta     = '1' === modal.getAttribute( 'data-mbn-survey-hide' );
 		this.auto       = '1' === modal.getAttribute( 'data-mbn-survey-auto' );
 		this.autoDelay  = ( parseInt( modal.getAttribute( 'data-mbn-survey-auto-delay' ), 10 ) || 0 ) * 1000;
+		this.openClose  = '1' === modal.getAttribute( 'data-mbn-survey-open-close' );
+		this.openTop    = '1' === modal.getAttribute( 'data-mbn-survey-open-top' );
+		this.openExternal = '1' === modal.getAttribute( 'data-mbn-survey-open-external' );
+		this.abriendo   = false;
+		this.externoPendiente = false;
+		this.omiteCierreHasta = 0;
+		this.salida     = modal.querySelector( '[data-mbn-survey-external]' );
+		this.continuar  = modal.querySelector( '[data-mbn-survey-external-continue]' );
 		this.reloj      = 0;
 		this.textos     = self.leeTextos();
 
@@ -232,13 +172,10 @@
 		this.muestraPaso( this.pasoActual );
 		this.revelaLanzador();
 		this.programaApertura();
+		this.programaActivadores();
 	}
 
-	/**
-	 * Los mensajes que imprimió PHP.
-	 *
-	 * @return {Object} Mapa de textos; vacío si el atributo no es JSON válido.
-	 */
+	// obtiene los mensajes configurados por el servidor
 	Encuesta.prototype.leeTextos = function () {
 		try {
 			var crudo = JSON.parse( this.modal.getAttribute( 'data-mbn-survey-messages' ) || '{}' );
@@ -249,9 +186,7 @@
 		}
 	};
 
-	/**
-	 * Engancha todos los escuchadores.
-	 */
+	// registra los controladores de eventos de la encuesta
 	Encuesta.prototype.conecta = function () {
 		var self = this;
 
@@ -280,8 +215,7 @@
 				self.teclado( paso, evento );
 			} );
 
-			// Anticipo visual: al recorrer la escala con el ratón se pintan las
-			// estrellas hasta la de debajo del cursor, sin tocar el valor.
+			// presenta una vista previa de la valoración sin modificar la respuesta guardada
 			escala.addEventListener( 'mouseover', function ( evento ) {
 				var estrella = evento.target.closest( '[data-mbn-survey-value]' );
 
@@ -319,18 +253,18 @@
 			}
 		} );
 
-		// Bootstrap sólo devuelve el foco cuando la apertura vino de un
-		// `data-bs-toggle`; esta viene de un clic interceptado.
+		// restaura el foco cuando el diálogo se abre mediante un evento personalizado
 		this.modal.addEventListener( 'hidden.bs.modal', function () {
+			self.abriendo = false;
+			if ( self.salida ) self.salida.hidden = true;
+			if ( self.continuar ) self.continuar.removeAttribute( 'href' );
 			if ( self.lanzador && ! self.lanzador.hidden ) {
 				self.lanzador.focus();
 			}
 		} );
 	};
 
-	/**
-	 * Enseña el botón flotante salvo que el bloqueo lo desaconseje.
-	 */
+	// presenta el botón flotante según el estado de participación
 	Encuesta.prototype.revelaLanzador = function () {
 		if ( ! this.lanzador ) {
 			return;
@@ -343,11 +277,7 @@
 		this.lanzador.hidden = false;
 	};
 
-	/**
-	 * ¿Queda bloqueo de los que respondió el servidor la última vez?
-	 *
-	 * @return {boolean}
-	 */
+	// comprueba el bloqueo de participación indicado por el servidor
 	Encuesta.prototype.bloqueoVigente = function () {
 		var hasta = parseInt( almacen.lee( STORAGE_BLOCKED ), 10 );
 
@@ -364,20 +294,19 @@
 		return true;
 	};
 
-	/**
-	 * Abre el diálogo y confirma con el servidor que se puede responder.
-	 */
+	// abre el diálogo y confirma con el servidor que se puede responder
 	Encuesta.prototype.abre = function () {
 		var self = this;
 
-		if ( ! window.bootstrap || ! window.bootstrap.Modal ) {
-			return;
+		if ( ! window.bootstrap || ! window.bootstrap.Modal || this.abriendo ) {
+			return false;
 		}
+		this.abriendo = true;
 
-		// Abierta una vez —por el botón o por el reloj—, no vuelve a abrirse sola
-		// en esta visita: insistir es lo que convierte un aviso en una molestia.
+		// limita la apertura automática a una vez por visita
 		sesion.escribe( SESION_AUTO, '1' );
 		this.detieneReloj();
+		if ( this.onBeforeUnload ) window.removeEventListener( 'beforeunload', this.onBeforeUnload );
 
 		window.bootstrap.Modal.getOrCreateInstance( this.modal ).show();
 
@@ -399,20 +328,15 @@
 				return;
 			}
 
-			// El cuestionario cambió desde que se pintó esta página: lo que hay
-			// en pantalla ya no es la versión vigente.
+			// comprueba si la versión del cuestionario visible continúa vigente
 			if ( estado.version_id && estado.version_id !== self.version ) {
 				self.cierraFormulario( self.textos.stale );
 			}
 		} );
+		return true;
 	};
 
-	/**
-	 * Arranca el reloj de la apertura automática, si está configurada.
-	 *
-	 * Late cada segundo en vez de programar un único `setTimeout` porque lo que
-	 * se mide no es tiempo de reloj: cada latido decide si ese segundo cuenta.
-	 */
+	// inicia el temporizador de apertura automática configurado
 	Encuesta.prototype.programaApertura = function () {
 		var self = this;
 
@@ -420,7 +344,7 @@
 			return;
 		}
 
-		// Ya se abrió en esta visita, o el visitante ya respondió.
+		// comprueba la apertura previa y el estado de participación de la visita
 		if ( sesion.lee( SESION_AUTO ) || this.bloqueoVigente() ) {
 			return;
 		}
@@ -434,12 +358,7 @@
 
 			anterior = ahora;
 
-			/*
-			 * Una pestaña en segundo plano no es navegación. Y un salto largo
-			 * entre dos latidos —el equipo suspendido, el navegador frenando
-			 * los temporizadores de una pestaña oculta— tampoco es tiempo que
-			 * nadie pasara leyendo el sitio.
-			 */
+			// excluye el tiempo de permanencia en pestañas inactivas
 			if ( 'visible' !== document.visibilityState || delta > 5000 ) {
 				return;
 			}
@@ -447,8 +366,7 @@
 			acumulado += delta;
 			sesion.escribe( SESION_TIEMPO, String( acumulado ) );
 
-			// Si todavía no toca, o toca pero el momento es malo, se reintenta
-			// en el siguiente latido.
+			// reprograma la apertura hasta que se cumplan las condiciones configuradas
 			if ( acumulado < self.autoDelay || ! self.puedeAbrirSola() ) {
 				return;
 			}
@@ -457,36 +375,28 @@
 		}, 1000 );
 	};
 
-	/**
-	 * ¿Es buen momento para abrir el diálogo sin que nadie lo haya pedido?
-	 *
-	 * @return {boolean}
-	 */
-	Encuesta.prototype.puedeAbrirSola = function () {
-		if ( this.bloqueado || this.bloqueoVigente() ) {
+	// comprueba las condiciones de apertura automática del diálogo
+	Encuesta.prototype.puedeAbrirSola = function ( cierre ) {
+		if ( ! window.bootstrap || ! window.bootstrap.Modal || this.abriendo || sesion.lee( SESION_AUTO ) || this.bloqueado || this.bloqueoVigente() || document.visibilityState !== 'visible' ) {
 			return false;
 		}
 
-		// Dos diálogos superpuestos dejan el telón y el desplazamiento del
-		// cuerpo en un estado del que Bootstrap no sale solo.
-		if ( document.querySelector( '.modal.show' ) ) {
+		// evita la apertura automática mientras existe otro diálogo activo
+		if ( document.querySelector( '.modal.show, .modal.showing, .offcanvas.show, .offcanvas.showing, [aria-modal="true"], .pum-active' ) ) {
 			return false;
 		}
 
-		// Nadie debería perder lo que está escribiendo —un buscador, un
-		// formulario— porque encima se abra una encuesta.
+		// pospone la apertura automática durante la edición de campos del formulario
 		var activo = document.activeElement;
 
-		if ( activo && ( activo.isContentEditable || /^(?:INPUT|TEXTAREA|SELECT)$/.test( activo.tagName ) ) ) {
+		if ( ! cierre && activo && ( activo.isContentEditable || /^(?:INPUT|TEXTAREA|SELECT)$/.test( activo.tagName ) ) ) {
 			return false;
 		}
 
 		return true;
 	};
 
-	/**
-	 * Para el reloj de la apertura automática.
-	 */
+	// detiene el temporizador de apertura automática
 	Encuesta.prototype.detieneReloj = function () {
 		if ( this.reloj ) {
 			window.clearInterval( this.reloj );
@@ -494,11 +404,106 @@
 		}
 	};
 
-	/**
-	 * Pregunta al servidor si la encuesta sigue abierta para este visitante.
-	 *
-	 * @return {Promise<Object|null>}
-	 */
+	// activadores compatibles: todos comparten la apertura única de esta visita
+	Encuesta.prototype.programaActivadores = function () {
+		var self = this;
+		var armado = false;
+		var ultimoY = null;
+
+		if ( this.openTop ) {
+			document.addEventListener( 'mousemove', function ( evento ) {
+				if ( ! window.matchMedia( '(any-hover: hover) and (any-pointer: fine)' ).matches ) return;
+				if ( evento.clientY > 80 ) armado = true;
+				if ( armado && null !== ultimoY && evento.clientY < ultimoY && evento.clientY <= 24 ) self.abreAutomaticamente();
+				ultimoY = evento.clientY;
+			}, { passive: true } );
+			document.addEventListener( 'mouseout', function ( evento ) {
+				if ( armado && ! evento.relatedTarget && evento.clientY <= 0 ) self.abreAutomaticamente();
+			} );
+		}
+
+		if ( this.openClose ) {
+			// navegar mediante un enlace o formulario no equivale a cerrar la pestaña
+			document.addEventListener( 'click', function ( evento ) {
+				var enlace = evento.target && evento.target.closest ? evento.target.closest( 'a[href]' ) : null;
+				if ( enlace && ! evento.ctrlKey && ! evento.metaKey && ! evento.shiftKey && ! evento.altKey && 0 === evento.button && '_blank' !== enlace.target.toLowerCase() ) {
+					self.omiteCierreHasta = Date.now() + 2000;
+				}
+			}, true );
+			document.addEventListener( 'submit', function () { self.omiteCierreHasta = Date.now() + 2000; }, true );
+			this.onBeforeUnload = function ( evento ) {
+				if ( sesion.lee( SESION_CIERRE ) || Date.now() < self.omiteCierreHasta || ! self.puedeAbrirSola( true ) ) return;
+				if ( navigator.userActivation && ! navigator.userActivation.hasBeenActive ) return;
+				evento.preventDefault();
+				evento.returnValue = true;
+				sesion.escribe( SESION_CIERRE, '1' );
+				// continúa la comprobación cuando el navegador permite reanudar el controlador
+				window.setTimeout( function () { self.abreAutomaticamente( true ); }, 0 );
+			};
+			if ( ! sesion.lee( SESION_AUTO ) && ! sesion.lee( SESION_CIERRE ) && ! this.bloqueoVigente() ) {
+				window.addEventListener( 'beforeunload', this.onBeforeUnload );
+			}
+		}
+
+		if ( this.openExternal ) {
+			document.addEventListener( 'click', function ( evento ) {
+				if ( evento.defaultPrevented || evento.button !== 0 || evento.ctrlKey || evento.metaKey || evento.shiftKey || evento.altKey ) return;
+				var enlace = evento.target && evento.target.closest ? evento.target.closest( 'a[href]' ) : null;
+				if ( ! self.esEnlaceExterno( enlace ) || sesion.lee( SESION_AUTO ) || self.bloqueoVigente() ) return;
+				var target = ( enlace.target || '_self' ).toLowerCase();
+				if ( '_self' === target || '_top' === target || '_parent' === target ) {
+					if ( ! self.puedeAbrirSola() ) return;
+					if ( self.salida && self.continuar ) {
+						self.continuar.href = enlace.href;
+						self.continuar.target = '_self';
+						self.salida.hidden = false;
+						if ( self.abreAutomaticamente() ) evento.preventDefault();
+					}
+				} else {
+					// la navegación normal ocurre primero; la encuesta queda en la pestaña de origen
+					window.setTimeout( function () { self.encolaExterno(); }, 0 );
+				}
+			} );
+			// este evento se emite solo después de confirmar el aviso de salida existente
+			document.addEventListener( 'mbn:external-opened', function () { self.encolaExterno(); } );
+			document.addEventListener( 'hidden.bs.modal', function () { self.reintentaExterno(); } );
+			document.addEventListener( 'hidden.bs.offcanvas', function () { self.reintentaExterno(); } );
+			document.addEventListener( 'visibilitychange', function () { self.reintentaExterno(); } );
+			window.addEventListener( 'focus', function () { window.setTimeout( function () { self.reintentaExterno(); }, 0 ); } );
+		}
+	};
+
+	Encuesta.prototype.abreAutomaticamente = function ( cierre ) {
+		if ( ! this.puedeAbrirSola( cierre ) ) return false;
+		return this.abre();
+	};
+
+	Encuesta.prototype.esEnlaceExterno = function ( enlace ) {
+		if ( ! enlace || enlace.hasAttribute( 'download' ) || enlace.closest( '[data-mbn-survey], [data-mbn-external-modal], [data-mbn-survey-skip]' ) ) return false;
+		if ( enlace.protocol !== 'https:' && enlace.protocol !== 'http:' ) return false;
+		function host( value ) { return String( value || '' ).toLowerCase().replace( /^www\./, '' ); }
+		var propios = [ host( window.location.hostname ) ];
+		var aviso = document.querySelector( '[data-mbn-external-modal]' );
+		try {
+			var otros = aviso ? JSON.parse( aviso.getAttribute( 'data-mbn-external-hosts' ) || '[]' ) : [];
+			if ( Array.isArray( otros ) ) propios = propios.concat( otros.map( host ) );
+		} catch ( e ) {}
+		return propios.indexOf( host( enlace.hostname ) ) === -1;
+	};
+
+	Encuesta.prototype.encolaExterno = function () {
+		if ( sesion.lee( SESION_AUTO ) || this.bloqueado || this.bloqueoVigente() ) return;
+		this.externoPendiente = true;
+		this.reintentaExterno();
+	};
+
+	Encuesta.prototype.reintentaExterno = function () {
+		if ( sesion.lee( SESION_AUTO ) ) { this.externoPendiente = false; return; }
+		if ( this.externoPendiente && this.abreAutomaticamente() ) this.externoPendiente = false;
+	};
+
+
+	// consulta la disponibilidad de participación en el servidor
 	Encuesta.prototype.consultaEstado = function () {
 		if ( ! this.endpoint || ! this.accionEstado ) {
 			return Promise.resolve( null );
@@ -517,16 +522,12 @@
 		} ).then( function ( cuerpo ) {
 			return ( cuerpo && cuerpo.success ) ? cuerpo.data : null;
 		} ).catch( function () {
-			// Sin respuesta no se toca nada: el envío volverá a comprobarlo.
+			// conserva el estado local cuando no se recibe respuesta del servidor
 			return null;
 		} );
 	};
 
-	/**
-	 * Deja el diálogo con un único mensaje y sin formulario.
-	 *
-	 * @param {string} mensaje Texto que explica por qué no se puede responder.
-	 */
+	// presenta el mensaje de estado sin el formulario de respuestas
 	Encuesta.prototype.cierraFormulario = function ( mensaje ) {
 		this.bloqueado = true;
 		this.formulario.hidden = true;
@@ -540,11 +541,7 @@
 		this.avisa( mensaje );
 	};
 
-	/**
-	 * Muestra un paso y ajusta indicador, botones y anuncio.
-	 *
-	 * @param {number} numero Paso, empezando en 1.
-	 */
+	// muestra un paso y ajusta indicador, botones y anuncio
 	Encuesta.prototype.muestraPaso = function ( numero ) {
 		var self = this;
 
@@ -575,10 +572,7 @@
 		this.anuncia( numero );
 		this.avisa( '' );
 
-		// El foco viaja al enunciado del paso nuevo: es lo que un lector de
-		// pantalla necesita oír antes que nada, y deja el tabulador justo encima
-		// de la escala. Con el diálogo aún cerrado —el primer pintado— no se
-		// toca el foco.
+		// establece el foco en el enunciado al cambiar de paso
 		if ( this.modal.classList.contains( 'show' ) ) {
 			this.enfocaPregunta();
 		}
@@ -586,9 +580,7 @@
 		this.guardaProgreso();
 	};
 
-	/**
-	 * Lleva el foco al enunciado del paso visible.
-	 */
+	// lleva el foco al enunciado del paso visible
 	Encuesta.prototype.enfocaPregunta = function () {
 		var activo = this.pasoDe( this.pasoActual );
 
@@ -609,12 +601,7 @@
 		}, 0 );
 	};
 
-	/**
-	 * El elemento de un paso.
-	 *
-	 * @param {number} numero Paso.
-	 * @return {HTMLElement|null}
-	 */
+	// el elemento de un paso
 	Encuesta.prototype.pasoDe = function ( numero ) {
 		for ( var i = 0; i < this.pasos.length; i++ ) {
 			if ( parseInt( this.pasos[ i ].getAttribute( 'data-mbn-survey-step' ), 10 ) === numero ) {
@@ -625,24 +612,14 @@
 		return null;
 	};
 
-	/**
-	 * El valor elegido en un paso.
-	 *
-	 * @param {HTMLElement} paso El paso.
-	 * @return {number} 0 si aún no hay respuesta.
-	 */
+	// el valor elegido en un paso
 	Encuesta.prototype.valorDe = function ( paso ) {
 		var id = paso.getAttribute( 'data-mbn-survey-question' );
 
 		return this.respuestas[ id ] || 0;
 	};
 
-	/**
-	 * Registra la valoración de un paso.
-	 *
-	 * @param {HTMLElement} paso  El paso.
-	 * @param {number}      valor Valoración de 1 a 7.
-	 */
+	// registra la valoración de un paso
 	Encuesta.prototype.elige = function ( paso, valor ) {
 		if ( this.bloqueado || ! valor ) {
 			return;
@@ -657,13 +634,7 @@
 		this.guardaProgreso();
 	};
 
-	/**
-	 * Pinta la escala de un paso.
-	 *
-	 * @param {HTMLElement} paso    El paso.
-	 * @param {number}      valor   Hasta qué estrella se rellena.
-	 * @param {boolean}     anticipo true si es el efecto del ratón.
-	 */
+	// presenta la escala de un paso
 	Encuesta.prototype.pinta = function ( paso, valor, anticipo ) {
 		var elegido = this.valorDe( paso );
 		var estrellas = paso.querySelectorAll( '[data-mbn-survey-value]' );
@@ -675,19 +646,13 @@
 			estrella.classList.toggle( 'is-filled', lleno && ! anticipo );
 			estrella.classList.toggle( 'is-preview', lleno && anticipo );
 
-			// `aria-checked` y el tabindex describen la elección real, no el
-			// anticipo del ratón.
+			// sincroniza los atributos accesibles con la respuesta guardada
 			estrella.setAttribute( 'aria-checked', propio === elegido ? 'true' : 'false' );
 			estrella.setAttribute( 'tabindex', tabindexDe( propio, elegido ) );
 		} );
 	};
 
-	/**
-	 * Teclado dentro de la escala.
-	 *
-	 * @param {HTMLElement} paso    El paso.
-	 * @param {KeyboardEvent} evento El evento.
-	 */
+	// teclado dentro de la escala
 	Encuesta.prototype.teclado = function ( paso, evento ) {
 		var total = paso.querySelectorAll( '[data-mbn-survey-value]' ).length;
 		var actual = this.valorDe( paso );
@@ -722,20 +687,14 @@
 		}
 	};
 
-	/**
-	 * Habilita o deshabilita el botón principal según haya respuesta.
-	 */
+	// habilita o deshabilita el botón principal según haya respuesta
 	Encuesta.prototype.actualizaSiguiente = function () {
 		var paso = this.pasoDe( this.pasoActual );
 
 		this.siguiente.disabled = this.enviando || ! paso || ! this.valorDe( paso );
 	};
 
-	/**
-	 * Anuncia el paso a quien no ve el indicador.
-	 *
-	 * @param {number} numero Paso actual.
-	 */
+	// anuncia el paso actual mediante la región de estado accesible
 	Encuesta.prototype.anuncia = function ( numero ) {
 		if ( ! this.progreso || ! this.textos.step ) {
 			return;
@@ -746,11 +705,7 @@
 			.replace( '%2$s', String( this.total ) );
 	};
 
-	/**
-	 * Enseña u oculta el aviso de error.
-	 *
-	 * @param {string} mensaje Texto; vacío para ocultarlo.
-	 */
+	// actualiza la visibilidad del mensaje de error
 	Encuesta.prototype.avisa = function ( mensaje ) {
 		if ( ! this.aviso ) {
 			return;
@@ -760,15 +715,9 @@
 		this.aviso.hidden = ! mensaje;
 	};
 
-	/**
-	 * Guarda el progreso a medias.
-	 *
-	 * Sólo versión, paso, valoraciones y marca de tiempo: nada que identifique a
-	 * nadie.
-	 */
+	// guarda las respuestas parciales de la encuesta
 	Encuesta.prototype.guardaProgreso = function () {
-		// Sin valoraciones no hay progreso: abrir y cerrar el diálogo no deja
-		// rastro en el navegador.
+		// almacena el progreso únicamente cuando existen valoraciones
 		if ( ! this.ttl || ! Object.keys( this.respuestas ).length ) {
 			return;
 		}
@@ -781,12 +730,7 @@
 		} ) );
 	};
 
-	/**
-	 * Recupera el progreso si sigue siendo válido.
-	 *
-	 * Se descarta cuando está corrupto, cuando pertenece a otra versión del
-	 * cuestionario o cuando pasó el plazo.
-	 */
+	// recupera el progreso si sigue siendo válido
 	Encuesta.prototype.restauraProgreso = function () {
 		var crudo = almacen.lee( STORAGE_PROGRESS );
 
@@ -823,15 +767,13 @@
 			var id = paso.getAttribute( 'data-mbn-survey-question' );
 			var valor = ( datos.a && datos.a[ id ] ) ? parseInt( datos.a[ id ], 10 ) : 0;
 
-			// Una valoración fuera de la escala, o de una pregunta que ya no
-			// existe, se ignora: el resto del progreso sigue sirviendo.
+			// descarta las respuestas incompatibles y conserva el progreso válido
 			if ( valor >= 1 && valor <= 7 ) {
 				valido[ id ] = valor;
 			}
 		} );
 
-		// Primero el estado y después el pintado: `pinta()` lee las respuestas
-		// para decidir el `aria-checked`.
+		// actualiza las respuestas antes de sincronizar la presentación de la escala
 		this.respuestas = valido;
 		this.pasoActual = Math.min( Math.max( parseInt( datos.s, 10 ) || 1, 1 ), this.total );
 
@@ -840,11 +782,7 @@
 		} );
 	};
 
-	/**
-	 * Recuerda hasta cuándo dijo el servidor que no se puede volver a responder.
-	 *
-	 * @param {string} hasta Fecha MySQL en UTC.
-	 */
+	// guarda la fecha de finalización del bloqueo indicado por el servidor
 	Encuesta.prototype.marcaBloqueo = function ( hasta ) {
 		if ( ! hasta ) {
 			return;
@@ -861,12 +799,7 @@
 		}
 	};
 
-	/**
-	 * Envía las respuestas.
-	 *
-	 * Un segundo clic mientras hay una petición en vuelo no hace nada: es lo que
-	 * evita el envío duplicado del doble clic.
-	 */
+	// envía las respuestas
 	Encuesta.prototype.envia = function () {
 		var self = this;
 
@@ -914,17 +847,14 @@
 
 			self.falla( datos && datos.data ? datos.data : null );
 		} ).catch( function () {
-			// Error de red: las respuestas siguen en pantalla y el botón vuelve
-			// a estar disponible para reintentar.
+			// error de red: las respuestas siguen en pantalla y el botón vuelve a estar disponible para reintentar
 			self.enviando = false;
 			self.restauraBoton();
 			self.avisa( self.textos.network || '' );
 		} );
 	};
 
-	/**
-	 * Deja el botón principal como estaba antes de enviar.
-	 */
+	// restablece el estado del botón después del envío
 	Encuesta.prototype.restauraBoton = function () {
 		this.siguiente.textContent = ( this.pasoActual >= this.total )
 			? ( this.textos.submit || '' )
@@ -933,12 +863,7 @@
 		this.actualizaSiguiente();
 	};
 
-	/**
-	 * Enseña la pantalla de agradecimiento. Sólo se llega aquí con la
-	 * confirmación del servidor en la mano.
-	 *
-	 * @param {Object} datos Respuesta del endpoint.
-	 */
+	// presenta la confirmación de recepción de respuestas
 	Encuesta.prototype.termina = function ( datos ) {
 		almacen.borra( STORAGE_PROGRESS );
 
@@ -958,8 +883,7 @@
 			this.privacidad.hidden = true;
 		}
 
-		// El Figma no dibuja cabecera en la pantalla final, así que el rótulo y el
-		// aspa se retiran y el nombre del diálogo pasa al título de gracias.
+
 		if ( this.cabecera ) {
 			this.cabecera.hidden = true;
 		}
@@ -981,11 +905,7 @@
 		}
 	};
 
-	/**
-	 * Traduce el error del servidor a un mensaje, sin perder lo respondido.
-	 *
-	 * @param {Object|null} datos Cuerpo del error.
-	 */
+	// presenta el error del servidor y conserva las respuestas introducidas
 	Encuesta.prototype.falla = function ( datos ) {
 		var codigo = ( datos && datos.code ) ? datos.code : '';
 
@@ -1012,9 +932,7 @@
 		this.avisa( this.textos.server || '' );
 	};
 
-	/**
-	 * Arranque.
-	 */
+
 	function arranca() {
 		var modal = document.querySelector( '[data-mbn-survey]' );
 

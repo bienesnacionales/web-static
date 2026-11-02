@@ -1,56 +1,21 @@
-/* ============================================================
- * Encuesta de satisfacción — botón flotante y diálogo
- * (template-parts/survey/, inc/survey-frontend.php)
- *
- * Figma: 885:11943 (botón flotante), 885:8370 (su posición en la página),
- * 918:12068 / 918:12372 / 918:12756 / 918:12874 (los pasos), 918:12999
- * (agradecimiento) y 885:8257 (pregunta única y estrellas seleccionadas).
- *
- * Es el `modal` de Bootstrap con las variables `--bs-modal-*` redefinidas
- * (§7.3), como `external-link.css` y `pdf-viewer.css`.
- *
- * Dos notas que no se ven en el código:
- *   - `h2` llega con `font-weight: 500 !important` y `font-family: Roboto
- *     !important` desde `base.css`, el Base Kit de Siigsa (§6). La pregunta y
- *     el título de agradecimiento son negrita en el Figma, así que su
- *     `font-weight` necesita `!important` para ganar; el tamaño y el interlineado
- *     no, porque ahí base.css no lo usa.
- *   - Las estrellas se pintan con `mask-image` y no con `<img>`: el valor
- *     elegido cambia de **forma** (contorno → relleno) y de color, y un `<img>`
- *     no toma color del CSS (§8). Las dos siluetas son el mismo vector del
- *     Figma en dos pinturas.
- *
- * El móvil no está maquetado: el Figma sólo trae el canvas de 1440. La
- * adaptación es propia —diálogo fluido con 16px de aire, estrellas de 32px y
- * botones apilados— y no un escalado del desktop (§12 del encargo).
- * ============================================================ */
+/* define la presentación de encuesta de satisfacción */
+/* ajustes de presentación para escritorio */
 
-/* ---------- Botón flotante ---------- */
+/* botón flotante */
 
-/* El Figma lo ancla en `x = 0` a media altura del alto de la página. Aquí es
-   `fixed` y centrado en la ventana: el botón tiene que seguir alcanzable al
-   desplazarse, que es lo que significa «flotante».
 
-   ⚠️ `left`/`top` FÍSICOS, no `inset-inline-start`/`inset-block-start`: las
-   propiedades lógicas se resuelven contra el modo de escritura del propio
-   elemento, y este es `vertical-rl`, así que las lógicas intercambian los ejes
-   y el botón se iba al centro del borde superior. */
 .mbn-survey-launcher {
 	position: fixed;
 	left: 0;
 	top: 23%;
 	transform: translateY(-50%);
-	/* Por encima del header (1020) y de los dropdowns (1030), por debajo del
-	   offcanvas (1045) y del propio diálogo (1055). */
+
 	z-index: 1035;
 	display: flex;
 	align-items: center;
 	justify-content: center;
 	gap: 8px;
-	/* El atajo `padding` es físico y no gira con el modo de escritura: 24px
-	   arriba y abajo —el aire que el Figma pone antes de la estrella y después
-	   del texto— y 12px a los lados, que con la línea de 28.5px del texto dan
-	   los 53px de ancho de la maqueta. */
+
 	padding: 24px 12px;
 	border: 0;
 	border-radius: 0;
@@ -62,7 +27,7 @@
 	line-height: 1.5;
 	text-align: center;
 	cursor: pointer;
-	/* Texto de abajo arriba, como en la maqueta. */
+
 	writing-mode: vertical-rl;
 	rotate: 180deg;
 }
@@ -77,8 +42,7 @@
 	display: none;
 }
 
-/* La rotación del botón voltearía también la estrella: se compensa para que
-   quede derecha (ver el docblock del template). */
+
 .mbn-survey-launcher__icon {
 	flex: 0 0 auto;
 	width: 24px;
@@ -95,7 +59,7 @@
 	-webkit-mask-size: 24px 24px;
 }
 
-/* la barra móvil solo ocupa espacio mientras la encuesta esté disponible */
+
 .mbn-survey-mobile-dock {
 	display: none;
 }
@@ -152,7 +116,7 @@
 		min-width: 0;
 	}
 
-	/* comparte la fila con el chat existente, sin cambiar su nombre accesible */
+
 	body:has(.mbn-survey-launcher:not([hidden])) .mbn-chat {
 		right: 16px;
 		bottom: calc(14px + env(safe-area-inset-bottom, 0px));
@@ -177,7 +141,7 @@
 	}
 }
 
-/* ---------- Diálogo ---------- */
+/* diálogo */
 
 .mbn-survey {
 	--bs-modal-width: 448px;
@@ -191,8 +155,7 @@
 }
 
 .mbn-survey__content {
-	/* La franja superior es hija directa del contenido y tiene que respetar el
-	   radio de 16px de las esquinas. */
+
 	overflow: hidden;
 }
 
@@ -202,7 +165,7 @@
 	margin: 0;
 }
 
-/* 165.758 de 448 en el Figma. */
+
 .mbn-survey__flag-blue {
 	flex: 0 0 37%;
 	background-color: var(--mbn-brand-blue, #0F69C4);
@@ -220,7 +183,7 @@
 	padding: var(--bs-modal-padding);
 }
 
-/* ---------- Cabecera ---------- */
+/* cabecera */
 
 .mbn-survey__header {
 	display: flex;
@@ -278,10 +241,9 @@
 	display: none;
 }
 
-/* ---------- Indicador de pasos ---------- */
+/* indicador de pasos */
 
-/* Un punto por pregunta activa, unidos por la línea del stepper del design
-   system. Con una o dos preguntas el PHP no lo imprime. */
+
 .mbn-survey__steps {
 	display: flex;
 	align-items: center;
@@ -321,14 +283,13 @@
 	background-color: var(--mbn-brand-blue, #0F69C4);
 }
 
-/* El paso actual y los ya respondidos van rellenos; los pendientes, en
-   contorno. */
+
 .mbn-survey__step-dot.is-done::before,
 .mbn-survey__step-dot.is-current::before {
 	background-color: var(--mbn-brand-blue, #0F69C4);
 }
 
-/* ---------- Paso ---------- */
+/* paso */
 
 .mbn-survey__form {
 	display: flex;
@@ -352,21 +313,18 @@
 	color: var(--mbn-text-primary, #333333);
 	font-family: var(--mbn-roboto-body-small-font-family, "Roboto", sans-serif);
 	font-size: calc(20px * var(--mbn-text-scale, 1));
-	/* Gana a `h2 { font-weight: 500 !important }` de base.css (§6). */
+
 	font-weight: 700 !important;
 	line-height: calc(27.5px * var(--mbn-text-scale, 1));
 }
 
-/* El enunciado recibe el foco al cambiar de paso para que un lector de pantalla
-   lo lea (assets/js/survey.js). No es un control —no se alcanza con el
-   tabulador— así que no dibuja el anillo de foco: sería un recuadro azul
-   permanente alrededor del texto para quien navega con ratón. */
+
 .mbn-survey__question:focus,
 .mbn-survey__question:focus-visible {
 	outline: none;
 }
 
-/* ---------- Escala de 7 estrellas ---------- */
+/* escala de 7 estrellas */
 
 .mbn-survey__scale {
 	display: flex;
@@ -393,16 +351,14 @@
 	-webkit-mask-size: 40px 40px;
 }
 
-/* Elegido el valor 5, las estrellas 1 a 5 quedan rellenas: cambia la silueta,
-   no sólo el color. */
+
 .mbn-survey__star.is-filled {
 	background-color: var(--mbn-survey-star-active, #0F5AC4);
 	mask-image: var(--mbn-survey-star-filled);
 	-webkit-mask-image: var(--mbn-survey-star-filled);
 }
 
-/* Anticipo al pasar el ratón o al recorrer la escala con el teclado, en el azul
-   de marca para distinguirlo de lo ya elegido. */
+
 .mbn-survey__star.is-preview {
 	background-color: var(--mbn-brand-blue, #0F69C4);
 	mask-image: var(--mbn-survey-star-filled);
@@ -424,7 +380,7 @@
 	text-align: end;
 }
 
-/* ---------- Aviso de error ---------- */
+/* aviso de error */
 
 .mbn-survey__alert {
 	margin: 0;
@@ -441,17 +397,14 @@
 	display: none;
 }
 
-/* ---------- Botones ---------- */
+/* botones */
 
 .mbn-survey__actions {
 	display: flex;
 	gap: 14px;
 }
 
-/* Clase de Bootstrap + variables `--bs-btn-*` redefinidas (§7.3) en vez de
-   declaraciones sueltas: `.btn:disabled` tiene más especificidad que una clase
-   propia, así que un `background-color` a secas se perdía justo en el estado
-   deshabilitado, que es el que pinta el Figma en el primer paso. */
+
 .mbn-survey__button {
 	--bs-btn-padding-y: 8px;
 	--bs-btn-padding-x: 16px;
@@ -477,8 +430,7 @@
 	--bs-btn-hover-border-color: transparent;
 	--bs-btn-active-bg: var(--mbn-brand-blue-dark, #00268D);
 	--bs-btn-active-color: var(--mbn-text-on-primary, #E7ECFF);
-	/* El Figma pinta «Siguiente» deshabilitado al 36% del mismo azul, no en
-	   gris: sigue leyéndose como el botón principal, apagado. */
+
 	--bs-btn-disabled-bg: var(--mbn-action-primary, #0046A8);
 	--bs-btn-disabled-color: var(--mbn-text-on-primary, #E7ECFF);
 	--bs-btn-disabled-border-color: transparent;
@@ -502,7 +454,7 @@
 	min-width: 77px;
 }
 
-/* ---------- Privacidad ---------- */
+/* privacidad */
 
 .mbn-survey__privacy {
 	margin: 0;
@@ -518,7 +470,7 @@
 	text-decoration: underline;
 }
 
-/* ---------- Pantalla de agradecimiento ---------- */
+/* pantalla de agradecimiento */
 
 .mbn-survey__done {
 	display: flex;
@@ -538,8 +490,7 @@
 	height: 64px;
 	border-radius: 50%;
 	background-color: var(--mbn-surface-brand-soft, #E8F0FE);
-	/* El visto se compone dentro del círculo: el fondo es del círculo y la
-	   máscara recorta la marca sobre el color de acción. */
+
 	background-image: none;
 	position: relative;
 }
@@ -576,7 +527,7 @@
 	line-height: calc(22.75px * var(--mbn-text-scale, 1));
 }
 
-/* ---------- Móvil y tablet ---------- */
+/* ajustes de presentación para móviles */
 
 @media (max-width: 767.98px) {
 	.mbn-survey {
@@ -592,8 +543,7 @@
 		line-height: calc(25px * var(--mbn-text-scale, 1));
 	}
 
-	/* Siete estrellas de 40 no caben en 402px de ancho: 32 con 8 de aire sí, y
-	   siguen por encima del área táctil mínima. */
+
 	.mbn-survey__scale {
 		gap: 8px;
 	}
@@ -622,3 +572,13 @@
 		inset-inline-start: 22px;
 	}
 }
+
+.mbn-survey__external {
+	margin-bottom: 16px;
+	padding: 12px;
+	border: 1px solid var(--mbn-border-default, #CCC);
+	border-radius: 8px;
+}
+.mbn-survey__external[hidden] { display: none; }
+.mbn-survey__external p { margin: 0 0 8px; }
+.mbn-survey__external a { display: inline-flex; text-decoration: none; }

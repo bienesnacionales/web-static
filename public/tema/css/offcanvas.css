@@ -1,18 +1,4 @@
-/* Offcanvas derecho — menu tablet/mobile.
- *
- * Decisión humana (openQuestions.resolvedAt 2026-08-25T05:01 — OPEN-Q-HF-001):
- *   - Bootstrap 5.3.3 Offcanvas
- *   - tablet 768-1199.98 → 400px
- *   - mobile <768 → 320px
- *   - transition 240ms
- *   - backdrop, scrollLock, focusTrap, closeOnEsc nativos
- *   - focusReturn al disparador (assets/js/header-nav.js)
- *
- * Se sobreescribe el ancho default de Bootstrap (.offcanvas-end) en dos
- * breakpoints para cumplir la decisión humana; el resto del comportamiento
- * (animación, aria-modal, scrollLock) lo entrega Bootstrap.
- */
-
+/* define la presentación de menú de navegación móvil */
 .mbn-offcanvas {
 	background: var(--mbn-surface-white, #FFFFFF);
 	color: var(--mbn-text-primary, #333333);
@@ -45,7 +31,7 @@
 .mbn-offcanvas__title {
 	margin: 0;
 	font: 500 19px/1.5 "Roboto", system-ui, sans-serif;
-	/* El atajo `font` reinicia el tamaño: se reescribe escalado. */
+
 	font-size: calc(19px * var(--mbn-text-scale, 1));
 	color: var(--mbn-text-primary, #333333);
 }
@@ -84,10 +70,7 @@
 	flex-direction: column;
 }
 
-/* Buscador (sin maqueta): a todo el ancho del panel. Los 8px de abajo más los
- * 16 de `padding-block` del primer ítem dejan «Inicio» a 24 del campo, el
- * `--mbn-space-stack` del sitio. La piel es la del header desktop: el
- * `input-group` de Bootstrap con las utilidades del template. */
+
 .mbn-offcanvas__search {
 	width: 100%;
 	margin-bottom: 8px;
@@ -118,7 +101,7 @@
 	border: 0;
 	color: var(--mbn-text-primary, #333333);
 	font: 400 16px/1.5 "Roboto", system-ui, sans-serif;
-	/* El atajo `font` reinicia el tamaño: se reescribe escalado. */
+
 	font-size: calc(16px * var(--mbn-text-scale, 1));
 	text-decoration: none;
 	text-align: left;
@@ -148,7 +131,7 @@
 	font-weight: 700;
 }
 
-/* Inicio: icono + texto agrupados a la izquierda (Figma 446:9171, gap 8px). */
+
 .mbn-offcanvas__nav-link {
 	justify-content: flex-start;
 }
@@ -186,7 +169,7 @@
 	color: var(--mbn-text-primary, #333333);
 	text-decoration: none;
 	font: 400 16px/1.5 "Roboto", system-ui, sans-serif;
-	/* El atajo `font` reinicia el tamaño: se reescribe escalado. */
+
 	font-size: calc(16px * var(--mbn-text-scale, 1));
 	border-bottom: 1px solid var(--mbn-border-divider, #E6E6E6);
 }
@@ -230,8 +213,7 @@
 	outline-offset: 2px;
 }
 
-/* En los topes de la escala el botón lleva `aria-disabled` y no `disabled`
-   (§8), así que el estado apagado se pinta por los dos. */
+
 .mbn-offcanvas__a11y-button:disabled,
 .mbn-offcanvas__a11y-button[aria-disabled="true"] {
 	background: var(--mbn-a11y-button-surface-disabled, #E6E6E6);
@@ -244,7 +226,7 @@
 	color: var(--mbn-surface-white, #FFFFFF);
 }
 
-/* Los iconos son <img>, así que no heredan currentColor: se invierten. */
+
 .mbn-offcanvas__a11y-button[aria-pressed="true"] img {
 	filter: invert(1);
 }
@@ -254,14 +236,40 @@
 	height: 24px;
 }
 
-/* Tablet: ancho 400px (limitado al ancho disponible). */
+
 @media (min-width: 768px) and (max-width: 1199.98px) {
 	.mbn-offcanvas {
 		width: 400px;
 	}
 }
 
-/* Body scroll lock cuando el offcanvas está abierto. */
+
 body.mbn-offcanvas-open {
 	overflow: hidden;
 }
+
+
+.mbn-header-social--mobile {
+ margin-top: 20px;
+ padding-top: 20px;
+ border-top: 1px solid #E1E6ED;
+}
+.mbn-header-social__title {
+ display: block;
+ margin: 0 0 14px;
+ color: var(--mbn-text-primary, #333);
+ font-family: "Roboto", Arial, sans-serif;
+ font-size: calc(16px * var(--mbn-text-scale, 1));
+ font-weight: 700;
+ line-height: 1.5;
+}
+.mbn-header-social--mobile .mbn-header-social__list { gap: 12px; }
+.mbn-header-social--mobile .mbn-header-social__link {
+ width: 44px;
+ height: 44px;
+ border: 0;
+ background: transparent;
+}
+.mbn-header-social--mobile .mbn-header-social__icon { width: 22px; height: 22px; }
+html.mbn-contrast .mbn-header-social--mobile { border-top-color: #FCFF3C; }
+html.mbn-contrast .mbn-header-social__title { color: #FFF; }

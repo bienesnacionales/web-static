@@ -1,13 +1,4 @@
-/* TopBar — bloque independiente del Header.
- *
- * Bloque del contrato: header-footer-contract-v1.json → blocks.topbar
- * Visibilidad: visible ≥1200px, oculto <1200px.
- * Estructura: fill #4D4D4D, padding 0 24, border-bottom #27425F 2px.
- *
- * El display:none <1200px es REGLA DURA del contrato (AC-HF-01):
- * el bloque debe quedar acoplable a "puede ocultarse" sin tocar el Header.
- */
-
+/* define la presentación de identificación del Gobierno de Chile */
 .mbn-topbar {
 	background: var(--mbn-surface-topbar, #4D4D4D);
 	color: var(--mbn-surface-white, #FFFFFF);

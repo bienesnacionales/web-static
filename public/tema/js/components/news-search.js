@@ -1,38 +1,10 @@
-/**
- * Componente global — Buscador de noticias.
- *
- * El bloque funciona sin este archivo: los filtros son enlaces y la búsqueda un
- * formulario GET, así que navegar da el mismo resultado. Lo que añade el script
- * es sustituir solo la región de resultados en lugar de recargar la página, y
- * mantener la URL en sintonía con lo que se está viendo.
- *
- * Tres reglas que sostienen el resto:
- *
- *   1. **La URL es el estado.** Cada petición se arma a partir del `href` que el
- *      servidor ya escribió en el enlace, no de un objeto de estado paralelo. Al
- *      responder, `pushState` deja esa misma URL en la barra: copiarla y abrirla
- *      en otra pestaña reproduce exactamente la vista.
- *   2. **Una petición a la vez.** `AbortController` cancela la anterior, de modo
- *      que dos clics rápidos en dos categorías nunca dejan en pantalla la
- *      respuesta de la primera.
- *   3. **Si algo falla, navega.** Cualquier error deja que el enlace o el
- *      formulario hagan lo suyo: la degradación es la navegación normal, no una
- *      pantalla rota.
- *
- * @package mbn
- */
-
+/* gestiona las interacciones de búsqueda de noticias */
 ( function () {
 	'use strict';
 
 	var SELECTOR = '[data-mbn-news-search]';
 
-	/**
-	 * Cablea un buscador de noticias.
-	 *
-	 * @param {HTMLElement} root Raíz del componente.
-	 * @return {void}
-	 */
+	// inicializa un buscador de noticias
 	function setupNewsSearch( root ) {
 		var endpoint = root.getAttribute( 'data-mbn-news-search-endpoint' );
 		var action = root.getAttribute( 'data-mbn-news-search-action' );
@@ -42,9 +14,7 @@
 			return;
 		}
 
-		// Sin `fetch`, `AbortController` o `history.pushState` no se degrada a
-		// una versión peor del filtrado: se deja la navegación completa, que ya
-		// funciona.
+		// conserva la navegación completa cuando las API de filtrado no están disponibles
 		if ( ! window.fetch || ! window.AbortController || ! window.history || ! window.history.pushState ) {
 			return;
 		}
@@ -61,12 +31,7 @@
 		var baseUrl = root.getAttribute( 'data-mbn-news-search-base' ) || window.location.href;
 		var controller = null;
 
-		/**
-		 * Lee los parámetros del listado de una URL.
-		 *
-		 * @param {string} url URL absoluta o relativa.
-		 * @return {Object} Estado: { categoria, buscar, pagina }.
-		 */
+		// lee los parámetros del listado de una URL
 		function stateFromUrl( url ) {
 			var parsed = new URL( url, window.location.href );
 
@@ -77,12 +42,7 @@
 			};
 		}
 
-		/**
-		 * Compone la URL del endpoint para un estado.
-		 *
-		 * @param {Object} state Estado del listado.
-		 * @return {string} URL de la petición.
-		 */
+		// construye la dirección de consulta para el estado seleccionado
 		function endpointUrl( state ) {
 			var url = new URL( endpoint, window.location.href );
 
@@ -113,16 +73,7 @@
 			return url.toString();
 		}
 
-		/**
-		 * Reescribe los enlaces de los filtros para el estado vigente.
-		 *
-		 * Los chips viven fuera de la región que se reemplaza —así el foco del
-		 * chip pulsado sobrevive al filtrado—, de modo que hay que actualizarlos
-		 * a mano: la marca de activo y el término de búsqueda que arrastran.
-		 *
-		 * @param {Object} state Estado del listado.
-		 * @return {void}
-		 */
+		// reescribe los enlaces de los filtros para el estado vigente
 		function syncFilters( state ) {
 			if ( ! filters ) {
 				return;
@@ -158,13 +109,7 @@
 			}
 		}
 
-		/**
-		 * Pide una vista del listado y sustituye los resultados.
-		 *
-		 * @param {string}  url        URL pública de la vista pedida.
-		 * @param {boolean} moveFocus  Si hay que llevar el foco a los resultados.
-		 * @return {void}
-		 */
+		// consulta el listado y actualiza la región de resultados
 		function load( url, moveFocus ) {
 			var state = stateFromUrl( url );
 
@@ -207,9 +152,7 @@
 						status.textContent = payload.data.announce;
 					}
 
-					// El foco solo se mueve al paginar: al filtrar, el chip
-					// pulsado sigue siendo el punto de referencia y quitárselo
-					// al teclado desorienta más de lo que ayuda.
+					// traslada el foco al paginar y lo conserva en el filtro durante la selección
 					if ( moveFocus ) {
 						results.focus();
 					}
@@ -219,8 +162,7 @@
 						return;
 					}
 
-					// Sin resultados que mostrar, la navegación completa es la
-					// respuesta correcta: la misma URL devuelve la misma vista.
+					// utiliza la navegación completa cuando la respuesta no contiene una vista válida
 					results.setAttribute( 'aria-busy', 'false' );
 					root.classList.remove( 'mbn-news-search--loading' );
 					window.location.assign( url );
@@ -228,8 +170,7 @@
 		}
 
 		root.addEventListener( 'click', function ( event ) {
-			// Clic con modificador o botón secundario: es una petición explícita
-			// de abrir en otra pestaña, y el navegador ya sabe hacerla.
+			// conserva el comportamiento nativo de los clics modificados o secundarios
 			if ( event.defaultPrevented || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || 0 !== event.button ) {
 				return;
 			}
@@ -264,18 +205,13 @@
 			} );
 		}
 
-		// Atrás y adelante del navegador: la vista se rehace desde la URL, que
-		// es justo lo que `pushState` dejó ahí.
+		// restaura el listado desde la dirección al navegar por el historial
 		window.addEventListener( 'popstate', function () {
 			load( window.location.href, false );
 		} );
 	}
 
-	/**
-	 * Inicializa todos los buscadores presentes en la página.
-	 *
-	 * @return {void}
-	 */
+	// inicializa todos los buscadores presentes en la página
 	function init() {
 		var blocks = document.querySelectorAll( SELECTOR );
 

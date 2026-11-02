@@ -1,17 +1,4 @@
-/* ============================================================
- * Plantilla — Ministerio y Autoridades (template-ministerio.php)
- * Maqueta: Figma 292:3317 (frame 1440; contenido de 1120).
- *
- * Este archivo solo aporta el andamiaje de la página y las piezas que no son
- * componentes: el título y la descripción. Las pestañas y el organigrama son
- * componentes globales y traen su propia hoja
- * (`components/authorities.css` y `components/org-chart.css`).
- *
- * Ojo con base.css (el Base Kit de Siigsa): `main p` fija color, tamaño y un
- * `font-weight: 400 !important`, y `h1` fuerza familia y peso. Donde hace
- * falta !important para ganarle está anotado.
- * ============================================================ */
-
+/* define la presentación de información institucional */
 .mbn-ministerio {
 	padding-block: var(--mbn-space-page-top, 24px) var(--mbn-space-section, 36px);
 	background: var(--mbn-surface-white, #FFFFFF);
@@ -20,14 +7,11 @@
 .mbn-ministerio__container {
 	display: flex;
 	flex-direction: column;
-	/* 24 + los 12 de padding propio de las migas = los 36 (spacing-l) que
-	   separan la fila de migas del contenido, igual que en el detalle de
-	   trámite. */
+
 	gap: 24px;
 }
 
-/* El bloque «título + descripción» es una sola pieza y va con gap 8, no con
-   los 24 que separan las secciones. */
+
 .mbn-ministerio__intro {
 	display: flex;
 	flex-direction: column;
@@ -35,9 +19,7 @@
 	min-width: 0;
 }
 
-/* base.css: `h1 { font-weight: 700 !important; font-family: Roboto Slab
-   !important }`. La familia coincide con la maqueta (Heading/Slab/Large); el
-   peso 500 necesita !important para ganarle. */
+
 .mbn-ministerio__title {
 	margin: 0;
 	font-family: var(--mbn-roboto-slab-large-font-family, "Roboto Slab", serif) !important;
@@ -83,9 +65,7 @@
 	color: var(--mbn-brand-blue-dark, #00268D);
 }
 
-/* base.css declara familia y peso de h2-h6 con !important, así que los
-   subtítulos que el editor escriba se quedan con los del kit; aquí solo se
-   ajustan tamaño, color y ritmo vertical. */
+
 .mbn-ministerio__content h2,
 .mbn-ministerio__content h3 {
 	margin-top: 32px;
@@ -108,7 +88,7 @@
 	height: auto;
 }
 
-/* ---------- md ≥ 768px ---------- */
+/* md ≥ 768px */
 
 @media (min-width: 768px) {
 	.mbn-ministerio__title {
@@ -116,7 +96,7 @@
 	}
 }
 
-/* ---------- xl ≥ 1200px (canvas 1440 del Figma) ---------- */
+/* ajustes de presentación para escritorio */
 
 @media (min-width: 1200px) {
 	.mbn-ministerio__title {

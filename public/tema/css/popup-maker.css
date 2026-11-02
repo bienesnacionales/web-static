@@ -1,58 +1,88 @@
-/**
- * Popup Maker — lo que la plantilla «MBN» no puede expresar desde el admin.
- *
- * La plantilla (popup_theme 55296, slug `mbn`) se configura en Popup Maker →
- * Plantillas de popup: telón, caja, radio, sombra, colores del texto y botón de
- * cierre salen de allí, y el plugin los escribe en su propio CSS
- * (`uploads/pum/pum-site-styles.css`). Esta hoja añade SOLO lo que su editor
- * no tiene (§16):
- *
- *   - La franja institucional de 8px del borde superior, azul y roja. El editor
- *     ofrece un borde igual en los cuatro lados y una sola sombra.
- *   - El relleno superior que reserva la fila del botón de cierre (el plugin
- *     tiene un único relleno para los cuatro lados) y el inferior de 28px.
- *   - El hover y el foco del botón de cierre: el plugin no tiene estados.
- *   - La escala de texto de la botonera de accesibilidad en el contenido: el
- *     reinicio del plugin fija `font-size: medium`, que no la sigue.
- *
- * Maqueta: Figma `1365:6714` («Modal / Cuenta Pública 2026»), 640px de ancho.
- *
- * Los selectores llevan `.pum-overlay.pum-theme-mbn` a propósito: el reinicio
- * del plugin (`.pum-container { background: none }`) y su CSS generado
- * (`.pum-theme-mbn .pum-container`) van en una hoja cuyo orden respecto a esta
- * no está garantizado, así que se gana por especificidad, (0,3,0), no por orden.
- *
- * @package mbn
- */
-
+/* define la presentación de ventanas emergentes de Popup Maker */
 .pum-overlay.pum-theme-mbn .pum-container {
-	/* 284 de 640 en el Figma. La custom property la reutiliza a11y.css para
-	   devolver la franja en alto contraste, donde el barrido la quita. */
+
 	--mbn-popup-flag: linear-gradient(90deg,
 		var(--mbn-brand-blue, #0F69C4) 0 44.375%,
 		var(--mbn-survey-flag-red, #FF2930) 44.375% 100%);
 
-	/* Franja (8) + relleno del cuerpo (16) + fila del cierre (28) + separación (16).
-	   Sin esto el botón de cierre, que el plugin posiciona en absoluto, pisaría la
-	   esquina de la imagen. */
+
 	padding-top: 68px;
 	padding-bottom: 28px;
 
-	/* En el fondo y no en un pseudo-elemento: así la recorta el mismo radio de
-	   la caja, sin `overflow: hidden`, que cortaría el contenido desplazable. */
+
 	background-image: var(--mbn-popup-flag);
 	background-repeat: no-repeat;
 	background-position: top left;
 	background-size: 100% 8px;
+
+
+	position: fixed !important;
+	left: 50% !important;
+	top: 50% !important;
+	bottom: auto !important;
+	right: auto !important;
+	margin: 0 !important;
+	transform: translate(-50%, -50%) !important;
+
+	width: clamp(640px, 40vw, 1120px) !important;
+	min-width: 0 !important;
+	max-width: calc(100vw - 32px) !important;
+	max-height: calc(100vh - 32px);
+	max-height: calc(100dvh - 32px);
+	display: flex !important;
+	flex-direction: column;
+	box-sizing: border-box;
+	overflow: hidden;
 }
 
 .pum-overlay.pum-theme-mbn .pum-content {
 	font-size: calc(16px * var(--mbn-text-scale, 1));
+	flex: 1 1 auto;
+	min-height: 0;
+	overflow-y: auto;
+	overscroll-behavior: contain;
 }
 
-/* El mismo estado que el cierre de la encuesta (survey.css), que sale del
-   mismo componente de Figma. La «×» va en #4D4D4D desde el admin: el #99A1AF
-   de la maqueta mide 2,6:1 sobre blanco y no llega al 3:1 de WCAG 1.4.11. */
+
+.pum-overlay.pum-theme-mbn .pum-content .wp-block-image img {
+	display: block;
+	flex: 0 0 auto !important;
+	align-self: center;
+	width: auto !important;
+	height: auto !important;
+	max-width: 100% !important;
+	max-height: max(80px, calc(100vh - 220px));
+	max-height: max(80px, calc(100dvh - 220px));
+	object-fit: contain !important;
+	margin-left: auto !important;
+	margin-right: auto !important;
+}
+
+
+.pum-overlay.pum-theme-mbn .pum-content + .pum-close {
+	position: absolute;
+	top: 16px;
+	right: 16px;
+	bottom: auto;
+	left: auto;
+	margin: 0;
+	padding: 0;
+	width: 44px;
+	height: 44px;
+	line-height: 44px;
+	font-size: 24px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	z-index: 2;
+}
+
+.pum-overlay.pum-theme-mbn .pum-content + .pum-close:focus-visible {
+	outline: 3px solid var(--mbn-action-primary, #0046A8);
+	outline-offset: 2px;
+}
+
+
 .pum-overlay.pum-theme-mbn .pum-content + .pum-close:is(:hover, :focus-visible) {
 	background-color: var(--mbn-surface-hover, #F2F2F2);
 }

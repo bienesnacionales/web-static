@@ -1,24 +1,15 @@
-/*
-Title: Base Kit Digital
-Autor: Siigsa 
-Year: 2025
-Version 1.4
-*/
-
-/* width */
+/* define la presentación de estilos base del sitio; Base Kit Digital, Siigsa, versión 1.4 (2025) */
 ::-webkit-scrollbar {width: 10px;}
-/* Track */
+
 ::-webkit-scrollbar-track {background: #f1f1f1; }
-/* Handle */
+
 ::-webkit-scrollbar-thumb {background: #888; }
-/* Handle on hover */
+
 ::-webkit-scrollbar-thumb:hover {background: #555; }
 
 body {background-color: #fff; color: #4a4a4a}
 
-/*--------------------------------------------------------------
-# Header, Footer y Main
---------------------------------------------------------------*/
+/* header, Footer y Main */
 
 header {display: inline-block; width: 100%; padding-bottom: 5px; min-height: 100px}
 footer {background-color: #012C50 !important; padding: 40px 0 50px; color: #fff; position: relative;}
@@ -53,9 +44,7 @@ main .parrafogrande {font-size: 1.2em; line-height: 1.4em; }
 
 
 
-/*--------------------------------------------------------------
-# Menus  
---------------------------------------------------------------*/
+/* menus */
 
 nav.navbar {box-shadow: none !important;}
 nav.navbar .navbar-brand {width: 115px !important; height: inherit; padding: 0px}
@@ -91,7 +80,7 @@ header.bg-terciario a {color: #ffffff}
   nav .navbar-collapse.collapse.show {margin-bottom: 20px}
 }
 
-/* Menu drop down hover*/
+
 #navbarNavDropdown ul li {position: relative; display: block;}
 #navbarNavDropdown ul li ul.sub-menu {position: absolute; z-index: 999; width: auto; display: none; padding: 0px;}
 #navbarNavDropdown ul li:hover ul.sub-menu {display: block}
@@ -102,9 +91,7 @@ header.bg-terciario a {color: #ffffff}
 }
 
 
-/*--------------------------------------------------------------
-# Títulos y párrafos
---------------------------------------------------------------*/
+/* títulos y párrafos */
 
 main p {font-size: 1rem; line-height: 1.5em; font-weight: 400 !important; font-family: Roboto;  color: #4a4a4a; margin-bottom: 20px}
 main ul li, 
@@ -139,11 +126,9 @@ p a, main a {color: #006fb3;}
 p a:hover, main ahover {color: #006fb3;}
 
 
-/*--------------------------------------------------------------
-# Padding y márgenes
---------------------------------------------------------------*/
+/* padding y márgenes */
 
-/*Paddings*/
+
 
 .p0 {padding: 0px !important}
 
@@ -203,7 +188,7 @@ p a:hover, main ahover {color: #006fb3;}
 .p64-y {padding-top: 64px; padding-bottom: 64px}
 .p80-y {padding-top: 80px; padding-bottom: 80px}
 
-/*Márgenes */
+
 
 .m0 {margin: 0px !important}
 
@@ -263,9 +248,7 @@ p a:hover, main ahover {color: #006fb3;}
 .m64-y {margin-top: 64px; margin-bottom: 64px}
 .m80-y {margin-top: 80px; margin-bottom: 80px}
 
-/*--------------------------------------------------------------
-# Botones
---------------------------------------------------------------*/
+/* botones */
 
 .boton {
   display: inline-block;
@@ -281,13 +264,13 @@ p a:hover, main ahover {color: #006fb3;}
   transition: color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;
 }
 
-/*Tamaños*/
+
 .boton-lg {padding: 13px 25px; font-size:  1.25rem !important; line-height: 1rem;}
 .boton-md {padding: 12px 20px; font-size: 1rem !important; line-height: 1rem;}
 .boton-sm {padding: 8px 15px; font-size:  1rem !important; line-height: 1rem;}
 
 
-/*Básicos*/
+
 .boton-primario { background-color: #006FB3; color: #ffffff; border: 1px solid #006FB3; text-decoration: none !important;}
 .boton-secundario { background-color: #ffffff; color: #006FB3; border: 1px solid #006FB3; text-decoration: none !important;}
 .boton-terciario { background-color: #012C50; color: #ffffff;  border: 1px solid #012C50}
@@ -300,22 +283,22 @@ p a:hover, main ahover {color: #006fb3;}
 
 .boton.disabled, .boton:disabled { color: #8a8a8a; background-color: #E5E5E5; border-color: #E5E5E5; pointer-events: none;}
 
-/*Link*/
+
 .boton-link { background-color: transparent; color: #006FB3; border: 0px;}
 .boton-link i { visibility: hidden;font-size: 0.8em; margin-left: 0px;}
 .boton-link:hover { background-color: transparent; color: #0A588B; border: 0px;}
 .boton-link:hover i{ visibility: visible; font-size: 0.8em; margin-left: 4px; transition: 0.5s}
 
 
-/*Border curvo*/
+
 .boton-curvo {border-radius: 30px}
 
-/*Ver más - Más detalles */
+
 .boton-vermas { text-decoration: none !important;}
 .boton-vermas:after {content: '\e5e1'; font-size: 0.8rem; font-family: 'Material Symbols Outlined'; margin-left: 0.5rem; transition: 0.5s }
 .boton-vermas:hover:after {margin-left: 0.9rem; transition: 0.5s }
 
-/*Botones Acciones*/
+
 .boton-peligro { background-color: #E22C2C; color: #ffffff;  border: 1px solid #E22C2C; text-decoration: none !important;}
 .boton-precaucion { background-color: #F56B0F; color: #ffffff;  border: 1px solid #F56B0F; text-decoration: none !important;}
 .boton-exito { background-color: #0B8578; color: #ffffff;  border: 1px solid #0B8578; text-decoration: none !important;}
@@ -330,15 +313,12 @@ p a:hover, main ahover {color: #006fb3;}
 .boton-claro:hover, .boton-claro:ac { background-color: #F2F2F2; color: #191A1A;  border: 1px solid #F2F2F2}
 .boton-oscuro:hover, .boton-oscuro:ac { background-color: #000000; color: #ffffff;  border: 1px solid #000000}
 
-/*Boton con icono*//*
-.boton span.material-symbols-outlined {top: 4px; position: relative;font-size: 1.1em;}*/
 
-/*Boton Clave única*/
+
+
 a.btn-cu, a.btn-cu .texto {text-decoration: none;}
 
-/*--------------------------------------------------------------
-# Cards tarjetas
---------------------------------------------------------------*/
+/* cards tarjetas */
 
 .card {border: 1px solid #abb7c7; margin-bottom: 2em; background-color: #fff}
 .card-title {margin-bottom: 8px }
@@ -362,14 +342,12 @@ a.btn-cu, a.btn-cu .texto {text-decoration: none;}
 
 .card.card-boton .material-symbols-outlined {font-size: 1rem}
 
-/*--------------------------------------------------------------
-# Tabs
---------------------------------------------------------------*/
+/* tabs */
 
 .tab-content .tab-pane {padding: 16px }
 .nav-tabs .nav-link {border: 0px !important}
 
-/*Tab horizontal*/
+
 .nav-tabs .nav-item {color: #505050;}
 .nav-tabs .nav-item , .nav-pills .nav-item {cursor: pointer;}
 .nav-tabs .nav-item {
@@ -387,7 +365,7 @@ a.btn-cu, a.btn-cu .texto {text-decoration: none;}
   font-weight: bold;
 }
 
-/*Tab vertical*/
+
 .nav-tabs[aria-orientation=vertical] button.nav-link {text-align: left !important; border-radius: 0px}
 .nav-tabs[aria-orientation=vertical] button.nav-link:hover {border: 0px !important; border-right: #016fb3 3px solid !important;}
 
@@ -409,16 +387,12 @@ a.btn-cu, a.btn-cu .texto {text-decoration: none;}
 }
 
 
-/*--------------------------------------------------------------
-# Modals
---------------------------------------------------------------*/
+/* modals */
 .modal-header .close {padding: 0rem 1rem}
 .modal .modal-header .close span {font-size: 2em}
 .modal .modal-footer {border-top: 0px; justify-content: center}
 
-/*--------------------------------------------------------------
-# Alertas
---------------------------------------------------------------*/
+/* alertas */
 .alerta {
   position: relative;
   margin-bottom: 1rem;
@@ -431,29 +405,25 @@ a.btn-cu, a.btn-cu .texto {text-decoration: none;}
 }
 .alerta i, .alerta .material-symbols-outlined {font-size: 1.8em; margin-right: 16px}
 
-/*--------------------------------------------------------------
-# Banners
---------------------------------------------------------------*/
+/* banners */
 a.banner { height: 100px; }
 
-/*--------------------------------------------------------------
-# Formularios
---------------------------------------------------------------*/
+/* formularios */
 
-/*Tamaños*/
+
 label {margin-bottom: 4px}
 
 .form-control, .form-check {min-height: 40px}
 .form-control-lg, input.form-control-lg, select.custom-select-lg  {min-height: 48px; font-size: 1em}
 .form-control-lg, input.form-control-sm, select.custom-select-sm {min-height: 32px}
 
-/*Input styles*/
+
 .input-group.icon-derecha .form-control {border-right: 0px}
 .input-group.icon-izquierda .form-control {border-left: 0px}
 .input-group.icon-derecha .input-group-prepend .input-group-text {border-left: 0px; background-color: transparent;}
 .input-group.icon-izquierda .input-group-prepend .input-group-text {border-right: 0px; background-color: transparent;}
 
-/*Select*/
+
 .custom-select { 
   height: auto; 
   background: inherit;
@@ -468,8 +438,8 @@ label {margin-bottom: 4px}
   background-repeat: no-repeat;
 }
 
-/*Checkbox*/
-.form-check .form-check-input {-ms-transform: scale(1.3); /* IE */-moz-transform: scale(1.3); /* FF */-webkit-transform: scale(1.3); /* Safari and Chrome */-o-transform: scale(1.3); /* Opera */transform: scale(1.3);}
+
+.form-check .form-check-input {-ms-transform: scale(1.3); -moz-transform: scale(1.3); -webkit-transform: scale(1.3); -o-transform: scale(1.3); transform: scale(1.3);}
 .form-check .form-check-label {margin-left: 10px;}
 
 form input:focus,
@@ -477,39 +447,35 @@ form textarea:focus,
 form select:focus {border: 3px solid #CFE1F3}
 
 
-/*--------------------------------------------------------------
-# Elementos
---------------------------------------------------------------*/
+/* elementos */
 
-/*Bordes*/
+
 .borde1 {border-width: 1px}
 .borde2 {border-width: 2px}
 .borde3 {border-width: 3px}
 .borde4 {border-width: 4px}
 .borde5 {border-width: 5px}
 
-/*Tags*/
+
 .tag {font-weight: 400 !important; padding: 4px 12px; display: inline-block; margin-bottom: 0.5em;} 
 .tag-curvo {font-weight: 400 !important;  padding: 4px 15px; display: inline-block; margin-bottom: 0.5em; border-radius: 15px; } 
 .tag-sm {font-size: 0.875rem; line-height: 1.125rem; }
 .tag-img {position: absolute; top: 5px; left: 5px}
 
-/*Colasable*/
+
 .collapsible-links2, .collapsible-links-list2{padding-left: 0; list-style: none; }
 .collapsible-links-list2:hover { background-color: #006FB3; color: #ffffff; }
 
-/*Breadcrumb*/
+
 .breadcrumb-item+.breadcrumb-item::before {content: "/" !important; color: #232323}
 .breadcrumb-item a {color: #006FB3}
 
-/*Paginador*/
+
 .pagination-container.left {justify-content: start;}
 .pagination-container.right {justify-content: end;}
 
 
-/*--------------------------------------------------------------
-# Accesibilidad
---------------------------------------------------------------*/
+/* accesibilidad */
 
 .saltar-contenido {
   background-color: #fff000;
@@ -528,11 +494,9 @@ form select:focus {border: 3px solid #CFE1F3}
   opacity: 1
 }
 
-/*--------------------------------------------------------------
-# colores
---------------------------------------------------------------*/
+/* colores */
 
-/*Textos*/
+
 .text-primario {color: #006FB3}
 .text-primario2 {color: #0085D6}
 .text-primario3 {color: #0096F3}
@@ -569,7 +533,7 @@ form select:focus {border: 3px solid #CFE1F3}
 .text-subtitulo {color: #4A4A4A}
 .text-enlace {color: #0096F3}
 
-/*Fondos*/
+
 .bg-primario { background-color: #006FB3; color: #ffffff}
 .bg-primario2 { background-color: #0085D6; color: #ffffff}
 .bg-primario3 { background-color: #0096F3; color: #ffffff}
@@ -602,7 +566,7 @@ form select:focus {border: 3px solid #CFE1F3}
 .bg-claro { background-color: #ffffff; color: #191A1A;}
 .bg-oscuro { background-color: #191A1A; color: #ffffff;}
 
-/*Bordes*/
+
 .borde1 {border-width: 1px; border-style:solid}
 .borde2 {border-width: 2px; border-style:solid}
 .borde3 {border-width: 3px; border-style:solid}
@@ -639,7 +603,7 @@ form select:focus {border: 3px solid #CFE1F3}
 .borde-claro { border-color: #ffffff; }
 .borde-oscuro { border-color: #191A1A; }
 
-/*Alertas*/
+
 .alerta-peligro { background-color: #FFE7E7; border-width: 1px; border-style:solid }
 .alerta-precaucion { background-color: #fff7e7; border-width: 1px; border-style:solid }
 .alerta-exito { background-color: #EAF1F2; border-width: 1px; border-style:solid }
@@ -650,9 +614,7 @@ form select:focus {border: 3px solid #CFE1F3}
 .linea-roja {height: 5px; width: 90px; display: inline-block; background-color: #fc072f}
 
 
-/*--------------------------------------------------------------
-#  contraste 
---------------------------------------------------------------*/
+/* contraste */
 
 .a11y-contrast main p,
 .a11y-contrast main ul li,
@@ -785,9 +747,7 @@ form select:focus {border: 3px solid #CFE1F3}
 .a11y-contrast #casos {background-image: none !important}
 
 
-/*--------------------------------------------------------------
-# sitio framework
---------------------------------------------------------------*/
+/* sitio framework */
 
 pre code .tag {text-transform: inherit !important; line-height: 0.5em; margin: 0px}
 pre {overflow-y: scroll; max-height: 400px;}

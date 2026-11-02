@@ -1,23 +1,11 @@
-/* ============================================================
- * Componente global — Listado de noticias
- * Maqueta: Figma 369:7324 (columna de 368px del detalle de noticia:
- * título Roboto Medium 24, tarjetas con imagen de 138px, cuerpo con
- * padding 16 y gap 8, botón outline «Ver Noticia» alineado a la derecha).
- *
- * La tarjeta es la misma pieza visual que en media-cards.css. No se
- * comparte hoja porque cada componente tiene la suya (convención §9) y
- * porque los dos bloques pueden evolucionar por separado; si un día
- * divergen de verdad, esa duplicación es lo que lo permite sin romper
- * la portada.
- * ============================================================ */
-
+/* define la presentación de listados de noticias */
 .mbn-news-list {
 	display: flex;
 	flex-direction: column;
 	gap: 24px;
 }
 
-/* base.css declara font-family y font-weight de h1-h6 con !important. */
+
 .mbn-news-list__title {
 	margin: 0;
 	font-family: var(--mbn-roboto-sans-medium-font-family, "Roboto", sans-serif) !important;
@@ -53,8 +41,7 @@
 	transition: border-color 120ms ease-out, box-shadow 120ms ease-out;
 }
 
-/* El área clicable es toda la tarjeta (stretched-link), así que el realce va
-   en la tarjeta y no solo en el botón. */
+
 .mbn-news-list__card:hover,
 .mbn-news-list__card:focus-within {
 	border-color: var(--mbn-action-primary, #0046A8);
@@ -121,7 +108,7 @@
 	color: var(--mbn-text-on-primary, #E7ECFF);
 }
 
-/* ---------- md ≥ 768px ---------- */
+/* md ≥ 768px */
 
 @media (min-width: 768px) {
 	.mbn-news-list--cols-2 .mbn-news-list__grid,
@@ -130,7 +117,7 @@
 	}
 }
 
-/* ---------- xl ≥ 1200px (canvas 1440 del Figma) ---------- */
+/* ajustes de presentación para escritorio */
 
 @media (min-width: 1200px) {
 	.mbn-news-list__title {
@@ -146,7 +133,7 @@
 	}
 }
 
-/* ---------- Movimiento reducido ---------- */
+/* movimiento reducido */
 
 @media (prefers-reduced-motion: reduce) {
 	.mbn-news-list__card,

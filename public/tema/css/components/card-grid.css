@@ -1,16 +1,4 @@
-/* ============================================================
- * Componente global — Rejilla de tarjetas
- *
- * Dos maquetas, un solo componente:
- *   - Acceso rápido a trámites — Figma 280:2712 (2 columnas, gap 24, fondo
- *     gris, con ícono, botón outline, tarjeta de 304px).
- *   - Destacados               — Figma 179:1116 (3 columnas, gap 16, fondo
- *     blanco, sin ícono, botón sólido, tarjeta de 220px).
- *
- * Todo lo que comparten (padding 24, gap 8, tipografías, botonera alineada a
- * la derecha) vive en las reglas base; lo que las separa, en modificadores.
- * ============================================================ */
-
+/* define la presentación de tarjetas de acceso y destacados */
 .mbn-card-grid {
 	background: var(--mbn-surface-soft, #F9F9F9);
 	padding: var(--mbn-space-section, 36px) 24px;
@@ -25,7 +13,7 @@
 	margin-inline: auto;
 }
 
-/* ---------- Encabezado ---------- */
+/* encabezado */
 
 .mbn-card-grid__header {
 	display: flex;
@@ -36,8 +24,7 @@
 	margin-bottom: 24px;
 }
 
-/* base.css declara font-family y font-weight de h1-h6 con !important, así que
-   la tipografía de título de sección solo se puede imponer con !important. */
+
 .mbn-card-grid__title {
 	margin: 0;
 	font-family: var(--mbn-roboto-slab-large-font-family, "Roboto Slab", serif) !important;
@@ -74,7 +61,7 @@
 	outline-offset: 2px;
 }
 
-/* ---------- Rejilla ---------- */
+/* rejilla */
 
 .mbn-card-grid__grid {
 	list-style: none;
@@ -90,10 +77,7 @@
 	flex-direction: column;
 	align-items: flex-start;
 	gap: 8px;
-	/* El Figma fija el alto de la tarjeta (304px en Acceso rápido, 220px en
-	   Destacados). Aquí es una altura MÍNIMA y llega por custom property: con
-	   una altura fija, un título o una descripción más largos que los medidos
-	   quedarían recortados por el overflow. */
+
 	min-height: var(--mbn-card-grid-card-min-height, 0);
 	padding: 24px;
 	background: var(--mbn-surface-white, #FFFFFF);
@@ -103,13 +87,9 @@
 	transition: border-color 160ms ease-out, box-shadow 160ms ease-out;
 }
 
-/* ---------- Hover — Figma 600:8079 (Acceso rápido) y 600:8189 (Destacados) --------- */
 
-/* El degradado va en un pseudo-elemento y no en `background-image` de la
-   tarjeta: los degradados no son interpolables, así que animar su opacidad es
-   la única forma de que la transición no sea un salto seco.
-   Se pinta antes que los hijos en el orden del DOM y todos ellos llevan
-   `position: relative`, de modo que quedan por encima sin necesidad de z-index. */
+
+
 .mbn-card-grid__card::before {
 	content: "";
 	position: absolute;
@@ -125,8 +105,7 @@
 	position: relative;
 }
 
-/* `:focus-within` acompaña al hover para que quien navegue con teclado reciba
-   el mismo realce al llegar al botón de la tarjeta. */
+
 .mbn-card-grid__card:hover,
 .mbn-card-grid__card:focus-within {
 	border-color: var(--mbn-action-primary, #0046A8);
@@ -145,8 +124,7 @@
 	color: var(--mbn-text-on-brand-soft, rgba(255, 255, 255, 0.95));
 }
 
-/* Sobre el degradado, las dos variantes de botón convergen en el mismo blanco:
-   la sólida se invierte y la de contorno se queda como está. */
+
 .mbn-card-grid__card:hover .mbn-card-grid__cta,
 .mbn-card-grid__card:focus-within .mbn-card-grid__cta {
 	background: var(--mbn-surface-white, #FFFFFF);
@@ -154,8 +132,7 @@
 	color: var(--mbn-brand-blue-dark, #00268D);
 }
 
-/* El hover propio del botón no puede volverlo azul cuando la tarjeta ya lo es:
-   desaparecería sobre el degradado. Se realza con un tinte claro. */
+
 .mbn-card-grid__card:hover .mbn-card-grid__cta:hover,
 .mbn-card-grid__card:hover .mbn-card-grid__cta:focus-visible,
 .mbn-card-grid__card:focus-within .mbn-card-grid__cta:focus-visible {
@@ -204,9 +181,7 @@
 	color: var(--mbn-text-primary, #333333);
 }
 
-/* La botonera se ancla al fondo de la tarjeta. En el Figma queda justo después
-   del texto y a distinta altura en cada tarjeta, pero esa irregularidad viene
-   de un párrafo vacío en el archivo, no del diseño. */
+
 .mbn-card-grid__cta-wrap {
 	display: flex;
 	justify-content: flex-end;
@@ -244,7 +219,7 @@
 	outline-offset: 2px;
 }
 
-/* Variante sólida del botón (Destacados). La base es la de contorno. */
+
 .mbn-card-grid__cta--solid {
 	border-color: var(--mbn-action-primary, #0046A8);
 	background: var(--mbn-action-primary, #0046A8);
@@ -258,14 +233,12 @@
 	color: var(--mbn-text-on-primary, #E7ECFF);
 }
 
-/* El texto alternativo del botón solo existe por debajo de xl. Se alternan con
-   display para que el que queda oculto no forme parte del nombre accesible del
-   enlace (WCAG 2.5.3). */
+
 .mbn-card-grid__cta-label--responsive {
 	display: none;
 }
 
-/* ---------- md ≥ 768px ---------- */
+/* md ≥ 768px */
 
 @media (min-width: 768px) {
 	.mbn-card-grid {
@@ -286,7 +259,7 @@
 	}
 }
 
-/* ---------- xl ≥ 1200px (canvas 1440 del Figma) ---------- */
+/* ajustes de presentación para escritorio */
 
 @media (min-width: 1200px) {
 	.mbn-card-grid {
@@ -301,16 +274,13 @@
 		font-size: calc(24px * var(--mbn-text-scale, 1));
 	}
 
-	/* La tercera columna solo aparece en el canvas de 1440: por debajo, tres
-	   tarjetas de 24px de título quedan demasiado estrechas. */
+
 	.mbn-card-grid__grid--cols-3 {
 		grid-template-columns: repeat(3, 1fr);
 	}
 }
 
-/* Por debajo de xl el botón muestra su texto alternativo, cuando el editor lo
-   ha definido. El template marca el texto de escritorio con --desktop
-   únicamente en ese caso, así que aquí basta con intercambiarlos. */
+
 @media (max-width: 1199.98px) {
 	.mbn-card-grid__cta-label--desktop {
 		display: none;
@@ -321,7 +291,7 @@
 	}
 }
 
-/* ---------- Movimiento reducido ---------- */
+/* movimiento reducido */
 
 @media (prefers-reduced-motion: reduce) {
 	.mbn-card-grid__all-link,
@@ -332,4 +302,148 @@
 	.mbn-card-grid__card-body {
 		transition: none;
 	}
+}
+
+
+.mbn-card-grid--carousel .mbn-card-grid__grid {
+	position: relative;
+	display: grid;
+	grid-template-columns: none;
+	grid-auto-flow: column;
+	overflow-x: auto;
+	overscroll-behavior-x: contain;
+	scrollbar-width: none;
+}
+.mbn-card-grid--carousel .mbn-card-grid__grid::-webkit-scrollbar { display: none; }
+.mbn-card-grid--carousel .mbn-card-grid__card { min-width: 0; }
+.mbn-card-grid--carousel .mbn-card-grid__grid:focus-visible {
+	outline: 3px solid var(--mbn-brand-blue, #0F69C4);
+	outline-offset: 4px;
+}
+.mbn-card-grid--continuous .mbn-card-grid__grid {
+	grid-auto-columns: calc((100% - 16px) / 2);
+	scroll-snap-type: none;
+	scroll-behavior: auto;
+}
+.mbn-card-grid__controls {
+	display: flex;
+	align-items: center;
+	justify-content: flex-end;
+	margin-top: 16px;
+}
+.mbn-card-grid__navigation { display: none; }
+.mbn-card-grid__controls[hidden] { display: none; }
+.mbn-card-grid__nav {
+	position: relative;
+	flex: 0 0 auto;
+	width: 40px;
+	height: 40px;
+	padding: 0;
+	border: 2px solid var(--mbn-action-primary, #0046A8);
+	border-radius: 50%;
+	background: var(--mbn-surface-white, #FFFFFF);
+	cursor: pointer;
+	transition: background-color 120ms ease-out, border-color 120ms ease-out, opacity 120ms ease-out;
+}
+
+
+.mbn-card-grid__nav::before {
+	content: "";
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	width: 9px;
+	height: 9px;
+	border-top: 2px solid var(--mbn-brand-blue-dark, #00268D);
+	border-right: 2px solid var(--mbn-brand-blue-dark, #00268D);
+}
+
+.mbn-card-grid__nav--next::before {
+	transform: translate(-65%, -50%) rotate(45deg);
+}
+
+.mbn-card-grid__nav--prev::before {
+	transform: translate(-35%, -50%) rotate(-135deg);
+}
+
+.mbn-card-grid__nav:hover:not(:disabled) {
+	background: var(--mbn-action-primary, #0046A8);
+}
+
+.mbn-card-grid__nav:hover:not(:disabled)::before {
+	border-color: var(--mbn-surface-white, #FFFFFF);
+}
+
+.mbn-card-grid__nav:focus-visible {
+	outline: 3px solid var(--mbn-brand-blue, #0F69C4);
+	outline-offset: 2px;
+}
+
+
+.mbn-card-grid__nav:disabled {
+	border-color: var(--mbn-border-default, #CCCCCC);
+	opacity: 0.5;
+	cursor: default;
+}
+
+.mbn-card-grid__nav:disabled::before {
+	border-color: var(--mbn-text-muted, #808080);
+}
+
+.mbn-card-grid__status {
+	margin: 0;
+	min-width: 4ch;
+	font-family: var(--mbn-roboto-body-small-font-family, "Roboto", sans-serif);
+	font-size: calc(16px * var(--mbn-text-scale, 1));
+	line-height: 1.5;
+	color: var(--mbn-text-primary, #333333);
+	text-align: center;
+	font-variant-numeric: tabular-nums;
+}
+
+html.mbn-contrast .mbn-card-grid__nav { background: #000; border-color: #FCFF3C; }
+html.mbn-contrast .mbn-card-grid__nav::before { border-color: #FCFF3C; }
+html.mbn-contrast .mbn-card-grid__nav:focus-visible { outline-color: #FCFF3C; }
+html.mbn-contrast .mbn-card-grid__status { color: #FFF; }
+@media (max-width: 767.98px) {
+	[data-mbn-card-carousel] .mbn-card-grid__grid {
+		position: relative;
+		display: flex;
+		flex-wrap: nowrap;
+		gap: 16px;
+		overflow-x: auto;
+		overflow-y: hidden;
+		scroll-snap-type: x mandatory;
+		overscroll-behavior-x: contain;
+		scrollbar-width: none;
+		padding: 4px;
+		margin: -4px;
+	}
+	[data-mbn-card-carousel] .mbn-card-grid__grid::-webkit-scrollbar { display: none; }
+	[data-mbn-card-carousel] .mbn-card-grid__card {
+		flex: 0 0 86%;
+		min-width: 0;
+		scroll-snap-align: center;
+		scroll-snap-stop: always;
+	}
+	.mbn-card-grid__controls { justify-content: center; }
+	.mbn-card-grid__navigation { display: flex; align-items: center; justify-content: center; gap: 16px; }
+}
+@media (min-width: 1200px) {
+	.mbn-card-grid--continuous .mbn-card-grid__grid { grid-auto-columns: calc((100% - 32px) / 3); }
+}
+@media (prefers-reduced-motion: reduce) {
+	.mbn-card-grid__nav { transition: none; }
+	[data-mbn-card-carousel] .mbn-card-grid__grid { scroll-behavior: auto; }
+}
+
+@media (min-width: 768px) {
+	.mbn-card-grid__controls { display: none; }
+	.mbn-card-grid--continuous .mbn-card-grid__grid {
+		cursor: grab;
+		user-select: none;
+		-webkit-user-select: none;
+	}
+	.mbn-card-grid--continuous .mbn-card-grid__grid--dragging,
+	.mbn-card-grid--continuous .mbn-card-grid__grid--dragging * { cursor: grabbing; }
 }

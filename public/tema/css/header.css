@@ -1,24 +1,5 @@
-/* Header — bloques headerDesktop / headerTablet / headerMobile + botonera accesibilidad.
- *
- * Bloques del contrato: header-footer-contract-v1.json → blocks.headerDesktop/Tablet/Mobile
- * Decisión humana: Bootstrap 5.3.3 Offcanvas anclado a la derecha
- * (openQuestions.resolvedAt 2026-08-25T05:01).
- *
- * Visibilidad por viewport:
- *   - desktop ≥1200px → .mbn-header--desktop visible, --mobile oculto
- *   - tablet/mobile <1200px → .mbn-header--desktop oculto, --mobile visible
- *
- * Tokens (assets/css/tokens.css):
- *   --mbn-surface-white        #FFFFFF
- *   --mbn-text-primary         #333333
- *   --mbn-brand-blue           #0F69C4
- *   --mbn-action-primary       #0046A8
- *   --mbn-border-header        #B3B3B3 (border bottom header desktop)
- *   --mbn-border-divider       #E6E6E6 (divider row1/row2 desktop + border bottom mobile)
- *   --mbn-header-padding-horizontal-h (no existe; uso fallback 24px)
- */
-
-/* ---------- compartido ---------- */
+/* define la presentación de cabecera y navegación */
+/* compartido */
 
 .mbn-header {
 	background: var(--mbn-surface-white, #FFFFFF);
@@ -67,7 +48,7 @@
 	max-width: 100%;
 }
 
-/* La versión de alto contraste sólo se ve con html.mbn-contrast (a11y.css). */
+
 .mbn-header__logo-img--contrast {
 	display: none;
 }
@@ -79,7 +60,7 @@
 	margin: 0;
 }
 
-/* ---------- Desktop ≥1200px ---------- */
+/* ajustes de presentación para escritorio */
 
 .mbn-header--desktop {
 	display: none;
@@ -98,8 +79,8 @@
 	gap: 8px;
 	width: 347px;
 	max-width: 100%;
-	/* border: 1px solid var(--mbn-text-primary, #333333); */
-	/* border-radius: 24px; */
+
+
 	padding: 8px 12px;
 	background: var(--mbn-surface-white, #FFFFFF);
 }
@@ -120,7 +101,7 @@
 	border: 0;
 	background: transparent;
 	font: 400 16px/1.5 "Roboto", system-ui, sans-serif;
-	/* El atajo `font` reinicia el tamaño: se reescribe escalado. */
+
 	font-size: calc(16px * var(--mbn-text-scale, 1));
 	color: var(--mbn-text-primary, #333333);
 	outline: none;
@@ -151,15 +132,14 @@
 	align-items: center;
 }
 
-/* Figma 359:7449: cada ítem lleva su propio padding de 16px y gap de 8px
- * (utilidades .p-3 / .gap-2 en el template); la fila no usa gap adicional. */
+
 .mbn-header--desktop .mbn-header__nav-link,
 .mbn-header--desktop .mbn-header__nav-button {
 	color: var(--mbn-text-primary, #333333);
 	background: transparent;
 	border: 0;
 	font: 400 16px/1.5 "Roboto", system-ui, sans-serif;
-	/* El atajo `font` reinicia el tamaño: se reescribe escalado. */
+
 	font-size: calc(16px * var(--mbn-text-scale, 1));
 	text-decoration: none;
 	cursor: pointer;
@@ -198,11 +178,7 @@
 	background: rgba(0, 70, 168, 0.06);
 }
 
-/* Botonera accesibilidad — Figma node 359:7464 ("Botonera Accesibilidad").
- * Frame de 146px con justify-content:space-between: 3 botones de 38px
- * ⇒ 16px de separación. Display/alineación se resuelven con utilidades
- * Bootstrap en el template; aquí sólo van las medidas y colores de la maqueta.
- */
+
 .mbn-header__a11y {
 	width: 146px;
 }
@@ -225,9 +201,7 @@
 	outline-offset: 2px;
 }
 
-/* Estado apagado del nodo I359:7464;47:29022 — fill #E6E6E6, stroke #808080.
-   En los topes de la escala el botón lleva `aria-disabled` y no `disabled`
-   (§8), así que el estado se pinta por los dos. */
+
 .mbn-header__a11y-button:disabled,
 .mbn-header__a11y-button[aria-disabled="true"] {
 	background: var(--mbn-a11y-button-surface-disabled, #E6E6E6);
@@ -240,7 +214,7 @@
 	color: var(--mbn-surface-white, #FFFFFF);
 }
 
-/* Los iconos son <img>, así que no heredan currentColor: se invierten. */
+
 .mbn-header__a11y-button[aria-pressed="true"] img {
 	filter: invert(1);
 }
@@ -250,7 +224,7 @@
 	height: 24px;
 }
 
-/* ---------- Mobile/Tablet <1200px ---------- */
+/* ajustes de presentación para móviles */
 
 .mbn-header--mobile {
 	display: block;
@@ -294,9 +268,9 @@
 	height: 24px;
 }
 
-/* ---------- viewport switch ---------- */
+/* viewport switch */
 
-/* el header conserva su lugar en el documento al quedar fijo */
+
 .mbn-header__sticky-nav {
 	position: relative;
 }
@@ -392,3 +366,62 @@ html.mbn-contrast .mbn-header__sticky-stripe .mbn-header__sticky-stripe--contras
 		display: none;
 	}
 }
+
+
+.mbn-header__tools {
+ display: flex;
+ flex-direction: column;
+ align-items: flex-end;
+ gap: 2px;
+}
+.mbn-header__tools > .mbn-header-social { padding-right: 12px; }
+.mbn-header-social__list {
+ display: flex;
+ align-items: center;
+ flex-wrap: wrap;
+ gap: 6px;
+ list-style: none;
+ margin: 0;
+ padding: 0;
+}
+.mbn-header-social__item { display: flex; margin: 0; padding: 0; }
+.mbn-header-social__link {
+ display: flex;
+ align-items: center;
+ justify-content: center;
+ width: 28px;
+ height: 28px;
+ border-radius: 50%;
+ background: transparent;
+ border: 0;
+ color: #111;
+ text-decoration: none;
+}
+.mbn-header-social__link:hover { background: transparent; }
+.mbn-header-social__link:focus-visible {
+ outline: 3px solid var(--mbn-brand-blue, #0F69C4);
+ outline-offset: 3px;
+}
+.mbn-header-social__icon {
+ display: block;
+ flex: 0 0 auto;
+ width: 22px;
+ height: 22px;
+ color: #111;
+ background-color: currentColor;
+ mask-image: var(--mbn-header-social-icon);
+ mask-repeat: no-repeat;
+ mask-position: center;
+ mask-size: contain;
+ -webkit-mask-image: var(--mbn-header-social-icon);
+ -webkit-mask-repeat: no-repeat;
+ -webkit-mask-position: center;
+ -webkit-mask-size: contain;
+}
+html.mbn-contrast .mbn-header-social__link {
+ background: transparent;
+ color: #FCFF3C;
+ border: 0;
+}
+html.mbn-contrast .mbn-header-social__icon { color: #FCFF3C; }
+html.mbn-contrast .mbn-header-social__link:focus-visible { outline-color: #FCFF3C; }

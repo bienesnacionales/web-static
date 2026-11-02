@@ -1,16 +1,4 @@
-/* ============================================================
- * Componente global — Slider
- * Maqueta: Figma 359:5553 (component set, 3 variantes de 1440x520).
- *
- * Se monta sobre el Carousel de Bootstrap 5.3.3 (§8.3 de AGENTS.md):
- * el componente aporta indicadores, control de pausa y el tratamiento
- * visual; el comportamiento (transición, teclado, swipe, autoplay) es de
- * Bootstrap.
- *
- * El color de acento del CTA llega por diapositiva en la custom property
- * --mbn-slider-accent, inyectada inline desde el template.
- * ============================================================ */
-
+/* define la presentación de carruseles de portada */
 .mbn-slider {
 	position: relative;
 	overflow: hidden;
@@ -28,11 +16,7 @@
 	overflow: hidden;
 }
 
-/* El centrado vertical del copy necesita display:flex, pero declararlo sobre
-   .mbn-slider__slide pisaría el display:none con el que Bootstrap oculta las
-   diapositivas inactivas (misma especificidad, y este archivo carga después):
-   las tres se apilarían. Por eso el flex se aplica solo a la diapositiva
-   visible — o a todas cuando no hay carrusel. */
+
 .mbn-slider__carousel--static .mbn-slider__slide,
 .mbn-slider .carousel-item.active,
 .mbn-slider .carousel-item-next,
@@ -62,8 +46,7 @@
 	position: relative;
 	z-index: 2;
 	width: 100%;
-	/* La diapositiva activa es un contenedor flex y sus hijos no encogen por
-	   debajo de su contenido sin esto: en mobile el título desbordaba. */
+
 	min-width: 0;
 	max-width: var(--mbn-width-frame-desktop, 1440px);
 	margin-inline: auto;
@@ -93,9 +76,7 @@
 	margin-bottom: 8px;
 }
 
-/* base.css (Base Kit Digital de Siigsa) declara font-family y font-weight de
-   h1-h6 con !important, así que la tipografía de marca del título solo se puede
-   imponer con !important. Es la excepción documentada en §9 de AGENTS.md. */
+
 .mbn-slider__title {
 	margin: 0;
 	font-family: var(--mbn-gobcl-h1-responsive-font-family, "gobCL", sans-serif) !important;
@@ -148,8 +129,7 @@
 	outline-offset: 3px;
 }
 
-/* La flecha se pinta con mask-image para que herede el color de acento de la
-   diapositiva; un <img> no puede tomar currentColor. */
+
 .mbn-slider__cta-arrow {
 	flex: 0 0 auto;
 	width: 20px;
@@ -164,7 +144,7 @@
 	transform: translateX(2px);
 }
 
-/* ---------- Controles ---------- */
+/* controles */
 
 .mbn-slider__controls {
 	position: absolute;
@@ -178,8 +158,7 @@
 	gap: 16px;
 }
 
-/* Neutraliza el posicionamiento absoluto propio de .carousel-indicators para
-   que conviva en la misma fila con el botón de pausa. */
+
 .mbn-slider__indicators.carousel-indicators {
 	position: static;
 	margin: 0;
@@ -190,10 +169,7 @@
 	gap: 8px;
 }
 
-/* Los indicadores de Bootstrap son barras de 30x3 px con bordes transparentes
-   y opacidad 0.5, aplicados con `.carousel-indicators [data-bs-target]`. Hay
-   que igualar esa especificidad para convertirlos en los puntos de la maqueta:
-   un selector de clase simple pierde y deja las barras a la vista. */
+
 .mbn-slider__indicators.carousel-indicators [data-bs-target] {
 	position: relative;
 	box-sizing: content-box;
@@ -216,9 +192,7 @@
 	background-color: #FFFFFF;
 }
 
-/* Amplía el área de activación a 24px de alto sin alterar el tamaño visual del
-   indicador (WCAG 2.2 — 2.5.8 target size). El ancho se mantiene en la medida
-   de la maqueta, que fija la separación entre indicadores en 8px. */
+
 .mbn-slider__indicators.carousel-indicators [data-bs-target]::after {
 	content: "";
 	position: absolute;
@@ -252,8 +226,7 @@
 	outline-offset: 3px;
 }
 
-/* Glifos dibujados con bordes: dos barras en estado "reproduciendo",
-   un triángulo cuando está pausado. Evita añadir dos assets más. */
+
 .mbn-slider__playpause::before {
 	content: "";
 	position: absolute;
@@ -279,7 +252,7 @@
 	transform: translate(-40%, -50%);
 }
 
-/* ---------- md ≥ 768px ---------- */
+/* md ≥ 768px */
 
 @media (min-width: 768px) {
 	.mbn-slider__inner {
@@ -291,7 +264,7 @@
 	}
 }
 
-/* ---------- xl ≥ 1200px (canvas 1440 del Figma) ---------- */
+/* ajustes de presentación para escritorio */
 
 @media (min-width: 1200px) {
 	.mbn-slider__inner {
@@ -318,7 +291,7 @@
 	}
 }
 
-/* ---------- Movimiento reducido ---------- */
+/* movimiento reducido */
 
 @media (prefers-reduced-motion: reduce) {
 	.mbn-slider .carousel-item,

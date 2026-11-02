@@ -85,36 +85,62 @@
 				/>
 			</a>
 
-			<form
-				class="mbn-header__search"
-				role="search"
-				action="/buscar/"
-				method="get"
-				aria-label="Buscar en el sitio"
-			>
-				<label class="visually-hidden" for="mbn-header-search-input">
-					Buscar				</label>
-				<div class="input-group flex-nowrap">
-					<span class="input-group-text bg-transparent border-dark border-end-0 rounded-start-pill pe-1">
-						<img
-							src="/tema/images/header-footer/ui-icon-search.svg"
-							alt=""
-							aria-hidden="true"
-							focusable="false"
-							width="24"
-							height="24"
+			<div class="mbn-header__tools">
+				<nav class="mbn-header-social" aria-label="Redes sociales del Ministerio">
+		<ul class="mbn-header-social__list">
+					<li class="mbn-header-social__item">
+				<a class="mbn-header-social__link" href="https://www.facebook.com/MinisterioBBNN" title="Facebook" target="_blank" rel="noopener noreferrer" aria-label="Facebook (se abre en una nueva pestaña)">
+					<span class="mbn-header-social__icon" aria-hidden="true" style="--mbn-header-social-icon: url('/uploads/2026/09/social-icon-facebook.svg');"></span>
+				</a>
+			</li>
+					<li class="mbn-header-social__item">
+				<a class="mbn-header-social__link" href="https://www.instagram.com/bienesnacionales/" title="Instagram" target="_blank" rel="noopener noreferrer" aria-label="Instagram (se abre en una nueva pestaña)">
+					<span class="mbn-header-social__icon" aria-hidden="true" style="--mbn-header-social-icon: url('/uploads/2026/09/social-icon-instagram.svg');"></span>
+				</a>
+			</li>
+					<li class="mbn-header-social__item">
+				<a class="mbn-header-social__link" href="https://www.youtube.com/@Ministeriobbnn" title="YouTube" target="_blank" rel="noopener noreferrer" aria-label="YouTube (se abre en una nueva pestaña)">
+					<span class="mbn-header-social__icon" aria-hidden="true" style="--mbn-header-social-icon: url('/uploads/2026/09/social-icon-youtube.svg');"></span>
+				</a>
+			</li>
+					<li class="mbn-header-social__item">
+				<a class="mbn-header-social__link" href="https://x.com/MinisterioBBNN" title="X (antes Twitter)" target="_blank" rel="noopener noreferrer" aria-label="X (antes Twitter) (se abre en una nueva pestaña)">
+					<span class="mbn-header-social__icon" aria-hidden="true" style="--mbn-header-social-icon: url('/uploads/2026/09/social-icon-twitter-x.svg');"></span>
+				</a>
+			</li>
+			</ul>
+</nav>
+				<form
+					class="mbn-header__search"
+					role="search"
+					action="/buscar/"
+					method="get"
+					aria-label="Buscar en el sitio"
+				>
+					<label class="visually-hidden" for="mbn-header-search-input">
+						Buscar					</label>
+					<div class="input-group flex-nowrap">
+						<span class="input-group-text bg-transparent border-dark border-end-0 rounded-start-pill pe-1">
+							<img
+								src="/tema/images/header-footer/ui-icon-search.svg"
+								alt=""
+								aria-hidden="true"
+								focusable="false"
+								width="24"
+								height="24"
+							/>
+						</span>
+						<input
+							id="mbn-header-search-input"
+							type="search"
+							name="s"
+							class="form-control border-dark border-start-0 rounded-end-pill ps-2"
+							placeholder="Buscar"
+							autocomplete="off"
 						/>
-					</span>
-					<input
-						id="mbn-header-search-input"
-						type="search"
-						name="s"
-						class="form-control border-dark border-start-0 rounded-end-pill ps-2"
-						placeholder="Buscar"
-						autocomplete="off"
-					/>
-				</div>
-			</form>
+					</div>
+				</form>
+			</div>
 		</div>
 
 		<div class="mbn-header__sticky-nav d-flex align-items-center justify-content-between gap-3 py-2">
@@ -298,15 +324,6 @@
 				<a
 					role="menuitem"
 					tabindex="-1"
-					class="mbn-dropdown__option"
-					id="mbn-dropdown-option-tramites-denuncias"					href="/tramites/?tipo=denuncias"
-									>
-					Denuncias				</a>
-			</li>
-								<li role="none" class="mbn-dropdown__item">
-				<a
-					role="menuitem"
-					tabindex="-1"
 					class="mbn-dropdown__option mbn-dropdown__option--multiline"
 					id="mbn-dropdown-option-tramites-solicitud-de-copia-de-plano-de-un-inmueble-fiscal"					href="/tramites/?tipo=copia-de-plano"
 									>
@@ -362,7 +379,7 @@
 					role="menuitem"
 					tabindex="-1"
 					class="mbn-dropdown__option mbn-dropdown__option--multiline"
-					id="mbn-dropdown-option-ciudadania-estado-de-consulta-de-la-solicitud-de-atencion-ciudadana"					href="https://sistred.bienes.cl/siac-atencion/atencion"
+					id="mbn-dropdown-option-ciudadania-solicitud-de-atencion-ciudadana-consultas-reclamos-y-sugerencias"					href="https://sistred.bienes.cl/siac-atencion/atencion"
 					 target="_blank" rel="noopener noreferrer" aria-label="Solicitud de Atención Ciudadana (Consultas, reclamos y sugerencias) (se abre en una nueva pestaña)"				>
 					Solicitud de Atención Ciudadana (Consultas, reclamos y sugerencias)				</a>
 			</li>
@@ -389,9 +406,9 @@
 					role="menuitem"
 					tabindex="-1"
 					class="mbn-dropdown__option"
-					id="mbn-dropdown-option-ciudadania-denuncias-externas"					href="/ciudadania/denuncias-externas/"
+					id="mbn-dropdown-option-ciudadania-denuncias"					href="/ciudadania/denuncias-externas/"
 									>
-					Denuncias Externas				</a>
+					Denuncias				</a>
 			</li>
 								<li role="none" class="mbn-dropdown__item">
 				<a
@@ -861,13 +878,6 @@
 										</li>
 																													<li class="mbn-offcanvas__submenu-item">
 											<a
-												class="mbn-offcanvas__submenu-link"
-												href="/tramites/?tipo=denuncias"
-																							>
-												Denuncias											</a>
-										</li>
-																													<li class="mbn-offcanvas__submenu-item">
-											<a
 												class="mbn-offcanvas__submenu-link mbn-offcanvas__submenu-link--multiline"
 												href="/tramites/?tipo=copia-de-plano"
 																							>
@@ -934,7 +944,7 @@
 												class="mbn-offcanvas__submenu-link"
 												href="/ciudadania/denuncias-externas/"
 																							>
-												Denuncias Externas											</a>
+												Denuncias											</a>
 										</li>
 																													<li class="mbn-offcanvas__submenu-item">
 											<a
@@ -1115,5 +1125,30 @@
 				/>
 			</button>
 		</div>
-			</div>
+				<nav class="mbn-header-social mbn-header-social--mobile" aria-label="Redes sociales del Ministerio">
+			<p class="mbn-header-social__title">Síguenos</p>
+		<ul class="mbn-header-social__list">
+					<li class="mbn-header-social__item">
+				<a class="mbn-header-social__link" href="https://www.facebook.com/MinisterioBBNN" title="Facebook" target="_blank" rel="noopener noreferrer" aria-label="Facebook (se abre en una nueva pestaña)">
+					<span class="mbn-header-social__icon" aria-hidden="true" style="--mbn-header-social-icon: url('/uploads/2026/09/social-icon-facebook.svg');"></span>
+				</a>
+			</li>
+					<li class="mbn-header-social__item">
+				<a class="mbn-header-social__link" href="https://www.instagram.com/bienesnacionales/" title="Instagram" target="_blank" rel="noopener noreferrer" aria-label="Instagram (se abre en una nueva pestaña)">
+					<span class="mbn-header-social__icon" aria-hidden="true" style="--mbn-header-social-icon: url('/uploads/2026/09/social-icon-instagram.svg');"></span>
+				</a>
+			</li>
+					<li class="mbn-header-social__item">
+				<a class="mbn-header-social__link" href="https://www.youtube.com/@Ministeriobbnn" title="YouTube" target="_blank" rel="noopener noreferrer" aria-label="YouTube (se abre en una nueva pestaña)">
+					<span class="mbn-header-social__icon" aria-hidden="true" style="--mbn-header-social-icon: url('/uploads/2026/09/social-icon-youtube.svg');"></span>
+				</a>
+			</li>
+					<li class="mbn-header-social__item">
+				<a class="mbn-header-social__link" href="https://x.com/MinisterioBBNN" title="X (antes Twitter)" target="_blank" rel="noopener noreferrer" aria-label="X (antes Twitter) (se abre en una nueva pestaña)">
+					<span class="mbn-header-social__icon" aria-hidden="true" style="--mbn-header-social-icon: url('/uploads/2026/09/social-icon-twitter-x.svg');"></span>
+				</a>
+			</li>
+			</ul>
+</nav>
+	</div>
 </div>

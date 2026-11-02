@@ -1,3 +1,4 @@
+/* gestiona las interacciones de escalado proporcional en pantallas grandes */
 ( function () {
 	'use strict';
 
@@ -25,7 +26,7 @@
 		try {
 			sessionStorage.setItem( storageKey, JSON.stringify( { width: screenWidth, height: screenHeight, density: density } ) );
 		} catch ( error ) {
-			// guardar la referencia es opcional
+			// conserva la ampliación aunque no pueda persistirse la referencia de pantalla
 		}
 	}
 
