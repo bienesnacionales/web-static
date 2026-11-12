@@ -1,20 +1,22 @@
 /**
- * Aviso emergente de la portada («Juntos Chile se cuida»).
+ * Aviso emergente de la portada (`src/contenido/marco/aviso-portada.html`).
  *
  * Reproduce lo que hacía Popup Maker con este aviso, sin cargar el plugin ni
  * jQuery: se abre solo a los 500 ms, se cierra con su botón y, una vez cerrado,
  * no vuelve a salir durante una hora. La cookie es la misma del plugin
- * (`pum-55289`). El centrado lo resuelven sus propias hojas de estilo.
+ * (el `id` del aviso, p. ej. `pum-559080`), así que cambiar el aviso vuelve a
+ * mostrarlo. El centrado lo resuelven sus propias hojas de estilo.
  */
 ( function () {
 	'use strict';
 
-	var COOKIE = 'pum-55289';
-	var overlay = document.getElementById( 'pum-55289' );
+	var overlay = document.querySelector( '.pum-overlay[id^="pum-"]' );
 
 	if ( ! overlay ) {
 		return;
 	}
+
+	var COOKIE = overlay.id;
 
 	var yaCerrado = document.cookie.split( '; ' ).some( function ( par ) {
 		return par.indexOf( COOKIE + '=' ) === 0;
