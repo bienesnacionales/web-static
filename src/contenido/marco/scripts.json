@@ -10,11 +10,11 @@
     "responseTimeout": 38,
     "answerFeedback": true,
     "links": {
-      "faq": "/preguntas-frecuentes/",
+      "faq": "/contacto-preguntas-frecuentes/",
       "tramites": "/tramites/",
       "participacion": "/ciudadania/participacion-ciudadana/"
     },
-    "contactUrl": "/preguntas-frecuentes/#mbn-chat-contacto"
+    "contactUrl": "/contacto-preguntas-frecuentes/#mbn-chat-contacto"
   },
   "pdfViewer": {
     "base": "/tema/vendor/pdfjs/6.4.299/",
