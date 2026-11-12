@@ -9,6 +9,7 @@
  */
 import cabecera from '@/contenido/marco/cabecera.html?raw';
 import pie from '@/contenido/marco/pie.html?raw';
+import avisoPortada from '@/contenido/marco/aviso-portada.html?raw';
 // import extrasPortada from '@/contenido/marco/portada.html?raw';
 import estilos from '@/contenido/marco/head.html?raw';
 import config from '@/contenido/marco/scripts.json';
@@ -120,8 +121,7 @@ const componentesTras = [
 
     {/* Estilos del tema y el script que aplica contraste y tamaño de texto antes del primer pintado. */}
     <Fragment set:html={estilos} />
-    {/* Aviso emergente de la portada, oculto por ahora. */}
-    {/* {portada && <link rel="stylesheet" href="/uploads/pum/pum-site-styles.css" />} */}
+    {portada && <link rel="stylesheet" href="/uploads/pum/pum-site-styles.css" />}
     <script is:inline src="/tema/js/large-screen.js"></script>
   </head>
 
@@ -129,7 +129,8 @@ const componentesTras = [
     <Fragment set:html={cabecera} />
     <slot />
     <Fragment set:html={pie} />
-    {/* Aviso emergente y encuesta de satisfacción de la portada, ocultos por ahora. */}
+    {portada && <Fragment set:html={avisoPortada} />}
+    {/* Encuesta de satisfacción de la portada, oculta por ahora. */}
     {/* {portada && <Fragment set:html={extrasPortada} />} */}
 
     {/*
@@ -147,8 +148,8 @@ const componentesTras = [
     <script is:inline src="/tema/js/components/pdf-viewer.js"></script>
     {componentesTras.map((src) => <script is:inline src={src}></script>)}
 
-    {/* {portada && <script is:inline src="/tema/js/survey.js"></script>}
-    {portada && <script is:inline src="/js/aviso-portada.js"></script>} */}
+    {/* {portada && <script is:inline src="/tema/js/survey.js"></script>} */}
+    {portada && <script is:inline src="/js/aviso-portada.js"></script>}
     {instagram && <script is:inline async src="https://www.instagram.com/embed.js"></script>}
   </body>
 </html>

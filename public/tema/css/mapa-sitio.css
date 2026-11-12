@@ -1,0 +1,170 @@
+/*
+ * Mapa del sitio (template-mapa-sitio.php)
+ *
+ * Andamiaje de la plantilla y de los enlaces dentro de los paneles del
+ * acordeón. Las columnas las pone el grid de Bootstrap (row-cols-1 / md-2 /
+ * xl-3); aquí solo va lo que el grid no expresa.
+ *
+ * Todo cuelga de `.mbn-site-map` para subir a (0,2,0): `accordion.css` declara
+ * `.mbn-accordion__body ul`, `li + li` y `a` con (0,1,1)-(0,1,2), y ganarían.
+ */
+
+.mbn-site-map {
+	padding-block: var(--mbn-space-page-top, 24px) var(--mbn-space-section, 36px);
+	background: var(--mbn-surface-white, #FFFFFF);
+}
+
+.mbn-site-map__container {
+	display: flex;
+	flex-direction: column;
+	gap: var(--mbn-space-stack, 24px);
+}
+
+.mbn-site-map__title {
+	margin: 0;
+	font-family: var(--mbn-roboto-slab-large-font-family, "Roboto Slab", serif) !important;
+	font-weight: var(--mbn-roboto-slab-large-font-weight, 500) !important;
+	font-size: calc(28px * var(--mbn-text-scale, 1));
+	line-height: 1.5;
+	color: var(--mbn-text-primary, #333333);
+}
+
+.mbn-site-map__intro p,
+.mbn-site-map__empty {
+	margin: 0 0 16px;
+	font-family: var(--mbn-roboto-body-small-font-family, "Roboto", sans-serif);
+	font-size: var(--mbn-roboto-body-small-font-size, 16px);
+	line-height: 1.5;
+	color: var(--mbn-text-primary, #333333);
+}
+
+.mbn-site-map__intro > :last-child,
+.mbn-site-map__empty {
+	margin-bottom: 0;
+}
+
+.mbn-site-map__intro a {
+	color: var(--mbn-link-default, #1D70B8);
+	text-decoration: underline;
+}
+
+/* listas */
+
+.mbn-site-map .mbn-site-map__list,
+.mbn-site-map .mbn-site-map__sublist {
+	margin-block: 0;
+	padding: 0;
+	list-style: none;
+}
+
+/* `.mbn-accordion__body ul { margin: 0 0 16px }` le quita al `.row` su margen
+   negativo, y las columnas quedarían desalineadas con el resto del panel. */
+.mbn-site-map .mbn-site-map__list.row {
+	margin-inline: calc(var(--bs-gutter-x) * -0.5);
+}
+
+.mbn-site-map .mbn-site-map__list--stack {
+	margin-inline: 0;
+}
+
+.mbn-site-map .mbn-site-map__sublist {
+	margin-inline: 11px 0;
+	padding-inline-start: 12px;
+	border-inline-start: 1px solid var(--mbn-border-divider, #E6E6E6);
+}
+
+.mbn-site-map .mbn-site-map__item {
+	margin: 0;
+}
+
+/* enlaces: chevron + texto, objetivo de 36px de alto (WCAG 2.5.8) */
+
+.mbn-site-map .mbn-site-map__link {
+	display: inline-flex;
+	align-items: flex-start;
+	gap: 4px;
+	min-height: 36px;
+	padding-block: 6px;
+	font-family: var(--mbn-roboto-body-small-font-family, "Roboto", sans-serif);
+	font-size: var(--mbn-roboto-body-small-font-size, 16px);
+	font-weight: 400;
+	line-height: 1.5;
+	color: var(--mbn-link-default, #1D70B8);
+	text-decoration: none;
+}
+
+.mbn-site-map .mbn-site-map__link:hover,
+.mbn-site-map .mbn-site-map__link:focus-visible {
+	color: var(--mbn-brand-blue-dark, #00268D);
+}
+
+.mbn-site-map .mbn-site-map__link:hover .mbn-site-map__label,
+.mbn-site-map .mbn-site-map__link:focus-visible .mbn-site-map__label {
+	text-decoration: underline;
+}
+
+.mbn-site-map__label {
+	min-width: 0;
+	overflow-wrap: anywhere;
+}
+
+.mbn-site-map__icon {
+	flex: 0 0 24px;
+	width: 24px;
+	height: 24px;
+	background-color: currentColor;
+	-webkit-mask-image: url("../images/components/icon-keyboard-arrow-right.svg");
+	mask-image: url("../images/components/icon-keyboard-arrow-right.svg");
+	-webkit-mask-repeat: no-repeat;
+	mask-repeat: no-repeat;
+	-webkit-mask-size: 24px 24px;
+	mask-size: 24px 24px;
+}
+
+/* enlace a la página madre de la sección */
+
+.mbn-site-map .mbn-site-map__lead {
+	margin: 0 0 8px;
+	padding-bottom: 8px;
+	border-bottom: 1px solid var(--mbn-border-divider, #E6E6E6);
+}
+
+.mbn-site-map .mbn-site-map__link--lead {
+	font-weight: 700;
+}
+
+/* grupos (los tipos de trámite) */
+
+.mbn-site-map .mbn-site-map__group-title {
+	margin: 0 0 4px;
+	font-size: calc(19px * var(--mbn-text-scale, 1));
+	line-height: 1.4;
+	color: var(--mbn-text-primary, #333333);
+}
+
+.mbn-site-map .mbn-site-map__group-title a {
+	color: inherit;
+	text-decoration: none;
+}
+
+.mbn-site-map .mbn-site-map__group-title a:hover,
+.mbn-site-map .mbn-site-map__group-title a:focus-visible {
+	color: var(--mbn-brand-blue-dark, #00268D);
+	text-decoration: underline;
+}
+
+/* md ≥ 768px */
+
+@media (min-width: 768px) {
+	.mbn-site-map__title {
+		font-size: calc(32px * var(--mbn-text-scale, 1));
+	}
+}
+
+/* xl ≥ 1200px */
+
+@media (min-width: 1200px) {
+	.mbn-site-map__title {
+		font-size: var(--mbn-roboto-slab-large-font-size, 36px);
+	}
+}
